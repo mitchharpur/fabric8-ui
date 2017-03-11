@@ -142,6 +142,10 @@ body
 
 }
 
+.flex-align-content-stretch
+{
+  align-content: stretch;
+}
 
 .app{
   @extend .flex-grow-1;

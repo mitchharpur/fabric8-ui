@@ -3,12 +3,11 @@
     <header>
       <h3>Create a new collaboration space</h3>
     </header>
-    <section class="margin-top-15">
-      <div class="container-fluid">
+    <section class="flex-container in-column-direction flex-grow-1 flex-align-content-stretch margin-top-15 container-fluid">
         <div class="row">
-          <div class="col-xs-12">
+          <div  class="col-xs-12">
             <div class="form-horizontal">
-              <div class="form-group has-clear">
+              <div class="form-group">
                 <label class="control-label col-xs-4">Space Name</label>
                 <div class="col-xs-8">
                   <input id="spaceName" name="spaceName" type="text" class="form-control" placeholder="Enter a unique name for your space"
@@ -33,7 +32,6 @@
                   </div>
                 </div>
               </div>
-            </div>
           </div>
         </div>
       </div>
@@ -82,8 +80,8 @@
     <header>
       <h3>Define a QuickStart to add to the <strong>{{configurator.space.name}}></strong> space. </h3>
     </header>
-    <section class="margin-top-15">
-      <div class="container-fluid">
+    <section class="flex-container in-column-direction flex-grow-1  flex-align-content-stretch margin-top-15 container-fluid">
+      <!--<div class="container-fluid">-->
         <div class="row">
           <div class="col-xs-12">
             <form class="form-horizontal">
@@ -119,7 +117,7 @@
             </form>
           </div>
         </div>
-      </div>
+      <!--</div>-->
     </section>
     <footer>
       <a class="btn btn-default margin-right-5" (click)="cancel()">Cancel</a>
