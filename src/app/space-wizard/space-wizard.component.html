@@ -1,5 +1,5 @@
 <div class="wizard">
-  <form class="wizard-step" [class.active]="wizard.activeStep==0" role="form" #spaceForm="ngForm" (ngSubmit)="wizard.step(wizardSteps.forge.index)">
+  <form class="wizard-step" [class.active]="wizard.isStepActive({name:'space'})" role="form" #spaceForm="ngForm" (ngSubmit)="wizard.gotoNextStep()">
     <header>
       <h3>Create a new collaboration space</h3>
     </header>
@@ -43,7 +43,7 @@
       <button class="btn btn-default" type="submit" [disabled]="!spaceForm.form.valid">Next</button>
     </footer>
   </form>
-  <div class="wizard-step" [class.active]="wizard.activeStep===wizardSteps.forge.index">
+  <div class="wizard-step" [class.active]="wizard.isStepActive({name:'forge'})">
     <header>
       <h3>Your <strong>{{configurator.space.name}}</strong> Space is ready! How would you like to get started ?</h3>
     </header>
@@ -67,18 +67,18 @@
         <header>I'd like to use a wizard or QuickStart.</header>
         <section><span>(more content and graphics)</span></section>
         <footer>
-          <a class="btn btn-default" (click)="wizard.step(wizardSteps.stack.index)">Wizard</a>
-          <a class="margin-top-5 btn btn-default" (click)="wizard.step(wizardSteps.quickStart.index)">QuickStart</a>
+          <a class="btn btn-default" (click)="wizard.gotoNextStep({name:'stack'})">Wizard</a>
+          <a class="margin-top-5 btn btn-default" (click)="wizard.gotoNextStep({name:'quickStart'})">QuickStart</a>
         </footer>
       </div>
     </section>
     <footer>
       <a class="btn btn-default margin-right-5" (click)="cancel()">Cancel</a>
-      <a class="btn btn-default margin-right-5" (click)="wizard.step(wizardSteps.space.index)">Back</a>
+      <a class="btn btn-default margin-right-5" (click)="wizard.gotoPreviousStep()">Back</a>
       <a class="btn btn-default" (click)="finish()">Finish</a>
     </footer>
   </div>
-  <div class="wizard-step" [class.active]="wizard.activeStep===wizardSteps.quickStart.index">
+  <div class="wizard-step" [class.active]="wizard.isStepActive({name:'quickStart'})">
     <header>
       <h3>Define a QuickStart to add to the <strong>{{configurator.space.name}}></strong> space. </h3>
     </header>
@@ -123,11 +123,11 @@
     </section>
     <footer>
       <a class="btn btn-default margin-right-5" (click)="cancel()">Cancel</a>
-      <a class="btn btn-default margin-right-5" (click)="wizard.step(wizardSteps.forge.index)">Back</a>
+      <a class="btn btn-default margin-right-5" (click)="wizard.gotoPreviousStep()">Back</a>
       <a class="btn btn-default" (click)="finish()">Finish</a>
     </footer>
   </div>
-  <div class="wizard-step" [class.active]="wizard.activeStep===wizardSteps.stack.index">
+  <div class="wizard-step" [class.active]="wizard.isStepActive({name:'stack'})">
     <header>
       <h3>Select a project type to add to the <strong>{{configurator.space.name}}</strong> space.</h3>
     </header>
@@ -148,12 +148,12 @@
     </div>
     <footer>
       <a class="btn btn-default margin-right-5" (click)="cancel()">Cancel</a>
-      <a class="btn btn-default margin-right-5" (click)="wizard.step(wizardSteps.forge.index)">Back</a>
-      <a class="btn btn-default margin-right-5 " (click)="wizard.step(wizardSteps.pipeline.index)">Select Pipeline</a>
+      <a class="btn btn-default margin-right-5" (click)="wizard.gotoPreviousStep()">Back</a>
+      <a class="btn btn-default margin-right-5 " (click)="wizard.gotoNextStep('pipeline')">Select Pipeline</a>
       <a class="btn btn-default" (click)="finish()">Finish</a>
     </footer>
   </div>
-  <div class="wizard-step" [class.active]="wizard.activeStep===wizardSteps.pipeline.index">
+  <div class="wizard-step" [class.active]="wizard.isStepActive({name:'pipeline'})">
     <header>
       <h3>Select a pipeline type to add to the <strong>{{configurator.space.name}}</strong> space.</h3>
     </header>
@@ -181,7 +181,7 @@
     </div>
     <footer>
       <a class="btn btn-default margin-right-5" (click)="cancel()">Cancel</a>
-      <a class="btn btn-default margin-right-5" (click)="wizard.step(wizardSteps.forge.index)">Back</a>
+      <a class="btn btn-default margin-right-5" (click)="wizard.gotoPreviousStep()">Back</a>
       <a class="btn btn-default" (click)="finish()">Finish</a>
     </footer>
   </div>
