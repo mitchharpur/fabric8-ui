@@ -9,7 +9,9 @@ import { Broadcaster, User } from 'ngx-login-client';
 import { DummyService } from '../shared/dummy.service';
 
 import { IModalHost } from './domain/modal-host';
-import { IWizardStep, Wizard, IWizard } from './domain/wizard';
+import { IWizardStep, IWizard } from './domain/wizard';
+import { Wizard } from './domain/wizard-implementation';
+
 import { SpaceConfigurator } from './domain/codebase';
 
 @Component({
@@ -40,11 +42,11 @@ export class SpaceWizardComponent implements OnInit {
     private spaceService: SpaceService,
     private _contextService: ContextService) {
     SpaceWizardComponent.instanceCount++;
-    console.log(`space-wizard.component:creating instance ${SpaceWizardComponent.instanceCount}`);
+    console.log(`space-wizard: ${SpaceWizardComponent.instanceCount} : creating instance`);
   }
 
   ngOnInit() {
-    console.log("space-wizard:ngOnInit")
+    console.log(`space-wizard: ${SpaceWizardComponent.instanceCount} : ngOnInit`)
     this.configureHost();
     this.wizard = this.createWizard();
     this.configurator=this.createSpaceConfigurator();
@@ -59,14 +61,14 @@ export class SpaceWizardComponent implements OnInit {
     // apply reset every time the host dialog is opened
     let openHandler = this.host.open;
     this.host.open = function (...args) {
-      console.log('opening wizard dialog and apply reset ...');
+      console.log(`space-wizard: ${SpaceWizardComponent.instanceCount} : Opening wizard modal dialog ...`);
       me.reset();
-      openHandler.apply(this, args);
+      return openHandler.apply(this, args);
     }
     let closeHandler = this.host.close;
     this.host.close = function (...args) {
-      console.log('closing wizard dialog ...');
-      closeHandler.apply(this, args);
+      console.log(`space-wizard: ${SpaceWizardComponent.instanceCount} : Closing wizard modal dialog ...`);
+       return closeHandler.apply(this, args);
     }
   }
   /** creates and initializes a default space */
@@ -116,7 +118,7 @@ export class SpaceWizardComponent implements OnInit {
     return wizard;
   }
   reset() {
-    console.info("space-wizard:reset");
+    console.info(`space-wizard: ${SpaceWizardComponent.instanceCount} : reset`);
     this.configurator=this.createSpaceConfigurator();
     this.wizard=this.createWizard()
     this.wizard=this.initWizard()
@@ -160,8 +162,7 @@ export class SpaceWizardComponent implements OnInit {
 
   cancel() {
     if (this.host) {
-      (this.host as IModalHost).close();
-      //this.reset();
+      this.host.close();
     }
   }
 

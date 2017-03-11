@@ -1,5 +1,5 @@
 <div class="wizard">
-  <form class="wizard-step" [class.active]="wizard.isStepActive({name:'space'})" role="form" #spaceForm="ngForm" (ngSubmit)="wizard.gotoNextStep()">
+  <form class="wizard-step" [class.active]="wizard.isStepActive({name:'space'})" role="form" #spaceForm="ngForm" (ngSubmit)="wizard.gotoNextStep()"  >
     <header>
       <h3>Create a new collaboration space</h3>
     </header>
@@ -39,8 +39,8 @@
       </div>
     </section>
     <footer>
-      <button class="btn btn-default margin-right-5" (click)="cancel()">Cancel</button>
-      <button class="btn btn-default" type="submit" [disabled]="!spaceForm.form.valid">Next</button>
+      <button class="btn btn-default margin-right-5" type="button" (click)="cancel()">Cancel</button>
+      <button class="btn btn-default" [disabled]="!spaceForm.form.valid" type="submit" >Next</button>
     </footer>
   </form>
   <div class="wizard-step" [class.active]="wizard.isStepActive({name:'forge'})">
