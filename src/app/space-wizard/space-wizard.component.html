@@ -37,9 +37,9 @@
       </div>
     </section>
     <footer>
+      <a class="btn btn-default margin-right-5" (click)="wizard.gotoNextStep('dynamic-step')"> Next Dynamic</a>
       <button class="btn btn-default margin-right-5" type="button" (click)="wizard.cancel()">Cancel</button>
       <button class="btn btn-default" [disabled]="!spaceForm.form.valid" type="submit" >Next</button>
-      <a class="btn btn-default margin-right-5" (click)="wizard.gotoNextStep('dynamic-step')"> Next Dynamic</a>
 
     </footer>
   </form>
