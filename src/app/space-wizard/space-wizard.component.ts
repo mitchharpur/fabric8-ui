@@ -28,12 +28,24 @@ export class SpaceWizardComponent implements OnInit {
 
   static instanceCount: number = 0;
 
-  configurator: SpaceConfigurator;
-  private _context: Context;
-  wizard: IWizard;
-
   @Input() host: IModalHost;
 
+  configurator: SpaceConfigurator;
+  private _context: Context;
+  private _wizard:IWizard=null;
+
+  get wizard(): IWizard{
+    if(!this._wizard)
+    {
+      this._wizard=Wizard.Create()
+    }
+    return this._wizard;
+  };
+
+  set wizard(value:IWizard)
+  {
+    this._wizard=value;
+  }
 
   constructor(
     private router: Router,
@@ -47,28 +59,31 @@ export class SpaceWizardComponent implements OnInit {
 
   ngOnInit() {
     console.log(`space-wizard: ${SpaceWizardComponent.instanceCount} : ngOnInit`)
-    this.configureHost();
-    this.wizard = this.createWizard();
+    this.configureComponentHost();
     this.configurator=this.createSpaceConfigurator();
     this._contextService.current.subscribe(val => this._context = val);
   }
 
-  /** configure host dialog settings */
-  configureHost() {
+  /** configure component host dialog settings */
+  configureComponentHost() {
+
     this.host.closeOnEscape = true;
     this.host.closeOnOutsideClick = false;
+
     let me = this;
-    // apply reset every time the host dialog is opened
-    let openHandler = this.host.open;
+    // Intercept when the host dialog is opened or closed to perform initialization and settings adjustments
+    let originalOpenHandler = this.host.open;
     this.host.open = function (...args) {
-      console.log(`space-wizard: ${SpaceWizardComponent.instanceCount} : Opening wizard modal dialog ...`);
+      console.log(`space-wizard: instance ${SpaceWizardComponent.instanceCount} : Opening wizard modal dialog ...`);
       me.reset();
-      return openHandler.apply(this, args);
+      //note: this is not me ... that is why not using a =>
+      return originalOpenHandler.apply(this, args);
     }
-    let closeHandler = this.host.close;
+    let originalCloseHandler = this.host.close;
     this.host.close = function (...args) {
-      console.log(`space-wizard: ${SpaceWizardComponent.instanceCount} : Closing wizard modal dialog ...`);
-       return closeHandler.apply(this, args);
+      console.log(`space-wizard: instance ${SpaceWizardComponent.instanceCount} : Closing wizard modal dialog ...`);
+      //note: this is not me ... that is why not using a =>
+      return originalCloseHandler.apply(this, args);
     }
   }
   /** creates and initializes a default space */
@@ -90,15 +105,13 @@ export class SpaceWizardComponent implements OnInit {
     return configurator;
   }
   /** create and initializes the wizard */
-  createWizard():IWizard
-  {
-    return new Wizard();
-  }
-  initWizard(wizard?:IWizard): IWizard {
+  initializeWizard(wizard?:IWizard): IWizard {
     if(!wizard)
     {
-      wizard=this.createWizard()
+      wizard= Wizard.Create()
     }
+    let component=this;
+    // Initialize the wizard steps and optionally the first step
     wizard.initialize({
       steps: () => {
         return [
@@ -106,25 +119,34 @@ export class SpaceWizardComponent implements OnInit {
           { name: "forge", index: 1, nextIndex: 2 },
           { name: "quickStart", index: 2, nextIndex: 3 },
           { name: "stack", index: 3, nextIndex: 4 },
-          { name: "pipeline", index: 4, nextIndex: 4 }
+          { name: "pipeline", index: 4, nextIndex: 4 },
+          { name: "dynamic-step", index: 5, nextIndex: 5 }
         ];
       },
       firstStep: () => {
         return {
           index: 0
         };
-      }
+      },
+      cancel:(...args)=>{
+         // ensure cancel has correct 'this'
+         component.cancel.apply(component,args);
+      },
+      finish:(...args)=>{
+         // ensure finish has correct 'this'
+        component.finish.apply(component,args);
+      },
     });
     return wizard;
   }
   reset() {
     console.info(`space-wizard: ${SpaceWizardComponent.instanceCount} : reset`);
     this.configurator=this.createSpaceConfigurator();
-    this.wizard=this.createWizard()
-    this.wizard=this.initWizard()
+    this.wizard=this.initializeWizard()
   }
 
   finish() {
+    console.info(`space-wizard: ${SpaceWizardComponent.instanceCount} : finish`);
     console.log('finish!', this._context);
     let space = this.configurator.space;
     space.attributes.name = space.name;
@@ -161,8 +183,9 @@ export class SpaceWizardComponent implements OnInit {
   }
 
   cancel() {
+    console.info(`space-wizard: ${SpaceWizardComponent.instanceCount} : cancel`);
     if (this.host) {
-      this.host.close();
+        this.host.close();
     }
   }
 

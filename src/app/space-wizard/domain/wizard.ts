@@ -11,6 +11,15 @@ export interface IWizardStepQuery{
 export interface IWizardLocator {
   (): IWizard
 }
+/** Defines the signature of the delegate that will do a deferred retrieval of the wizard */
+export interface IWizardStepLocator {
+  (): IWizardStep
+}
+
+export interface ICallback
+{
+  (options?:any):any;
+}
 
 /** Defines the shape of the options used o initialize a wizard  */
 export interface IWizardOptions {
@@ -18,6 +27,8 @@ export interface IWizardOptions {
   steps(): Array<Partial<IWizardStep>>;
   /** The delegate that returns a wizard step query */
   firstStep?:IWizardStepQuery;
+  cancel?:ICallback;
+  finish?:ICallback;
 }
 /** Defines the IWizard contract */
 export interface IWizard {
@@ -41,6 +52,12 @@ export interface IWizard {
   findStep(step: number | string | Partial<IWizardStep>): IWizardStep;
   /** retrieves the first step */
   firstStep():IWizardStep;
+  /** wizard cancel handler */
+  cancel(options:any):any;
+  /** wizard finish handler */
+  finish(options:any):any;
+  /** wizard reset handler */
+  reset(options:any):any;
 }
 /** Defines the IWizardStep contract */
 export interface IWizardStep {

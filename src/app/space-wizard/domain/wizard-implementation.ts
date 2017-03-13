@@ -3,6 +3,8 @@ import { IWizardStep, IWizard, IWizardLocator, IWizardOptions } from './wizard'
 /** implementation of the wizardstep */
 export class WizardStep implements IWizardStep {
 
+
+
   index: number = 0;
   name: string = "";
   nextIndex: number;
@@ -55,6 +57,10 @@ export class WizardStep implements IWizardStep {
 /** Implementation of the wizard contract */
 export class Wizard implements IWizard {
 
+  static Create():IWizard{
+    return new Wizard();
+  }
+
   private _steps: Array<IWizardStep> = [];
 
   private _activeStep: IWizardStep
@@ -68,6 +74,19 @@ export class Wizard implements IWizard {
 
   set steps(value: Array<IWizardStep>) {
     this.initialize({ steps: () => value });
+  }
+
+  /** default cancel handler */
+  cancel(options:any):any{
+      return null;
+  }
+  /** default finish handler */
+  finish(options:any):any{
+      return null;
+  }
+  /** default reset handler */
+  reset(options:any):any{
+      return null;
   }
 
   firstStep(): IWizardStep {
@@ -88,7 +107,8 @@ export class Wizard implements IWizard {
     console.log("wizard: Initializing wizard ...")
     let wizard = this;
     this._steps = [];
-    let items = options.steps() || [];
+    //ensure callback have correct 'this'
+    let items = options.steps.apply(wizard) || [];
     // first sort by index
     items = items.sort((i) => { return i.index; });
     // retrieve the default first item, i.e the one with the lowest index.
@@ -120,6 +140,27 @@ export class Wizard implements IWizard {
     }
     //now set active step to firstStep
     this.activeStep = this.firstStep();
+    if(options.cancel)
+    {
+      this.cancel=(...args)=>{
+          var timer=setTimeout(()=>{
+          clearTimeout(timer);
+          console.log("wizard: invoking cancel ... ");
+          options.cancel.apply(wizard,args);
+        },10);
+      }
+      return true;
+    }
+    if(options.finish)
+    {
+      this.finish=(...args)=>{
+          var timer=setTimeout(()=>{
+          clearTimeout(timer);
+          console.log("wizard: invoking finish ... ");
+          options.finish.apply(wizard,args);
+        },10)
+      }
+    }
   }
 
   isStepActive(step: number | string | Partial<IWizardStep>) {

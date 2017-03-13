@@ -37,8 +37,10 @@
       </div>
     </section>
     <footer>
-      <button class="btn btn-default margin-right-5" type="button" (click)="cancel()">Cancel</button>
+      <button class="btn btn-default margin-right-5" type="button" (click)="wizard.cancel()">Cancel</button>
       <button class="btn btn-default" [disabled]="!spaceForm.form.valid" type="submit" >Next</button>
+      <a class="btn btn-default margin-right-5" (click)="wizard.gotoNextStep('dynamic-step')"> Next Dynamic</a>
+
     </footer>
   </form>
   <div class="wizard-step" [class.active]="wizard.isStepActive({name:'forge'})">
@@ -71,9 +73,9 @@
       </div>
     </section>
     <footer>
-      <a class="btn btn-default margin-right-5" (click)="cancel()">Cancel</a>
+      <a class="btn btn-default margin-right-5" (click)="wizard.cancel()">Cancel</a>
       <a class="btn btn-default margin-right-5" (click)="wizard.gotoPreviousStep()">Back</a>
-      <a class="btn btn-default" (click)="finish()">Finish</a>
+      <a class="btn btn-default" (click)="wizard.finish()">Finish</a>
     </footer>
   </div>
   <div class="wizard-step" [class.active]="wizard.isStepActive({name:'quickStart'})">
@@ -120,9 +122,9 @@
       <!--</div>-->
     </section>
     <footer>
-      <a class="btn btn-default margin-right-5" (click)="cancel()">Cancel</a>
+      <a class="btn btn-default margin-right-5" (click)="wizard.cancel()">Cancel</a>
       <a class="btn btn-default margin-right-5" (click)="wizard.gotoPreviousStep()">Back</a>
-      <a class="btn btn-default" (click)="finish()">Finish</a>
+      <a class="btn btn-default" (click)="wizard.finish()">Finish</a>
     </footer>
   </div>
   <div class="wizard-step" [class.active]="wizard.isStepActive({name:'stack'})">
@@ -145,10 +147,10 @@
       </div>
     </div>
     <footer>
-      <a class="btn btn-default margin-right-5" (click)="cancel()">Cancel</a>
+      <a class="btn btn-default margin-right-5" (click)="wizard.cancel()">Cancel</a>
       <a class="btn btn-default margin-right-5" (click)="wizard.gotoPreviousStep()">Back</a>
       <a class="btn btn-default margin-right-5 " (click)="wizard.gotoNextStep('pipeline')">Select Pipeline</a>
-      <a class="btn btn-default" (click)="finish()">Finish</a>
+      <a class="btn btn-default" (click)="wizard.finish()">Finish</a>
     </footer>
   </div>
   <div class="wizard-step" [class.active]="wizard.isStepActive({name:'pipeline'})">
@@ -178,9 +180,12 @@
       </div>
     </div>
     <footer>
-      <a class="btn btn-default margin-right-5" (click)="cancel()">Cancel</a>
+      <a class="btn btn-default margin-right-5" (click)="wizard.cancel()">Cancel</a>
       <a class="btn btn-default margin-right-5" (click)="wizard.gotoPreviousStep()">Back</a>
       <a class="btn btn-default" (click)="finish()">Finish</a>
     </footer>
   </div>
+  <wizard-dynamic-step class="wizard-step" [class.active]="wizard.isStepActive({name:'dynamic-step'})" [wizard]="wizard"  >
+  </wizard-dynamic-step>
+
 </div>
