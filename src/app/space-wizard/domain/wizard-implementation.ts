@@ -231,8 +231,11 @@ export class Wizard implements IWizard {
 
     let destinationStep = this.findStep(destination);
     if (destinationStep) {
-      let activeStep = this.activeStep;
-      this.activeStep = destinationStep;
+      if(this.isStepTransitionEnabled({from:this.activeStep,to:destinationStep}))
+      {
+        let activeStep = this.activeStep;
+        this.activeStep = destinationStep;
+      }
     }
     return destinationStep;
   }
@@ -266,10 +269,8 @@ export class Wizard implements IWizard {
       }
       console.warn(`wizard: gotoNextStep ... no next step  for step=${currentStep} ...`);
     }
-    // setup the previous step handler
+    // setup the previous step handler and transition to nextstep if the step is valid
     if (nextStep) {
-      if(this.isStepTransitionEnabled({from:this.activeStep,to:nextStep}))
-      {
         let priorHandler = nextStep.gotoPreviousStep;
         // by dynamically adding the gotoNextStep function using a closure to retriev previous step
         nextStep.gotoPreviousStep = () => {
@@ -279,7 +280,6 @@ export class Wizard implements IWizard {
           return step;
         }
         this.gotoStep(nextStep.index)
-      }
     }
     return nextStep;
   }
