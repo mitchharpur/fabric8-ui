@@ -66,7 +66,7 @@ export interface IWizard {
   /** wizard reset handler */
   reset(options:any):any;
   /** a way to subscribe to step transitions and prevent them from occuring or to redirect the next step */
-  Transitions:Observable<IStepTransition>
+  transitions:Observable<IWizardStepTransition>;
 }
 /** Defines the IWizardStep contract */
 export interface IWizardStep {

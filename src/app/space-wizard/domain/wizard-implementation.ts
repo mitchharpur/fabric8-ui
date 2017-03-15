@@ -1,4 +1,4 @@
-import { Observable,  Subscriber,Subject } from 'rxjs/Rx';
+import { Observable, Observer, Subscriber,Subject } from 'rxjs/Rx';
 
 import { IWizardStep, IWizardStepTransition, IWizard, IWizardLocator, IWizardOptions } from './wizard'
 
@@ -297,7 +297,9 @@ export class Wizard implements IWizard {
 
   private isStepTransitionEnabled(options:Partial<IWizardStepTransition>={enabled:true}):boolean{
      let transition=new WizardStepTransition(options);
+     console.log(`wizard: isStepTransitionEnabled: notifying subscribers.`);
      this.subject.next(transition);
+     //prevent transitions to same step
      if(transition.from===transition.to)
      {
         transition.enabled=false;
@@ -306,12 +308,16 @@ export class Wizard implements IWizard {
      return transition.enabled;
   }
 
+
+
   private subject:Subject<IWizardStepTransition>=new Subject<IWizardStepTransition>();
   //every subscriber gets an observable
-  get Transitions():Observable<IWizardStepTransition>{
+  get transitions():Observable<IWizardStepTransition>{
       let me=this;
-      let transitions:Observable<IWizardStepTransition>=Observable.create(observer=>{
-          me.subject.subscribe(observer);
+      let transitions:Observable<IWizardStepTransition>=Observable.create((observer:Observer<IWizardStepTransition>)=>{
+          console.log("wizard : adding observer to subscription...");
+          me.subject.subscribe(observer)
+
       });
       return transitions;
   }
