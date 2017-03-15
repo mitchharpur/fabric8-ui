@@ -1,4 +1,17 @@
-import { IWizardStep, IWizard, IWizardLocator, IWizardOptions } from './wizard'
+import { Observable,  Subscriber,Subject } from 'rxjs/Rx';
+
+import { IWizardStep, IWizardStepTransition, IWizard, IWizardLocator, IWizardOptions } from './wizard'
+
+
+/** allows intercepting of wizard step transitions  */
+class WizardStepTransition implements IWizardStepTransition {
+  constructor(options:Partial<IWizardStepTransition>={from:null,to:null,enabled:true}){
+    Object.assign(this,options);
+  }
+  from?:IWizardStep;
+  to?:IWizardStep;
+  enabled:boolean=true;
+}
 
 /** implementation of the wizardstep */
 export class WizardStep implements IWizardStep {
@@ -255,15 +268,18 @@ export class Wizard implements IWizard {
     }
     // setup the previous step handler
     if (nextStep) {
-      let priorHandler = nextStep.gotoPreviousStep;
-      // by dynamically adding the gotoNextStep function using a closure to retriev previous step
-      nextStep.gotoPreviousStep = () => {
-        let step = this.gotoStep(activeStep);
-        // restore prior handler
-        nextStep.gotoPreviousStep = priorHandler;
-        return step;
+      if(this.isStepTransitionEnabled({from:this.activeStep,to:nextStep}))
+      {
+        let priorHandler = nextStep.gotoPreviousStep;
+        // by dynamically adding the gotoNextStep function using a closure to retriev previous step
+        nextStep.gotoPreviousStep = () => {
+          let step = this.gotoStep(activeStep);
+          // restore prior handler
+          nextStep.gotoPreviousStep = priorHandler;
+          return step;
+        }
+        this.gotoStep(nextStep.index)
       }
-      this.gotoStep(nextStep.index)
     }
     return nextStep;
   }
@@ -277,6 +293,27 @@ export class Wizard implements IWizard {
       previousStep = currentActiveStep.gotoPreviousStep()
     }
     return previousStep;
+  }
+
+  private isStepTransitionEnabled(options:Partial<IWizardStepTransition>={enabled:true}):boolean{
+     let transition=new WizardStepTransition(options);
+     this.subject.next(transition);
+     if(transition.from===transition.to)
+     {
+        transition.enabled=false;
+     }
+     console.log(`IsStepTransition enabled=${transition.enabled}`);
+     return transition.enabled;
+  }
+
+  private subject:Subject<IWizardStepTransition>=new Subject<IWizardStepTransition>();
+  //every subscriber gets an observable
+  get Transitions():Observable<IWizardStepTransition>{
+      let me=this;
+      let transitions:Observable<IWizardStepTransition>=Observable.create(observer=>{
+          me.subject.subscribe(observer);
+      });
+      return transitions;
   }
 };
 

@@ -1,4 +1,4 @@
-
+import { Observable,  Subscriber } from 'rxjs/Rx';
 
 /** Defines the signature of the delegate that will do a deferred retrieval a wizard step query
  * the return type of the delegate is a partial wizardstep OR string (name) OR number (index)
@@ -19,6 +19,13 @@ export interface IWizardStepLocator {
 export interface ICallback
 {
   (options?:any):any;
+}
+
+export interface IWizardStepTransition
+{
+  readonly from?:IWizardStep;
+  to?:IWizardStep;
+  enabled:boolean;
 }
 
 /** Defines the shape of the options used o initialize a wizard  */
@@ -58,6 +65,8 @@ export interface IWizard {
   finish(options:any):any;
   /** wizard reset handler */
   reset(options:any):any;
+  /** a way to subscribe to step transitions and prevent them from occuring or to redirect the next step */
+  Transitions:Observable<IStepTransition>
 }
 /** Defines the IWizardStep contract */
 export interface IWizardStep {
