@@ -37,7 +37,7 @@ export interface IWizardStepTransition
 {
   readonly from?:IWizardStep;
   to?:IWizardStep;
-  enabled:boolean;
+  cancel:boolean;
   context:IWizardStepTransitionContext
 }
 

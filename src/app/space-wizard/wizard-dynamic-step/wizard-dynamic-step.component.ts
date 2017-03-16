@@ -99,6 +99,11 @@ export class WizardDynamicStepComponent implements OnInit, OnDestroy, OnChanges 
               }
           }
         }
+        if(transition.from.name==this.stepName && transition.context.direction==StepDirection.NEXT)
+        {
+          transition.cancel=true;
+
+        }
       }
       catch (err) {
         this.log({ message: err.message, error: true, inner: err });

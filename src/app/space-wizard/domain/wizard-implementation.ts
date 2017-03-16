@@ -1,21 +1,21 @@
-import { Observable, Observer, Subscriber,Subject } from 'rxjs/Rx';
+import { Observable, Observer, Subscriber, Subject } from 'rxjs/Rx';
 
-import { IWizardStep, IWizardStepTransition, IWizardStepTransitionContext, IWizard, IWizardLocator, IWizardOptions,WizardStepDirection,StepDirection} from './wizard'
+import { IWizardStep, IWizardStepTransition, IWizardStepTransitionContext, IWizard, IWizardLocator, IWizardOptions, WizardStepDirection, StepDirection } from './wizard'
 
 import { getLogger, ILog } from './logger';
 
 
 /** allows intercepting of wizard step transitions  */
 class WizardStepTransition implements IWizardStepTransition {
-  constructor(options:Partial<IWizardStepTransition>={from:null,to:null,enabled:true,context:{direction:StepDirection.GO}}){
-    this.context={direction:StepDirection.GO}
-    this.enabled=true;
-    Object.assign(this,options);
+  constructor(options: Partial<IWizardStepTransition> = { from: null, to: null, cancel: false, context: { direction: StepDirection.GO } }) {
+    this.context = { direction: StepDirection.GO }
+    this.cancel = false;
+    Object.assign(this, options);
   }
-  from?:IWizardStep;
-  to?:IWizardStep;
-  context:IWizardStepTransitionContext
-  enabled:boolean=true;
+  from?: IWizardStep;
+  to?: IWizardStep;
+  context: IWizardStepTransitionContext
+  cancel: boolean = false;
 }
 
 /** implementation of the wizardstep */
@@ -47,11 +47,11 @@ export class WizardStep implements IWizardStep {
     return this;
   }
 
-  gotoStep(destination: number | string | IWizardStep,context:IWizardStepTransitionContext={direction:StepDirection.GO}) {
+  gotoStep(destination: number | string | IWizardStep, context: IWizardStepTransitionContext = { direction: StepDirection.GO }) {
     let step: IWizardStep = null;
     if (this.isActive) {
       //you can only goto a step if 'this' is the active step
-      step = this.wizardLocator().gotoStep(destination,context);
+      step = this.wizardLocator().gotoStep(destination, context);
     }
     return step;
   }
@@ -65,8 +65,7 @@ export class WizardStep implements IWizardStep {
     return this.wizardLocator();
   }
 
-  set wizard(value:IWizard)
-  {
+  set wizard(value: IWizard) {
   }
 
 }
@@ -75,22 +74,22 @@ export class WizardStep implements IWizardStep {
 export class Wizard implements IWizard {
 
   static instanceCount: number = 0;
-  _instance:number=0;
+  _instance: number = 0;
 
-  private log:ILog=()=>{};
+  private log: ILog = () => { };
   private _steps: Array<IWizardStep> = [];
-  private _stepTransitionsSubject:Subject<IWizardStepTransition>;
+  private _stepTransitionsSubject: Subject<IWizardStepTransition>;
   private _activeStep: IWizardStep
 
-  static Create():IWizard{
+  static Create(): IWizard {
     return new Wizard();
   }
 
 
   constructor() {
     Wizard.instanceCount++;
-    this._instance=Wizard.instanceCount;
-    this.log=getLogger(this.constructor.name,this._instance);
+    this._instance = Wizard.instanceCount;
+    this.log = getLogger(this.constructor.name, this._instance);
   }
 
   get steps(): Array<IWizardStep> {
@@ -102,16 +101,16 @@ export class Wizard implements IWizard {
   }
 
   /** default cancel handler */
-  cancel(options:any):any{
-      return null;
+  cancel(options: any): any {
+    return null;
   }
   /** default finish handler */
-  finish(options:any):any{
-      return null;
+  finish(options: any): any {
+    return null;
   }
   /** default reset handler */
-  reset(options:any):any{
-      return null;
+  reset(options: any): any {
+    return null;
   }
 
   firstStep(): IWizardStep {
@@ -165,25 +164,23 @@ export class Wizard implements IWizard {
     }
     // now set active step to firstStep
     this.activeStep = this.firstStep();
-    if(options.cancel)
-    {
-      this.cancel=(...args)=>{
-          var timer=setTimeout(()=>{
+    if (options.cancel) {
+      this.cancel = (...args) => {
+        var timer = setTimeout(() => {
           clearTimeout(timer);
           this.log("Invoking cancel ... ");
-          options.cancel.apply(wizard,args);
-        },10);
+          options.cancel.apply(wizard, args);
+        }, 10);
       }
       return true;
     }
-    if(options.finish)
-    {
-      this.finish=(...args)=>{
-          var timer=setTimeout(()=>{
+    if (options.finish) {
+      this.finish = (...args) => {
+        var timer = setTimeout(() => {
           clearTimeout(timer);
           this.log("Invoking finish ... ");
-          options.finish.apply(wizard,args);
-        },10)
+          options.finish.apply(wizard, args);
+        }, 10)
       }
     }
   }
@@ -239,12 +236,11 @@ export class Wizard implements IWizard {
     return step;
   }
 
-  gotoStep(destination: number | string | Partial<IWizardStep>,context:IWizardStepTransitionContext={direction:StepDirection.GO}) {
+  gotoStep(destination: number | string | Partial<IWizardStep>, context: IWizardStepTransitionContext = { direction: StepDirection.GO }) {
 
     let destinationStep = this.findStep(destination);
     if (destinationStep) {
-      if(this.isStepTransitionEnabled({from:this.activeStep,to:destinationStep,context:context}))
-      {
+      if (this.isStepTransitionCancelled({ from: this.activeStep, to: destinationStep, context: context }) === false) {
         let activeStep = this.activeStep;
         this.activeStep = destinationStep;
       }
@@ -283,15 +279,15 @@ export class Wizard implements IWizard {
     }
     // setup the previous step handler and transition to nextstep if the step is valid
     if (nextStep) {
-        let priorHandler = nextStep.gotoPreviousStep;
-        // by dynamically adding the gotoNextStep function using a closure to retrieve previous step
-        nextStep.gotoPreviousStep = () => {
-          let step = this.gotoStep(activeStep,{direction:StepDirection.PREVIOUS});
-          // restore prior handler
-          nextStep.gotoPreviousStep = priorHandler;
-          return step;
-        }
-        this.gotoStep(nextStep.index,{direction:StepDirection.NEXT})
+      let priorHandler = nextStep.gotoPreviousStep;
+      // by dynamically adding the gotoNextStep function using a closure to retrieve previous step
+      nextStep.gotoPreviousStep = () => {
+        let step = this.gotoStep(activeStep, { direction: StepDirection.PREVIOUS });
+        // restore prior handler
+        nextStep.gotoPreviousStep = priorHandler;
+        return step;
+      }
+      this.gotoStep(nextStep.index, { direction: StepDirection.NEXT })
     }
     return nextStep;
   }
@@ -306,37 +302,32 @@ export class Wizard implements IWizard {
     }
     return previousStep;
   }
-
-  private isStepTransitionEnabled(options:Partial<IWizardStepTransition>={enabled:true,context:{direction:StepDirection.GO}}):boolean{
-     let transition=new WizardStepTransition(options);
-     this.log(`isStepTransitionEnabled: notifying subscribers.`);
-     this.stepTransitionsSubject.next(transition);
-     // prevent transitions to same step
-     //if(transition.from===transition.to)
-     //{
-     //   transition.enabled=false;
-     //}
-     this.log(`IsStepTransition enabled=${transition.enabled}`);
-     return transition.enabled;
+  //TODO needs to return a promice to cater for async step continuation
+  private isStepTransitionCancelled(options: Partial<IWizardStepTransition> = { cancel: false, context: { direction: StepDirection.GO } }): boolean {
+    let transition = new WizardStepTransition(options);
+    this.log(`isStepTransitionCancelled: notifying subscribers.`);
+    this.stepTransitionsSubject.next(transition);
+    this.log(`IsStepTransitionCancelled =${transition.cancel}`);
+    return transition.cancel;
   }
 
-  get stepTransitionsSubject():Subject<IWizardStepTransition>{
-    this._stepTransitionsSubject=this._stepTransitionsSubject||new Subject<IWizardStepTransition>();
+  get stepTransitionsSubject(): Subject<IWizardStepTransition> {
+    this._stepTransitionsSubject = this._stepTransitionsSubject || new Subject<IWizardStepTransition>();
     return this._stepTransitionsSubject;
   }
-  set stepTransitionsSubject(value:Subject<IWizardStepTransition>){
-    this._stepTransitionsSubject=value;
+  set stepTransitionsSubject(value: Subject<IWizardStepTransition>) {
+    this._stepTransitionsSubject = value;
   }
 
   //Note: every subscriber gets an observable instance
-  get transitions():Observable<IWizardStepTransition>{
-      let me=this;
-      let transitions:Observable<IWizardStepTransition>=Observable.create((observer:Observer<IWizardStepTransition>)=>{
-          this.log("Adding an observer that can subscribe to wizard step transitions ...");
-          me.stepTransitionsSubject.subscribe(observer)
+  get transitions(): Observable<IWizardStepTransition> {
+    let me = this;
+    let transitions: Observable<IWizardStepTransition> = Observable.create((observer: Observer<IWizardStepTransition>) => {
+      this.log("Adding an observer that can subscribe to wizard step transitions ...");
+      me.stepTransitionsSubject.subscribe(observer)
 
-      });
-      return transitions;
+    });
+    return transitions;
   }
 };
 
