@@ -76,16 +76,16 @@ export class WorkflowStep implements IWorkflowStep {
     return step;
   }
 
-  get wizard() {
+  get workflow() {
     return this.workflowLocator();
   }
 
-  set wizard(value: IWorkflow) {
+  set workflow(value: IWorkflow) {
   }
 
 }
 
-/** Implementation of the wizard contract */
+/** Implementation of the workflow contract */
 export class Workflow implements IWorkflow {
 
   static instanceCount: number = 0;
@@ -142,10 +142,10 @@ export class Workflow implements IWorkflow {
 
   initialize(options: IWorkflowOptions) {
     this.log("Initializing the workflow ...")
-    let wizard = this;
+    let workflow = this;
     this._steps = [];
     // ensure callback have correct 'this'
-    let items = options.steps.apply(wizard) || [];
+    let items = options.steps.apply(workflow) || [];
     // first sort by index
     items = items.sort((i) => { return i.index; });
     // retrieve the default first item, i.e the one with the lowest index.
@@ -158,20 +158,20 @@ export class Workflow implements IWorkflow {
       if (item.index && item.index < firstIndex) {
         firstIndex = item.index
       }
-      let step = new WorkflowStep(item, () => wizard);
+      let step = new WorkflowStep(item, () => workflow);
       this._steps.push(step);
     }
     // Set up the 'first step' handler/closure that will dynamically use index or
-    // the IWizardStepQuery optionally passed in with wizard options;
+    // the  IWorkflowStepQuery optionally passed in with workflow options;
     this.firstStep = () => {
       let firstStep: IWorkflowStep = null;
       if (!options.firstStep) {
         options.firstStep = () => firstIndex;
       }
       let first = options.firstStep();
-      firstStep = wizard.findStep(first);
+      firstStep = workflow.findStep(first);
       if (!firstStep) {
-        firstStep = wizard.findStep(firstIndex);
+        firstStep = workflow.findStep(firstIndex);
       }
       return firstStep;
     }
@@ -182,7 +182,7 @@ export class Workflow implements IWorkflow {
         var timer = setTimeout(() => {
           clearTimeout(timer);
           this.log("Invoking cancel ... ");
-          options.cancel.apply(wizard, args);
+          options.cancel.apply(workflow, args);
         }, 10);
       }
       return true;
@@ -192,7 +192,7 @@ export class Workflow implements IWorkflow {
         var timer = setTimeout(() => {
           clearTimeout(timer);
           this.log("Invoking finish ... ");
-          options.finish.apply(wizard, args);
+          options.finish.apply(workflow, args);
         }, 10)
       }
     }
@@ -310,7 +310,7 @@ export class Workflow implements IWorkflow {
 
   gotoPreviousStep() {
     this.log(`gotoPreviousStep ...`)
-    let wizard = this;
+    let workflow = this;
     let previousStep = null
     let currentActiveStep = this.activeStep;
     if (currentActiveStep.gotoPreviousStep) {
