@@ -61,7 +61,7 @@ export interface IWorkflowTransition
   continue:boolean;
   /** Misc contextual information */
   context?:IWorkflowTransitionContext;
-  /** The workflow direction in whihc the transition is being made */
+  /** The workflow direction in which the transition is being made */
   direction:WorkflowDirection;
 }
 

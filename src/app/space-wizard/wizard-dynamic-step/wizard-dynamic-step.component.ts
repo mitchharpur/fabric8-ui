@@ -5,7 +5,7 @@ import { IWorkflowStep, IWorkflowTransition, IWorkflow, TransitionDirection } fr
 import { getLogger, ILoggerDelegate } from '../domain/logger';
 import { INotifyPropertyChanged } from '../domain/component'
 
-import { IFieldSetService, IFieldSetServiceProvider } from '../services/field-set.service'
+import { IFieldInfo, IFieldSet, IFieldSetService, IFieldSetServiceProvider } from '../services/field-set.service'
 
 
 
@@ -81,6 +81,17 @@ export class WizardDynamicStepComponent implements OnInit, OnDestroy, OnChanges 
     }
   }
 
+  private isTransitioningToThisStep(transition:IWorkflowTransition):boolean
+  {
+    return transition.to && transition.to.name.toLowerCase() === this.stepName.toLowerCase()
+  }
+  private isTransitioningFromThisStep(transition:IWorkflowTransition):boolean
+  {
+    return transition.from && transition.from.name.toLowerCase() === this.stepName.toLowerCase()
+  }
+
+  fieldSet:IFieldSet;
+
   private subscribeToWorkflowTransitions(workflow: IWorkflow) {
     if (!workflow) {
       return;
@@ -89,22 +100,15 @@ export class WizardDynamicStepComponent implements OnInit, OnDestroy, OnChanges 
     workflow.transitions.subscribe((transition) => {
       try {
         this.log({ message: `Subscriber responding to an observed '${transition.direction}' workflow transition: from ${transition.from ? transition.from.name : "null"} to ${transition.to ? transition.to.name : "null"}.` });
-        // when target step is the same name as the stepName of the component then retrieve fields
-        if (transition.to && transition.to.name.toLowerCase() === this.stepName.toLowerCase()) {
-          //only get fields on 'next' operations
+        if (this.isTransitioningToThisStep(transition)){
           switch (transition.direction) {
             case TransitionDirection.NEXT:
               {
                 if (transition.from != transition.to) {
                   //handle first fieldset
-                  this._fieldSetService.FirstFieldSet().subscribe((fieldSet) => {
+                  this._fieldSetService.GetFieldSet({command:"first"}).subscribe((fieldSet) => {
+                    this.fieldSet=fieldSet
                     this.log(`retrieved the first set of ${fieldSet.length} fields ...`);
-                  })
-                }
-                else {
-                  //handle subsequent fieldsets
-                  this._fieldSetService.NextFieldSet().subscribe((fieldSet) => {
-                    this.log(`retrieved the next set of ${fieldSet.length} fields ...`);
                   })
                 }
                 break;
@@ -116,8 +120,28 @@ export class WizardDynamicStepComponent implements OnInit, OnDestroy, OnChanges 
               }
           }
         }
-        if (transition.from && transition.from.name === this.stepName && transition.direction == TransitionDirection.NEXT) {
-          transition.continue = false;
+        //leaving the step
+        if (this.isTransitioningFromThisStep(transition)) {
+          switch (transition.direction) {
+            case TransitionDirection.NEXT:
+              {
+                if (transition.from != transition.to) {
+                  //handle first fieldset
+                  this._fieldSetService.GetFieldSet({command:"second"}).subscribe((fieldSet) => {
+                    this.fieldSet=fieldSet
+                    this.log(`retrieved the next set of ${fieldSet.length} fields ...`);
+                  })
+                  transition.to=transition.from;
+                }
+                //transition.continue = false;
+                break;
+              }
+            case TransitionDirection.PREVIOUS:
+              {
+                this.log(`fieldset rollback ...`);
+                break;
+              }
+          }
 
         }
       }

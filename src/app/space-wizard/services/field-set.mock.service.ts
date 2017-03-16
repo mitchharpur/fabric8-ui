@@ -6,7 +6,34 @@ import { IFieldSet, IFieldInfo ,FieldSet, FieldSetServiceBase} from '../domain/f
 @Injectable()
 export class MockFieldSetService extends FieldSetServiceBase {
   constructor() { super() }
-  FirstFieldSet(options): Observable<IFieldSet> {
+  GetFieldSet(options:any={}): Observable<IFieldSet> {
+    switch(options.command)
+    {
+      case "first":
+      {
+        return getFirstFieldSet();
+      }
+      case "second":
+      {
+        return getSecondFieldSet();
+      }
+      default:{
+        return getDefaultFieldSet();
+      }
+    }
+  }
+}
+
+function getDefaultFieldSet():Observable<IFieldSet>
+{
+    return Observable.create((observer:Observer<IFieldSet>) => {
+      observer.next([]);
+      observer.complete();
+    });
+}
+
+function getFirstFieldSet():Observable<IFieldSet>
+{
     let tmp: Observable<IFieldSet> = Observable.create((observer:Observer<IFieldSet>) => {
       let items:IFieldInfo[]=
       [
@@ -36,8 +63,9 @@ export class MockFieldSetService extends FieldSetServiceBase {
       observer.complete();
     });
     return tmp;
-  }
-  NextFieldSet(options:any): Observable<IFieldSet> {
+}
+function getSecondFieldSet():Observable<IFieldSet>
+{
     return Observable.create((observer:Observer<IFieldSet>) => {
       observer.next([
         {
@@ -59,9 +87,18 @@ export class MockFieldSetService extends FieldSetServiceBase {
           index: 0,
           valid: true,
           value: "f4-value-4"
+        },
+        {
+          name: "f5",
+          label: "label-f5",
+          display: true,
+          enabled: true,
+          required: true,
+          index: 0,
+          valid: true,
+          value: "f5-value-5"
         }
       ]);
       observer.complete();
     });
-  }
 }

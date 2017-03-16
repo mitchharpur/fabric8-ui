@@ -256,8 +256,14 @@ export class Workflow implements IWorkflow {
       transitionOptions.continue=transitionOptions.continue||true;
       transitionOptions.direction=transitionOptions.direction||TransitionDirection.GO;
       transitionOptions.context=transitionOptions.context||{};
-      if (this.workflowTransitionShouldContinue({ from: this.activeStep, to: destinationStep, direction:transitionOptions.direction ,continue:transitionOptions.continue,context:transitionOptions.context }) === true) {
+      let transition=this.workflowTransitionShouldContinue({ from: this.activeStep, to: destinationStep, direction:transitionOptions.direction ,continue:transitionOptions.continue,context:transitionOptions.context });
+      if (transition.continue === true) {
         let activeStep = this.activeStep;
+        let targetStep=destinationStep;
+        if(destinationStep!== transition.to)
+        {
+          destinationStep=transition.to;
+        }
         this.activeStep = destinationStep;
       }
     }
@@ -320,7 +326,7 @@ export class Workflow implements IWorkflow {
   }
 
   //TODO needs to return a promise to cater for async step continuation
-  private workflowTransitionShouldContinue(options: Partial<IWorkflowTransition> = { continue: false, context: { direction: TransitionDirection.GO } }): boolean {
+  private workflowTransitionShouldContinue(options: Partial<IWorkflowTransition> = { continue: false, context: { direction: TransitionDirection.GO } }): IWorkflowTransition {
     let transition = new WorkflowTransition(options);
     this.log(`Notify workflow transition subscribers of an upcoming '${transition.direction}' transition from '${transition.from?transition.from.name:"null"}' to '${transition.to?transition.to.name:"null"}' `);
     this.workflowTransitionSubject.next(transition);
@@ -330,7 +336,7 @@ export class Workflow implements IWorkflow {
       this.log({message:`Note: workflow will not proceed from '${transition.from?transition.from.name:"null"}' to '${transition.to?transition.to.name:"null"}' because transition.continue=${transition.continue}`,warning:true});
 
     }
-    return transition.continue;
+    return transition;
   }
 
   get workflowTransitionSubject(): Subject<IWorkflowTransition> {

@@ -1,5 +1,7 @@
 <header>Header</header>
-<section>Dynamic Step </section>
+<section style="padding:20px;">
+    <div style="padding:20px;" *ngFor="let fieldInfo of fieldSet" >{{fieldInfo.name}}</div>
+</section>
 <footer>
       <a class="btn btn-default margin-right-5" (click)="workflow.cancel()">Cancel</a>
       <a class="btn btn-default margin-right-5" (click)="workflow.gotoPreviousStep()">Back</a>

@@ -2,9 +2,10 @@ import { Injectable, FactoryProvider, ClassProvider, Type, OpaqueToken } from '@
 
 import { Observable,  Subscriber } from 'rxjs/Rx';
 
-import { FieldSet , IFieldInfo , IFieldSetService , FieldSetServiceBase  } from '../domain/field-set'
+import { IFieldSetService , FieldSetServiceBase  } from '../domain/field-set'
 
-export { IFieldSetService } from '../domain/field-set';
+
+export { IFieldSetService, IFieldSet, IFieldInfo } from '../domain/field-set';
 
 import { MockFieldSetService } from './field-set.mock.service'
 
@@ -14,6 +15,8 @@ import { MockFieldSetService } from './field-set.mock.service'
 const  serviceBaseClassTypeName =  "FieldSetService";
 const  serviceInterfaceTypeName = "IFieldSetService";
 const  serviceInterfaceTypeToken = new OpaqueToken(serviceInterfaceTypeName);
+
+
 /**
  * This function returns a function that operates as the service factory for the FieldSetService.
  * the factory creates an instance of the service , but the provider resolves either an interface

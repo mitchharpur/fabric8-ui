@@ -23,13 +23,11 @@ export class FieldSet extends Array<IFieldInfo> implements IFieldSet
 
 /** FieldSetService contract */
 export interface IFieldSetService {
-  FirstFieldSet(options?:any): Observable<IFieldSet>
-  NextFieldSet(options?:any): Observable<IFieldSet>
+  GetFieldSet(options?:any): Observable<IFieldSet>
 }
 
 
 /** FieldSetService contract using abstract base class */
 export abstract class FieldSetServiceBase implements IFieldSetService {
-  abstract FirstFieldSet(options?:any): Observable<IFieldSet>;
-  abstract NextFieldSet(options?:any): Observable<IFieldSet>;
+  abstract GetFieldSet(options?:any): Observable<IFieldSet>;
 }
