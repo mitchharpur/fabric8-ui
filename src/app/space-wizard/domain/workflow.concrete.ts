@@ -318,6 +318,7 @@ export class Workflow implements IWorkflow {
     }
     return previousStep;
   }
+
   //TODO needs to return a promise to cater for async step continuation
   private workflowTransitionShouldContinue(options: Partial<IWorkflowTransition> = { continue: false, context: { direction: TransitionDirection.GO } }): boolean {
     let transition = new WorkflowTransition(options);
