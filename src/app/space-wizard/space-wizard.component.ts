@@ -1,6 +1,6 @@
 import { Context } from './../models/context';
 import { ContextService } from './../shared/context.service';
-import { Component, OnInit, Input,Inject } from '@angular/core';
+import { Component, OnInit, Input, Inject } from '@angular/core';
 import { Router } from '@angular/router';
 
 import { SpaceService, Space, ProcessTemplate, SpaceAttributes } from 'ngx-fabric8-wit';
@@ -30,27 +30,25 @@ export class SpaceWizardComponent implements OnInit {
   static instanceCount: number = 0;
 
   @Input() host: IModalHost;
-    /** adds a log entry to the logger */
-  log:ILog=()=>{};
+  /** adds a log entry to the logger */
+  log: ILog = () => { };
 
   configurator: SpaceConfigurator;
 
   private _context: Context;
-  private _instance:number=0;
+  private _instance: number = 0;
 
-  private _wizard:IWizard=null;
-  get wizard(): IWizard{
-    if(!this._wizard)
-    {
-      this._wizard=Wizard.Create();
+  private _wizard: IWizard = null;
+  get wizard(): IWizard {
+    if (!this._wizard) {
+      this._wizard = Wizard.Create();
       this.log(`Creating wizard instance`);
     }
     return this._wizard;
   };
 
-  set wizard(value:IWizard)
-  {
-    this._wizard=value;
+  set wizard(value: IWizard) {
+    this._wizard = value;
   }
 
   constructor(
@@ -60,15 +58,15 @@ export class SpaceWizardComponent implements OnInit {
     private spaceService: SpaceService,
     private _contextService: ContextService) {
     SpaceWizardComponent.instanceCount++;
-    this._instance=SpaceWizardComponent.instanceCount;
-    this.log=getLogger(this.constructor.name,this._instance);
+    this._instance = SpaceWizardComponent.instanceCount;
+    this.log = getLogger(this.constructor.name, this._instance);
     this.log(`Creating an instance.`);
   }
 
   ngOnInit() {
     console.log(`ngOnInit`)
     this.configureComponentHost();
-    this.configurator=this.createSpaceConfigurator();
+    this.configurator = this.createSpaceConfigurator();
     this._contextService.current.subscribe(val => this._context = val);
   }
 
@@ -113,12 +111,11 @@ export class SpaceWizardComponent implements OnInit {
     return configurator;
   }
   /** create and initializes the wizard */
-  initializeWizard(wizard?:IWizard): IWizard {
-    if(!wizard)
-    {
-      wizard= Wizard.Create()
+  initializeWizard(wizard?: IWizard): IWizard {
+    if (!wizard) {
+      wizard = Wizard.Create()
     }
-    let component=this;
+    let component = this;
     // Initialize the wizard steps and optionally the first step
     wizard.initialize({
       steps: () => {
@@ -136,21 +133,21 @@ export class SpaceWizardComponent implements OnInit {
           index: 0
         };
       },
-      cancel:(...args)=>{
-         // ensure cancel has correct 'this'
-         component.cancel.apply(component,args);
+      cancel: (...args) => {
+        // ensure cancel has correct 'this'
+        component.cancel.apply(component, args);
       },
-      finish:(...args)=>{
-         // ensure finish has correct 'this'
-        component.finish.apply(component,args);
+      finish: (...args) => {
+        // ensure finish has correct 'this'
+        component.finish.apply(component, args);
       },
     });
     return wizard;
   }
   reset() {
     this.log(`reset`);
-    this.configurator=this.createSpaceConfigurator();
-    this.wizard=this.initializeWizard();//this.wizard);
+    this.configurator = this.createSpaceConfigurator();
+    this.wizard = this.initializeWizard();
   }
 
   finish() {
@@ -193,7 +190,7 @@ export class SpaceWizardComponent implements OnInit {
   cancel() {
     this.log(`cancel`);
     if (this.host) {
-        this.host.close();
+      this.host.close();
     }
   }
 

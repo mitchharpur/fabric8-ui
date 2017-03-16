@@ -129,7 +129,7 @@ export class Wizard implements IWizard {
   }
 
   initialize(options: IWizardOptions) {
-    console.log("Initializing wizard ...")
+    this.log("Initializing wizard ...")
     let wizard = this;
     this._steps = [];
     // ensure callback have correct 'this'
