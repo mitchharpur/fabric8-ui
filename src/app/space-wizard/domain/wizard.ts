@@ -7,6 +7,18 @@ export interface IWizardStepQuery{
   ():Partial<IWizardStep>|number|string;
 }
 
+export class StepDirection{
+  static GO:WizardStepDirection="go";
+  static PREVIOUS:WizardStepDirection="previous";
+  static NEXT:WizardStepDirection="next";
+}
+
+export type WizardStepDirection="go"|"next"|"previous";
+
+export interface IWizardStepTransitionContext{
+  direction:WizardStepDirection
+}
+
 /** Defines the signature of the delegate that will do a deferred retrieval of the wizard */
 export interface IWizardLocator {
   (): IWizard
@@ -26,6 +38,7 @@ export interface IWizardStepTransition
   readonly from?:IWizardStep;
   to?:IWizardStep;
   enabled:boolean;
+  context:IWizardStepTransitionContext
 }
 
 /** Defines the shape of the options used o initialize a wizard  */
@@ -48,7 +61,7 @@ export interface IWizard {
   /** Checks if the parametrically specified step is active */
   isStepActive(step: number | string | Partial<IWizardStep>): boolean;
   /** parametrically activates the specified step but does not keep track the previous step */
-  gotoStep(step: number | string | Partial<IWizardStep>): IWizardStep;
+  gotoStep(step: number | string | Partial<IWizardStep>,context?:IWizardStepTransitionContext): IWizardStep;
   /** activates the default next step, as defined by nextIndex,
    * or as parametrically specified in the optional argument,
    * and records the current step as the previous step */
@@ -81,7 +94,7 @@ export interface IWizardStep {
   /** Activates this step if it is in the wizard steps collection. */
   activate():IWizardStep;
   /** Activates the parametrically specified step, and DOES NOT record the current step as the previous step. */
-  gotoStep(step: number | string | Partial<IWizardStep>): IWizardStep;
+  gotoStep(step: number | string | Partial<IWizardStep>,context?:IWizardStepTransitionContext): IWizardStep;
   /** activates the default next step, as defined by nextIndex,
    * or as parametrically specified in the optional argument,
    * and records the current step as the previous step */

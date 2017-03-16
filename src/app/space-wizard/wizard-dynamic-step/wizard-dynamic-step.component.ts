@@ -1,10 +1,12 @@
-import { Component, OnInit, OnChanges, SimpleChanges, OnDestroy, Input, Inject } from '@angular/core';
+import { Component, OnInit, OnChanges, OnDestroy, SimpleChanges, SimpleChange, Input, Inject } from '@angular/core';
 import { Router } from '@angular/router';
 
-import { IWizardStep, IWizardStepTransition, IWizard } from '../domain/wizard';
-//import { Wizard } from '../domain/wizard-implementation';
-
+import { IWizardStep, IWizardStepTransition, IWizard, StepDirection } from '../domain/wizard';
+import { getLogger, ILog } from '../domain/logger';
 import { IFieldSetService, IFieldSetServiceProvider } from '../services/field-set.service'
+
+
+
 
 @Component({
   host: {
@@ -16,66 +18,106 @@ import { IFieldSetService, IFieldSetServiceProvider } from '../services/field-se
   providers: [IFieldSetServiceProvider.FactoryProvider]
 
 })
-export class WizardDynamicStepComponent implements OnInit, OnDestroy {
+export class WizardDynamicStepComponent implements OnInit, OnDestroy, OnChanges {
 
   // keep track of the number of instances
   static instanceCount: number = 0;
+  private _instance: number = 0;
+  /** adds a log entry to the logger */
+  private log: ILog = () => { };
 
-  @Input() wizard: IWizard;
+  private _wizard: IWizard
+  @Input()
+  get wizard(): IWizard {
+    return this._wizard
+  }
+  set wizard(value: IWizard) {
+    this._wizard = value;
+  }
+
+  @Input() stepName: string = "";
 
   constructor( @Inject(IFieldSetServiceProvider.InjectToken) private _fieldSetService: IFieldSetService) {
     WizardDynamicStepComponent.instanceCount++;
-    console.log(`wizard-dynamic-step: ${WizardDynamicStepComponent.instanceCount} : creating instance`);
-    if(!this._fieldSetService)
-    {
-      console.warn("a null instance of OFieldSetService was injected...");
+    this._instance = WizardDynamicStepComponent.instanceCount;
+    //get a logger
+    this.log = getLogger(this.constructor.name, this._instance);
+    this.log({ message: "Creating an instance.", info: true });
+    if (!this._fieldSetService) {
+      this.log({ message: "A null instance of IFieldSetService was injected ...", warn: true });
     }
   }
 
-  getWizardTransitionHandler(service:IFieldSetService)
-  {
-    return (transition: IWizardStepTransition)=> {
-      console.log(`wizard-dynamic-step: ${WizardDynamicStepComponent.instanceCount} : Subscribed to transition: from ${transition.from ? transition.from.name : "null"} to ${transition.from ? transition.from.name : "null"}`)
-      try{
-        if (transition.to && transition.to.name.toLowerCase() === "dynamic-step") {
-          if (transition.from != transition.to) {
-            //handle first fieldset
-            service.FirstFieldSet.subscribe((fieldSet) => {
-              console.log(`wizard-dynamic-step:  ${WizardDynamicStepComponent.instanceCount} : retrieved first set of fields ...`)
-            })
-          }
-          else {
-            //handle subsequent fieldsets
-            service.NextFieldSet.subscribe((fieldSet) => {
-              console.log(`wizard-dynamic-step:  ${WizardDynamicStepComponent.instanceCount} : retrieved next set of fields ...`)
-            })
-          }
-        }
-      }
-      catch(err)
-      {
-          console.error(err.message);
-      }
-    }
+  /** At this point all inputs are bound and values assigned, but the wizard get a new instance every time the dilog is made visible */
+  ngOnInit() {
+    this.log(`ngOnInit.`)
+    //this.subscribeToWizardTransitions(this.wizard);
+  }
+
+  ngOnDestroy() {
+    this.log(`ngOnDestory.`)
   }
 
   ngOnChanges(changes: SimpleChanges) {
-    console.log(`wizard-dynamic-step: ${WizardDynamicStepComponent.instanceCount} : ngOnChanges.`)
+    this.log(`ngOnChanges.`)
+    this.onWizardPropertyChanged(changes["wizard"]);
+  }
 
-    if (changes["wizard"].currentValue !== changes["wizard"].previousValue) {
-      console.log(`wizard-dynamic-step: ${WizardDynamicStepComponent.instanceCount} : wizard changed : updating wizard and configuring to observe wizard transitions `);
-      (changes["wizard"].currentValue as IWizard).transitions.subscribe(this.getWizardTransitionHandler(this._fieldSetService));
+
+  private subscribeToWizardTransitions(wizard: IWizard) {
+    if(!wizard)
+    {
+      return;
+    }
+    this.log(`Subscribing to wizard transitions in order to observe any step transitions.`);
+    wizard.transitions.subscribe((transition) => {
+      try {
+        this.log({ message: `Subscriber responding to an observed '${transition.context.direction}' transition: from ${transition.from ? transition.from.name : "null"} to ${transition.to ? transition.to.name : "null"}.` });
+        if (transition.to && transition.to.name.toLowerCase() === this.stepName.toLowerCase()) {
+          //only get fields on next operations
+          switch (transition.context.direction) {
+            case StepDirection.NEXT:
+              {
+                if (transition.from != transition.to) {
+                  //handle first fieldset
+                  this._fieldSetService.FirstFieldSet.subscribe((fieldSet) => {
+                    this.log(`retrieved first set of fields ...`)
+                  })
+                }
+                else {
+                  //handle subsequent fieldsets
+                  this._fieldSetService.NextFieldSet.subscribe((fieldSet) => {
+                    this.log(`retrieved next set of fields ...`)
+                  })
+                }
+                break;
+              }
+            case StepDirection.PREVIOUS:
+              {
+                this.log(`field rollback ...`)
+                break;
+              }
+          }
+        }
+      }
+      catch (err) {
+        this.log({ message: err.message, error: true, inner: err });
+      }
+    })
+  }
+
+  private onWizardPropertyChanged(change?: SimpleChange) {
+    if (change) {
+      this.log(`The wizard property changed value ...`);
+      if (change.currentValue !== change.previousValue) {
+          let prev:IWizard=change.previousValue;
+          let current:IWizard=change.currentValue;
+          this.subscribeToWizardTransitions(current);
+      }
     }
 
   }
 
-  ngOnInit() {
-    console.log(`wizard-dynamic-step: ${WizardDynamicStepComponent.instanceCount} : ngOnInit.`)
-
-  }
-  ngOnDestroy() {
-    console.log(`wizard-dynamic-step: ${WizardDynamicStepComponent.instanceCount} : ngOnDestroy.`)
-  }
 
 
 

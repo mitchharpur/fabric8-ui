@@ -13,7 +13,7 @@ import { IWizardStep, IWizard } from './domain/wizard';
 import { Wizard } from './domain/wizard-implementation';
 
 import { SpaceConfigurator } from './domain/codebase';
-
+import { getLogger, ILog } from './domain/logger';
 
 @Component({
   host: {
@@ -30,15 +30,20 @@ export class SpaceWizardComponent implements OnInit {
   static instanceCount: number = 0;
 
   @Input() host: IModalHost;
+    /** adds a log entry to the logger */
+  log:ILog=()=>{};
 
   configurator: SpaceConfigurator;
-  private _context: Context;
-  private _wizard:IWizard=null;
 
+  private _context: Context;
+  private _instance:number=0;
+
+  private _wizard:IWizard=null;
   get wizard(): IWizard{
     if(!this._wizard)
     {
-      this._wizard=Wizard.Create()
+      this._wizard=Wizard.Create();
+      this.log(`Creating wizard instance`);
     }
     return this._wizard;
   };
@@ -55,11 +60,13 @@ export class SpaceWizardComponent implements OnInit {
     private spaceService: SpaceService,
     private _contextService: ContextService) {
     SpaceWizardComponent.instanceCount++;
-    console.log(`space-wizard: ${SpaceWizardComponent.instanceCount} : creating instance`);
+    this._instance=SpaceWizardComponent.instanceCount;
+    this.log=getLogger(this.constructor.name,this._instance);
+    this.log(`Creating an instance.`);
   }
 
   ngOnInit() {
-    console.log(`space-wizard: ${SpaceWizardComponent.instanceCount} : ngOnInit`)
+    console.log(`ngOnInit`)
     this.configureComponentHost();
     this.configurator=this.createSpaceConfigurator();
     this._contextService.current.subscribe(val => this._context = val);
@@ -75,15 +82,15 @@ export class SpaceWizardComponent implements OnInit {
     // Intercept when the host dialog is opened or closed to perform initialization and settings adjustments
     let originalOpenHandler = this.host.open;
     this.host.open = function (...args) {
-      console.log(`space-wizard: instance ${SpaceWizardComponent.instanceCount} : Opening wizard modal dialog ...`);
+      me.log(`Opening wizard modal dialog ...`);
       me.reset();
-      //note: this is not me ... that is why not using a =>
+      //note: 'this' is not me ... that is why not using a =>
       return originalOpenHandler.apply(this, args);
     }
     let originalCloseHandler = this.host.close;
     this.host.close = function (...args) {
-      console.log(`space-wizard: instance ${SpaceWizardComponent.instanceCount} : Closing wizard modal dialog ...`);
-      //note: this is not me ... that is why not using a =>
+      me.log(`Closing wizard modal dialog ...`);
+      //note: 'this' is not me ... that is why not using a =>
       return originalCloseHandler.apply(this, args);
     }
   }
@@ -141,13 +148,13 @@ export class SpaceWizardComponent implements OnInit {
     return wizard;
   }
   reset() {
-    console.info(`space-wizard: ${SpaceWizardComponent.instanceCount} : reset`);
+    this.log(`reset`);
     this.configurator=this.createSpaceConfigurator();
-    this.wizard=this.initializeWizard()
+    this.wizard=this.initializeWizard();//this.wizard);
   }
 
   finish() {
-    console.info(`space-wizard: ${SpaceWizardComponent.instanceCount} : finish`);
+    this.log(`finish`);
     console.log('finish!', this._context);
     let space = this.configurator.space;
     space.attributes.name = space.name;
@@ -184,7 +191,7 @@ export class SpaceWizardComponent implements OnInit {
   }
 
   cancel() {
-    console.info(`space-wizard: ${SpaceWizardComponent.instanceCount} : cancel`);
+    this.log(`cancel`);
     if (this.host) {
         this.host.close();
     }

@@ -185,7 +185,7 @@
       <a class="btn btn-default" (click)="finish()">Finish</a>
     </footer>
   </div>
-  <wizard-dynamic-step class="wizard-step" [class.active]="wizard.isStepActive({name:'dynamic-step'})" [wizard]="wizard"  >
+  <wizard-dynamic-step class="wizard-step" [class.active]="wizard.isStepActive({name:'dynamic-step'})" stepName="dynamic-step" [wizard]="wizard"  >
   </wizard-dynamic-step>
 
 </div>

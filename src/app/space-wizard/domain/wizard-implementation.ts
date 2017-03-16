@@ -1,21 +1,25 @@
 import { Observable, Observer, Subscriber,Subject } from 'rxjs/Rx';
 
-import { IWizardStep, IWizardStepTransition, IWizard, IWizardLocator, IWizardOptions } from './wizard'
+import { IWizardStep, IWizardStepTransition, IWizardStepTransitionContext, IWizard, IWizardLocator, IWizardOptions,WizardStepDirection,StepDirection} from './wizard'
+
+import { getLogger, ILog } from './logger';
 
 
 /** allows intercepting of wizard step transitions  */
 class WizardStepTransition implements IWizardStepTransition {
-  constructor(options:Partial<IWizardStepTransition>={from:null,to:null,enabled:true}){
+  constructor(options:Partial<IWizardStepTransition>={from:null,to:null,enabled:true,context:{direction:StepDirection.GO}}){
+    this.context={direction:StepDirection.GO}
+    this.enabled=true;
     Object.assign(this,options);
   }
   from?:IWizardStep;
   to?:IWizardStep;
+  context:IWizardStepTransitionContext
   enabled:boolean=true;
 }
 
 /** implementation of the wizardstep */
 export class WizardStep implements IWizardStep {
-
 
 
   index: number = 0;
@@ -43,11 +47,11 @@ export class WizardStep implements IWizardStep {
     return this;
   }
 
-  gotoStep(destination: number | string | IWizardStep) {
+  gotoStep(destination: number | string | IWizardStep,context:IWizardStepTransitionContext={direction:StepDirection.GO}) {
     let step: IWizardStep = null;
     if (this.isActive) {
       //you can only goto a step if 'this' is the active step
-      step = this.wizardLocator().gotoStep(destination);
+      step = this.wizardLocator().gotoStep(destination,context);
     }
     return step;
   }
@@ -70,15 +74,23 @@ export class WizardStep implements IWizardStep {
 /** Implementation of the wizard contract */
 export class Wizard implements IWizard {
 
+  static instanceCount: number = 0;
+  _instance:number=0;
+
+  private log:ILog=()=>{};
+  private _steps: Array<IWizardStep> = [];
+  private _stepTransitionsSubject:Subject<IWizardStepTransition>;
+  private _activeStep: IWizardStep
+
   static Create():IWizard{
     return new Wizard();
   }
 
-  private _steps: Array<IWizardStep> = [];
-
-  private _activeStep: IWizardStep
 
   constructor() {
+    Wizard.instanceCount++;
+    this._instance=Wizard.instanceCount;
+    this.log=getLogger(this.constructor.name,this._instance);
   }
 
   get steps(): Array<IWizardStep> {
@@ -112,15 +124,15 @@ export class Wizard implements IWizard {
   };
 
   set activeStep(value: IWizardStep) {
-    console.info(`wizard: Setting active wizard step from ${this._activeStep ? this._activeStep.name : 'null'} to ${value ? value.name : 'null'} `);
+    this.log(`Setting the active wizard step from ${this._activeStep ? this._activeStep.name : 'null'} to ${value ? value.name : 'null'} `);
     this._activeStep = value;
   }
 
   initialize(options: IWizardOptions) {
-    console.log("wizard: Initializing wizard ...")
+    console.log("Initializing wizard ...")
     let wizard = this;
     this._steps = [];
-    //ensure callback have correct 'this'
+    // ensure callback have correct 'this'
     let items = options.steps.apply(wizard) || [];
     // first sort by index
     items = items.sort((i) => { return i.index; });
@@ -137,8 +149,8 @@ export class Wizard implements IWizard {
       let step = new WizardStep(item, () => wizard);
       this._steps.push(step);
     }
-    //Set up the 'first step' handler/closure that will dynamically use index or
-    //the IWizardStepQuery optionally passed in with wizard options;
+    // Set up the 'first step' handler/closure that will dynamically use index or
+    // the IWizardStepQuery optionally passed in with wizard options;
     this.firstStep = () => {
       let firstStep: IWizardStep = null;
       if (!options.firstStep) {
@@ -151,14 +163,14 @@ export class Wizard implements IWizard {
       }
       return firstStep;
     }
-    //now set active step to firstStep
+    // now set active step to firstStep
     this.activeStep = this.firstStep();
     if(options.cancel)
     {
       this.cancel=(...args)=>{
           var timer=setTimeout(()=>{
           clearTimeout(timer);
-          console.log("wizard: invoking cancel ... ");
+          this.log("Invoking cancel ... ");
           options.cancel.apply(wizard,args);
         },10);
       }
@@ -169,7 +181,7 @@ export class Wizard implements IWizard {
       this.finish=(...args)=>{
           var timer=setTimeout(()=>{
           clearTimeout(timer);
-          console.log("wizard: invoking finish ... ");
+          this.log("Invoking finish ... ");
           options.finish.apply(wizard,args);
         },10)
       }
@@ -227,11 +239,11 @@ export class Wizard implements IWizard {
     return step;
   }
 
-  gotoStep(destination: number | string | Partial<IWizardStep>) {
+  gotoStep(destination: number | string | Partial<IWizardStep>,context:IWizardStepTransitionContext={direction:StepDirection.GO}) {
 
     let destinationStep = this.findStep(destination);
     if (destinationStep) {
-      if(this.isStepTransitionEnabled({from:this.activeStep,to:destinationStep}))
+      if(this.isStepTransitionEnabled({from:this.activeStep,to:destinationStep,context:context}))
       {
         let activeStep = this.activeStep;
         this.activeStep = destinationStep;
@@ -241,51 +253,51 @@ export class Wizard implements IWizard {
   }
 
   gotoNextStep(destination?: number | string | Partial<IWizardStep>) {
-    console.log(`wizard: gotoNextStep ...`)
+    this.log(`gotoNextStep ...`)
     let nextStep: IWizardStep = null;
     let activeStep = this.activeStep;
     if (!destination) {
       // if nothing specified (i.e no branching) then just do the default behavior based on nextIndex
       if (activeStep) {
         nextStep = this.findStep(activeStep.nextIndex);
-        console.log(`wizard: found next step = ${nextStep.name} ...`);
+        this.log(`found next step = ${nextStep.name} ...`);
       }
       else {
-        //if no active step then the firstStep is the next step
+        // if no active step then the firstStep is the next step
         this.activeStep = this.firstStep();
-        console.log(`wizard: found next step = ${this.activeStep.name} ...`);
+        this.log(`found next step = ${this.activeStep.name} ...`);
         return this.activeStep;
       }
     }
     else {
       // otherwise 'branch' to specified step
       nextStep = this.findStep(destination);
-      console.log(`wizard: found next step = ${nextStep.name} ...`);
+      this.log(`found next step = ${nextStep.name} ...`);
     }
     if (!nextStep) {
       let currentStep = "";
       if (this.activeStep) {
         currentStep = ` for ${this.activeStep.name}`;
       }
-      console.warn(`wizard: gotoNextStep ... no next step  for step=${currentStep} ...`);
+      this.log(`gotoNextStep ... no next step  for step=${currentStep} ...`);
     }
     // setup the previous step handler and transition to nextstep if the step is valid
     if (nextStep) {
         let priorHandler = nextStep.gotoPreviousStep;
-        // by dynamically adding the gotoNextStep function using a closure to retriev previous step
+        // by dynamically adding the gotoNextStep function using a closure to retrieve previous step
         nextStep.gotoPreviousStep = () => {
-          let step = this.gotoStep(activeStep);
+          let step = this.gotoStep(activeStep,{direction:StepDirection.PREVIOUS});
           // restore prior handler
           nextStep.gotoPreviousStep = priorHandler;
           return step;
         }
-        this.gotoStep(nextStep.index)
+        this.gotoStep(nextStep.index,{direction:StepDirection.NEXT})
     }
     return nextStep;
   }
 
   gotoPreviousStep() {
-    console.log(`wizard: gotoPreviousStep ...`)
+    this.log(`gotoPreviousStep ...`)
     let wizard = this;
     let previousStep = null
     let currentActiveStep = this.activeStep;
@@ -295,28 +307,33 @@ export class Wizard implements IWizard {
     return previousStep;
   }
 
-  private isStepTransitionEnabled(options:Partial<IWizardStepTransition>={enabled:true}):boolean{
+  private isStepTransitionEnabled(options:Partial<IWizardStepTransition>={enabled:true,context:{direction:StepDirection.GO}}):boolean{
      let transition=new WizardStepTransition(options);
-     console.log(`wizard: isStepTransitionEnabled: notifying subscribers.`);
-     this.subject.next(transition);
-     //prevent transitions to same step
-     if(transition.from===transition.to)
-     {
-        transition.enabled=false;
-     }
-     console.log(`IsStepTransition enabled=${transition.enabled}`);
+     this.log(`isStepTransitionEnabled: notifying subscribers.`);
+     this.stepTransitionsSubject.next(transition);
+     // prevent transitions to same step
+     //if(transition.from===transition.to)
+     //{
+     //   transition.enabled=false;
+     //}
+     this.log(`IsStepTransition enabled=${transition.enabled}`);
      return transition.enabled;
   }
 
+  get stepTransitionsSubject():Subject<IWizardStepTransition>{
+    this._stepTransitionsSubject=this._stepTransitionsSubject||new Subject<IWizardStepTransition>();
+    return this._stepTransitionsSubject;
+  }
+  set stepTransitionsSubject(value:Subject<IWizardStepTransition>){
+    this._stepTransitionsSubject=value;
+  }
 
-
-  private subject:Subject<IWizardStepTransition>=new Subject<IWizardStepTransition>();
-  //every subscriber gets an observable
+  //Note: every subscriber gets an observable instance
   get transitions():Observable<IWizardStepTransition>{
       let me=this;
       let transitions:Observable<IWizardStepTransition>=Observable.create((observer:Observer<IWizardStepTransition>)=>{
-          console.log("wizard : adding observer to subscription...");
-          me.subject.subscribe(observer)
+          this.log("Adding an observer that can subscribe to wizard step transitions ...");
+          me.stepTransitionsSubject.subscribe(observer)
 
       });
       return transitions;
