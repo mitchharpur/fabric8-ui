@@ -5,13 +5,13 @@
     error?:boolean,
     info?:boolean,
   }
-  export interface ILog{
+  export interface ILoggerDelegate{
     (options:any|string|ILogEntry):void
   }
   /** This is just a quick and dirty logger ... refactor later */
 
 
-  export function getLogger(name:string,instance:number):ILog
+  export function getLogger(name:string,instance:number):ILoggerDelegate
   {
       return function logger(options: any | string = {}) {
         let entry = { message: "" };

@@ -1,14 +1,15 @@
 import { Injectable } from '@angular/core';
 import { Observable, Observer } from 'rxjs/Rx';
-import { FieldSet , IFieldInfo , FieldSetService} from '../domain/field-set'
+import { IFieldSet, IFieldInfo ,FieldSet, FieldSetServiceBase} from '../domain/field-set'
 
 /** field set mock service */
 @Injectable()
-export class MockFieldSetService extends FieldSetService {
+export class MockFieldSetService extends FieldSetServiceBase {
   constructor() { super() }
-  get FirstFieldSet(): Observable<FieldSet> {
-    let tmp: Observable<FieldSet> = Observable.create((observer:Observer<FieldSet>) => {
-      observer.next([
+  FirstFieldSet(options): Observable<IFieldSet> {
+    let tmp: Observable<IFieldSet> = Observable.create((observer:Observer<IFieldSet>) => {
+      let items:IFieldInfo[]=
+      [
         {
           name: "f1",
           label: "label-f1",
@@ -29,13 +30,15 @@ export class MockFieldSetService extends FieldSetService {
           valid: true,
           value: "f1-value-2"
         }
-      ]);
+      ];
+      let set=new FieldSet(...items);
+      observer.next(set);
       observer.complete();
     });
     return tmp;
   }
-  get NextFieldSet(): Observable<FieldSet> {
-    return Observable.create((observer:Observer<FieldSet>) => {
+  NextFieldSet(options:any): Observable<IFieldSet> {
+    return Observable.create((observer:Observer<IFieldSet>) => {
       observer.next([
         {
           name: "f3",

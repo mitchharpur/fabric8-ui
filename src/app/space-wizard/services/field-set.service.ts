@@ -2,7 +2,7 @@ import { Injectable, FactoryProvider, ClassProvider, Type, OpaqueToken } from '@
 
 import { Observable,  Subscriber } from 'rxjs/Rx';
 
-import { FieldSet , IFieldInfo , IFieldSetService , FieldSetService  } from '../domain/field-set'
+import { FieldSet , IFieldInfo , IFieldSetService , FieldSetServiceBase  } from '../domain/field-set'
 
 export { IFieldSetService } from '../domain/field-set';
 
@@ -45,21 +45,22 @@ export class IFieldSetServiceProvider {
     return serviceInterfaceTypeToken;
   }
 }
-/** These providers uses the abstract base class as a contract. Does not required
- * using the @inject token
+/** These providers uses the abstract base class as a contract. Does not require
+ * using the @inject token to be reolved in a class that takes the service as
+ * a dependency
  */
 export class FieldSetServiceProvider {
-  /////////////////////////////
+
   static get ClassProvider(): ClassProvider {
     return {
-      provide: FieldSetService,
+      provide: FieldSetServiceBase,
       useClass: MockFieldSetService
     }
   }
-  //////////////////////////////////////////
+
   static get FactoryProvider(): FactoryProvider {
     return {
-      provide: FieldSetService,
+      provide: FieldSetServiceBase,
       useFactory: createServiceFactory(serviceBaseClassTypeName),
       deps: [],
       multi: false
@@ -69,55 +70,3 @@ export class FieldSetServiceProvider {
 
 
 
-
-// /** Field set interface */
-// export interface IFieldSetService {
-//   FirstFieldSet: Observable<FieldSet>
-//   NextFieldSet: Observable<FieldSet>
-// }
-
-
-// /** FieldSet Service contract */
-// export abstract class FieldSetService implements IFieldSetService {
-//   FirstFieldSet: Observable<FieldSet>
-//   NextFieldSet: Observable<FieldSet>
-// }
-
-
-/** Mockfield set service */
-// @Injectable()
-// export class MockFieldSetService extends FieldSetService {
-//   constructor() { super() }
-//   get FirstFieldSet(): Observable<FieldSet> {
-//     let tmp: Observable<FieldSet> = Observable.create(subscriber => {
-//       let o = subscriber as Subscriber<FieldSet>;
-//       o.next([
-//         {
-//           name: "f1",
-//           label: "label-f1",
-//           display: true,
-//           enabled: true,
-//           required: true,
-//           index: 0,
-//           valid: true,
-//           value: "f1-value"
-//         },
-//         {
-//           name: "f2",
-//           label: "label-f2",
-//           display: true,
-//           enabled: true,
-//           required: true,
-//           index: 0,
-//           valid: true,
-//           value: "f1-value-2"
-//         }
-//       ]);
-//       subscriber.complete();
-//     });
-//     return tmp;
-//   }
-//   get NextFieldSet(): Observable<FieldSet> {
-//     return null;//this._fieldSet;
-//   }
-// }

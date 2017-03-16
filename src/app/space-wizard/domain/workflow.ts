@@ -1,31 +1,33 @@
 import { Observable,  Subscriber } from 'rxjs/Rx';
 
+/** creates concrete implementations of the IWizard contract */
+export { WorkflowFactory} from './workflow.concrete';
+
 /** Defines the signature of the delegate that will do a deferred retrieval a wizard step query
  * the return type of the delegate is a partial wizardstep OR string (name) OR number (index)
 */
 export interface IWizardStepQuery{
-  ():Partial<IWizardStep>|number|string;
+  ():Partial<IWorkflowStep>|number|string;
 }
 
-export class StepDirection{
-  static GO:WizardStepDirection="go";
-  static PREVIOUS:WizardStepDirection="previous";
-  static NEXT:WizardStepDirection="next";
+export class TransitionDirection{
+  static GO:WorkflowDirection="go";
+  static PREVIOUS:WorkflowDirection="previous";
+  static NEXT:WorkflowDirection="next";
 }
 
-export type WizardStepDirection="go"|"next"|"previous";
+export type WorkflowDirection="go"|"next"|"previous";
 
-export interface IWizardStepTransitionContext{
-  direction:WizardStepDirection
+export interface IWorkflowTransitionContext{
 }
 
 /** Defines the signature of the delegate that will do a deferred retrieval of the wizard */
-export interface IWizardLocator {
-  (): IWizard
+export interface IWorkflowLocator {
+  (): IWorkflow
 }
 /** Defines the signature of the delegate that will do a deferred retrieval of the wizard */
 export interface IWizardStepLocator {
-  (): IWizardStep
+  (): IWorkflowStep
 }
 
 export interface ICallback
@@ -33,45 +35,46 @@ export interface ICallback
   (options?:any):any;
 }
 
-export interface IWizardStepTransition
+export interface IWorkflowTransition
 {
-  readonly from?:IWizardStep;
-  to?:IWizardStep;
-  cancel:boolean;
-  context:IWizardStepTransitionContext
+  readonly from?:IWorkflowStep;
+  to?:IWorkflowStep;
+  continue:boolean;
+  context?:IWorkflowTransitionContext;
+  direction:WorkflowDirection;
 }
 
 /** Defines the shape of the options used o initialize a wizard  */
-export interface IWizardOptions {
+export interface IWorkflowOptions {
   /** The steps that will be initialized */
-  steps(): Array<Partial<IWizardStep>>;
+  steps(): Array<Partial<IWorkflowStep>>;
   /** The delegate that returns a wizard step query */
   firstStep?:IWizardStepQuery;
   cancel?:ICallback;
   finish?:ICallback;
 }
 /** Defines the IWizard contract */
-export interface IWizard {
+export interface IWorkflow {
   /** Initializes|reinitializes the wizard steps */
-  initialize(options:IWizardOptions);
+  initialize(options:IWorkflowOptions);
   /** Gets or sets the list od wizard steps */
-  steps: Array<Partial<IWizardStep>>;
+  steps: Array<Partial<IWorkflowStep>>;
   /** Gets or sets the active step */
-  activeStep: IWizardStep;
+  activeStep: IWorkflowStep;
   /** Checks if the parametrically specified step is active */
-  isStepActive(step: number | string | Partial<IWizardStep>): boolean;
+  isStepActive(step: number | string | Partial<IWorkflowStep>): boolean;
   /** parametrically activates the specified step but does not keep track the previous step */
-  gotoStep(step: number | string | Partial<IWizardStep>,context?:IWizardStepTransitionContext): IWizardStep;
+  gotoStep(step: number | string | Partial<IWorkflowStep>,context?:IWorkflowTransitionContext): IWorkflowStep;
   /** activates the default next step, as defined by nextIndex,
    * or as parametrically specified in the optional argument,
    * and records the current step as the previous step */
-  gotoNextStep(step?: number | string | Partial<IWizardStep>): IWizardStep;
+  gotoNextStep(step?: number | string | Partial<IWorkflowStep>): IWorkflowStep;
   /** Activates the previous step but only if there is one to activate */
-  gotoPreviousStep(): IWizardStep;
+  gotoPreviousStep(): IWorkflowStep;
   /** Find the step parametrically defined */
-  findStep(step: number | string | Partial<IWizardStep>): IWizardStep;
+  findStep(step: number | string | Partial<IWorkflowStep>): IWorkflowStep;
   /** retrieves the first step */
-  firstStep():IWizardStep;
+  firstStep():IWorkflowStep;
   /** wizard cancel handler */
   cancel(options:any):any;
   /** wizard finish handler */
@@ -79,10 +82,10 @@ export interface IWizard {
   /** wizard reset handler */
   reset(options:any):any;
   /** a way to subscribe to step transitions and prevent them from occuring or to redirect the next step */
-  transitions:Observable<IWizardStepTransition>;
+  transitions:Observable<IWorkflowTransition>;
 }
 /** Defines the IWizardStep contract */
-export interface IWizardStep {
+export interface IWorkflowStep {
   /** tne name of the step */
   name: string
   /** the positional index of the step */
@@ -92,17 +95,17 @@ export interface IWizardStep {
   /** Checks if this step is active or not. */
   isActive(): boolean;
   /** Activates this step if it is in the wizard steps collection. */
-  activate():IWizardStep;
+  activate():IWorkflowStep;
   /** Activates the parametrically specified step, and DOES NOT record the current step as the previous step. */
-  gotoStep(step: number | string | Partial<IWizardStep>,context?:IWizardStepTransitionContext): IWizardStep;
+  gotoStep(step: number | string | Partial<IWorkflowStep>,context?:IWorkflowTransitionContext): IWorkflowStep;
   /** activates the default next step, as defined by nextIndex,
    * or as parametrically specified in the optional argument,
    * and records the current step as the previous step */
-  gotoNextStep(step?: number | string | Partial<IWizardStep>): IWizardStep;
+  gotoNextStep(step?: number | string | Partial<IWorkflowStep>): IWorkflowStep;
   /** Activates the previous step but if there is one. */
-  gotoPreviousStep(): IWizardStep
+  gotoPreviousStep(): IWorkflowStep
   /** Retrieves the next step if it is in the steps collection but does not activate it. */
-  getNextStep(): IWizardStep;
+  getNextStep(): IWorkflowStep;
   /** The owning wizard */
-  wizard:IWizard
+  wizard:IWorkflow
 }

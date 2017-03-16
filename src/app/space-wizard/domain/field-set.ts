@@ -1,6 +1,6 @@
 import { Observable,  Subscriber } from 'rxjs/Rx';
 
-export class IFieldInfo {
+export interface IFieldInfo {
   name: string;
   label: string;
   display: boolean;
@@ -10,21 +10,26 @@ export class IFieldInfo {
   valid: boolean;
   value: number | string | boolean | Array<any>;
 }
+/** IFieldSet defines the array like shape of IFieldSet */
+export interface IFieldSet extends Array<IFieldInfo>
+{
 
-export class FieldSet extends Array<IFieldInfo>
+}
+/** FieldSet is an extended IFieldInfo array */
+export class FieldSet extends Array<IFieldInfo> implements IFieldSet
 {
 
 }
 
-/** Field set contrace using interface */
+/** FieldSetService contract */
 export interface IFieldSetService {
-  FirstFieldSet: Observable<FieldSet>
-  NextFieldSet: Observable<FieldSet>
+  FirstFieldSet(options?:any): Observable<IFieldSet>
+  NextFieldSet(options?:any): Observable<IFieldSet>
 }
 
 
-/** FieldSet Service contract using abstract base class */
-export abstract class FieldSetService implements IFieldSetService {
-  FirstFieldSet: Observable<FieldSet>
-  NextFieldSet: Observable<FieldSet>
+/** FieldSetService contract using abstract base class */
+export abstract class FieldSetServiceBase implements IFieldSetService {
+  abstract FirstFieldSet(options?:any): Observable<IFieldSet>;
+  abstract NextFieldSet(options?:any): Observable<IFieldSet>;
 }

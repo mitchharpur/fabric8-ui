@@ -9,11 +9,11 @@ import { Broadcaster, User } from 'ngx-login-client';
 import { DummyService } from '../shared/dummy.service';
 
 import { IModalHost } from './domain/modal-host';
-import { IWizardStep, IWizard } from './domain/wizard';
-import { Wizard } from './domain/wizard-implementation';
+
+import {WorkflowFactory, IWorkflow, IWorkflowStep } from './domain/workflow';
 
 import { SpaceConfigurator } from './domain/codebase';
-import { getLogger, ILog } from './domain/logger';
+import { getLogger, ILoggerDelegate } from './domain/logger';
 
 @Component({
   host: {
@@ -31,24 +31,25 @@ export class SpaceWizardComponent implements OnInit {
 
   @Input() host: IModalHost;
   /** adds a log entry to the logger */
-  log: ILog = () => { };
+  log: ILoggerDelegate = () => { };
 
   configurator: SpaceConfigurator;
 
   private _context: Context;
   private _instance: number = 0;
 
-  private _wizard: IWizard = null;
-  get wizard(): IWizard {
-    if (!this._wizard) {
-      this._wizard = Wizard.Create();
-      this.log(`Creating wizard instance`);
+  private _workflow: IWorkflow = null;
+  @Input()
+  get workflow(): IWorkflow {
+    if (!this._workflow) {
+      this.log(`resolving workflow instance`);
+      this._workflow = WorkflowFactory.Create();
     }
-    return this._wizard;
+    return this._workflow;
   };
 
-  set wizard(value: IWizard) {
-    this._wizard = value;
+  set workflow(value: IWorkflow) {
+    this._workflow = value;
   }
 
   constructor(
@@ -60,11 +61,11 @@ export class SpaceWizardComponent implements OnInit {
     SpaceWizardComponent.instanceCount++;
     this._instance = SpaceWizardComponent.instanceCount;
     this.log = getLogger(this.constructor.name, this._instance);
-    this.log(`Creating an instance.`);
+    this.log(`New instance...`);
   }
 
   ngOnInit() {
-    console.log(`ngOnInit`)
+    this.log(`ngOnInit`)
     this.configureComponentHost();
     this.configurator = this.createSpaceConfigurator();
     this._contextService.current.subscribe(val => this._context = val);
@@ -82,13 +83,13 @@ export class SpaceWizardComponent implements OnInit {
     this.host.open = function (...args) {
       me.log(`Opening wizard modal dialog ...`);
       me.reset();
-      //note: 'this' is not me ... that is why not using a =>
+      //note: 'this' is not me ... but an instance of Modal that is why  => is not being used here
       return originalOpenHandler.apply(this, args);
     }
     let originalCloseHandler = this.host.close;
     this.host.close = function (...args) {
       me.log(`Closing wizard modal dialog ...`);
-      //note: 'this' is not me ... that is why not using a =>
+      //note: 'this' is not me ... but an instance of Modal that is why  => is not being used here
       return originalCloseHandler.apply(this, args);
     }
   }
@@ -110,44 +111,40 @@ export class SpaceWizardComponent implements OnInit {
     configurator.space = this.createSpace();
     return configurator;
   }
-  /** create and initializes the wizard */
-  initializeWizard(wizard?: IWizard): IWizard {
-    if (!wizard) {
-      wizard = Wizard.Create()
-    }
-    let component = this;
-    // Initialize the wizard steps and optionally the first step
-    wizard.initialize({
-      steps: () => {
-        return [
-          { name: "space", index: 0, nextIndex: 1 },
-          { name: "forge", index: 6, nextIndex: 0 },
-          { name: "quickStart", index: 2, nextIndex: 3 },
-          { name: "stack", index: 3, nextIndex: 4 },
-          { name: "pipeline", index: 4, nextIndex: 4 },
-          { name: "dynamic-step", index: 5, nextIndex: 6 }
-        ];
-      },
-      firstStep: () => {
-        return {
-          index: 0
-        };
-      },
-      cancel: (...args) => {
-        // ensure cancel has correct 'this'
-        component.cancel.apply(component, args);
-      },
-      finish: (...args) => {
-        // ensure finish has correct 'this'
-        component.finish.apply(component, args);
-      },
-    });
-    return wizard;
+  /** create and initializes a new workflow object */
+  createAndInitializeWorkflow(): IWorkflow {
+    let component=this;
+    let  workflow = WorkflowFactory.Create({
+        steps: () => {
+          return [
+            { name: "space", index: 0, nextIndex: 1 },
+            { name: "forge", index: 6, nextIndex: 0 },
+            { name: "quickStart", index: 2, nextIndex: 3 },
+            { name: "stack", index: 3, nextIndex: 4 },
+            { name: "pipeline", index: 4, nextIndex: 4 },
+            { name: "dynamic-step", index: 5, nextIndex: 6 }
+          ];
+        },
+        firstStep: () => {
+          return {
+            index: 0
+          };
+        },
+        cancel: (...args) => {
+          // ensure cancel has correct 'this'
+          component.cancel.apply(component, args);
+        },
+        finish: (...args) => {
+          // ensure finish has correct 'this'
+          component.finish.apply(component, args);
+        },
+      })
+    return workflow;
   }
   reset() {
     this.log(`reset`);
     this.configurator = this.createSpaceConfigurator();
-    this.wizard = this.initializeWizard();
+    this.workflow = this.createAndInitializeWorkflow();
   }
 
   finish() {

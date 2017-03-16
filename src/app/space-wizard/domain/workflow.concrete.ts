@@ -1,37 +1,52 @@
 import { Observable, Observer, Subscriber, Subject } from 'rxjs/Rx';
 
-import { IWizardStep, IWizardStepTransition, IWizardStepTransitionContext, IWizard, IWizardLocator, IWizardOptions, WizardStepDirection, StepDirection } from './wizard'
+import { IWorkflowStep, IWorkflowTransition, IWorkflowTransitionContext, IWorkflow, IWorkflowLocator, IWorkflowOptions, WorkflowDirection, TransitionDirection } from './workflow'
 
-import { getLogger, ILog } from './logger';
+import { getLogger, ILoggerDelegate } from './logger';
 
 
-/** allows intercepting of wizard step transitions  */
-class WizardStepTransition implements IWizardStepTransition {
-  constructor(options: Partial<IWizardStepTransition> = { from: null, to: null, cancel: false, context: { direction: StepDirection.GO } }) {
-    this.context = { direction: StepDirection.GO }
-    this.cancel = false;
-    Object.assign(this, options);
+export class WorkflowFactory
+{
+  static Create(options?: IWorkflowOptions):IWorkflow{
+    let tmp=new Workflow();
+    if(options)
+    {
+      tmp.initialize(options);
+    }
+    return tmp;
   }
-  from?: IWizardStep;
-  to?: IWizardStep;
-  context: IWizardStepTransitionContext
-  cancel: boolean = false;
 }
 
-/** implementation of the wizardstep */
-export class WizardStep implements IWizardStep {
+
+/** allows intercepting of workflow transitions  */
+class WorkflowTransition implements IWorkflowTransition {
+  constructor(options: Partial<IWorkflowTransition> = { from: null, to: null, continue: true,direction: TransitionDirection.GO,context: {  } }) {
+    this.context = { };
+    this.continue = true;
+    this.direction = TransitionDirection.GO;
+    Object.assign(this, options);
+  }
+  from?: IWorkflowStep;
+  to?: IWorkflowStep;
+  context: IWorkflowTransitionContext
+  continue: boolean = false;
+  direction:WorkflowDirection;
+}
+
+/** implementation of the IWorkflowstep */
+export class WorkflowStep implements IWorkflowStep {
 
 
   index: number = 0;
   name: string = "";
   nextIndex: number;
 
-  constructor(options: Partial<IWizardStep>, private wizardLocator: IWizardLocator) {
+  constructor(options: Partial<IWorkflowStep>, private workflowLocator: IWorkflowLocator) {
     Object.assign(this, options);
   }
 
-  gotoNextStep(step?: number | string | Partial<IWizardStep>) {
-    return this.wizardLocator().gotoNextStep(step);
+  gotoNextStep(step?: number | string | Partial<IWorkflowStep>) {
+    return this.workflowLocator().gotoNextStep(step);
   }
 
   gotoPreviousStep() {
@@ -39,64 +54,62 @@ export class WizardStep implements IWizardStep {
   }
 
   isActive() {
-    return this.wizardLocator().isStepActive(this);
+    return this.workflowLocator().isStepActive(this);
   }
 
   activate() {
-    this.wizardLocator().gotoStep(this);
+    this.workflowLocator().gotoStep(this);
     return this;
   }
 
-  gotoStep(destination: number | string | IWizardStep, context: IWizardStepTransitionContext = { direction: StepDirection.GO }) {
-    let step: IWizardStep = null;
+  gotoStep(destination: number | string | IWorkflowStep, context: IWorkflowTransitionContext = { direction: TransitionDirection.GO }) {
+    let step: IWorkflowStep = null;
     if (this.isActive) {
       //you can only goto a step if 'this' is the active step
-      step = this.wizardLocator().gotoStep(destination, context);
+      step = this.workflowLocator().gotoStep(destination, context);
     }
     return step;
   }
 
   getNextStep() {
-    let step = this.wizardLocator().findStep(this.nextIndex);
+    let step = this.workflowLocator().findStep(this.nextIndex);
     return step;
   }
 
   get wizard() {
-    return this.wizardLocator();
+    return this.workflowLocator();
   }
 
-  set wizard(value: IWizard) {
+  set wizard(value: IWorkflow) {
   }
 
 }
 
 /** Implementation of the wizard contract */
-export class Wizard implements IWizard {
+export class Workflow implements IWorkflow {
 
   static instanceCount: number = 0;
-  _instance: number = 0;
 
-  private log: ILog = () => { };
-  private _steps: Array<IWizardStep> = [];
-  private _stepTransitionsSubject: Subject<IWizardStepTransition>;
-  private _activeStep: IWizardStep
+  private _instance: number = 0;
+  private _steps: Array<IWorkflowStep> = [];
+  private _workflowTransitionSubject: Subject<IWorkflowTransition>;
+  private _activeStep: IWorkflowStep
 
-  static Create(): IWizard {
-    return new Wizard();
-  }
+  private log: ILoggerDelegate = () => { };
 
 
   constructor() {
-    Wizard.instanceCount++;
-    this._instance = Wizard.instanceCount;
+    Workflow.instanceCount++;
+    this._instance = Workflow.instanceCount;
     this.log = getLogger(this.constructor.name, this._instance);
+    this.log(`New instance...`);
   }
 
-  get steps(): Array<IWizardStep> {
+  get steps(): Array<IWorkflowStep> {
     return this._steps;
   };
 
-  set steps(value: Array<IWizardStep>) {
+  set steps(value: Array<IWorkflowStep>) {
     this.initialize({ steps: () => value });
   }
 
@@ -113,22 +126,22 @@ export class Wizard implements IWizard {
     return null;
   }
 
-  firstStep(): IWizardStep {
+  firstStep(): IWorkflowStep {
     // The default first step handler is null ... it gets overriden during intialization.
     return null;
   }
 
-  get activeStep(): IWizardStep {
+  get activeStep(): IWorkflowStep {
     return this._activeStep;
   };
 
-  set activeStep(value: IWizardStep) {
-    this.log(`Setting the active wizard step from ${this._activeStep ? this._activeStep.name : 'null'} to ${value ? value.name : 'null'} `);
+  set activeStep(value: IWorkflowStep) {
+    this.log(`Setting the active workflow step from '${this._activeStep ? this._activeStep.name : 'null'}' to '${value ? value.name : 'null'}' `);
     this._activeStep = value;
   }
 
-  initialize(options: IWizardOptions) {
-    this.log("Initializing wizard ...")
+  initialize(options: IWorkflowOptions) {
+    this.log("Initializing the workflow ...")
     let wizard = this;
     this._steps = [];
     // ensure callback have correct 'this'
@@ -145,13 +158,13 @@ export class Wizard implements IWizard {
       if (item.index && item.index < firstIndex) {
         firstIndex = item.index
       }
-      let step = new WizardStep(item, () => wizard);
+      let step = new WorkflowStep(item, () => wizard);
       this._steps.push(step);
     }
     // Set up the 'first step' handler/closure that will dynamically use index or
     // the IWizardStepQuery optionally passed in with wizard options;
     this.firstStep = () => {
-      let firstStep: IWizardStep = null;
+      let firstStep: IWorkflowStep = null;
       if (!options.firstStep) {
         options.firstStep = () => firstIndex;
       }
@@ -185,7 +198,7 @@ export class Wizard implements IWizard {
     }
   }
 
-  isStepActive(step: number | string | Partial<IWizardStep>) {
+  isStepActive(step: number | string | Partial<IWorkflowStep>) {
     if (this.activeStep) {
       if (step === this.findStep) {
         // check for reference
@@ -214,8 +227,8 @@ export class Wizard implements IWizard {
     return false;
   }
 
-  findStep(destination: number | string | Partial<IWizardStep>) {
-    let step: IWizardStep = null;
+  findStep(destination: number | string | Partial<IWorkflowStep>) {
+    let step: IWorkflowStep = null;
     if (typeof destination === 'number') {
       step = this.steps.find((step) => step.index === destination)
       return step;
@@ -235,12 +248,15 @@ export class Wizard implements IWizard {
     }
     return step;
   }
-
-  gotoStep(destination: number | string | Partial<IWizardStep>, context: IWizardStepTransitionContext = { direction: StepDirection.GO }) {
+  //TODO: convert to promise for async long running transiitions
+  gotoStep(destination: number | string | Partial<IWorkflowStep>, transitionOptions: Partial<IWorkflowTransition> = { continue:true, direction: TransitionDirection.GO,context:{} }) {
 
     let destinationStep = this.findStep(destination);
     if (destinationStep) {
-      if (this.isStepTransitionCancelled({ from: this.activeStep, to: destinationStep, context: context }) === false) {
+      transitionOptions.continue=transitionOptions.continue||true;
+      transitionOptions.direction=transitionOptions.direction||TransitionDirection.GO;
+      transitionOptions.context=transitionOptions.context||{};
+      if (this.workflowTransitionShouldContinue({ from: this.activeStep, to: destinationStep, direction:transitionOptions.direction ,continue:transitionOptions.continue,context:transitionOptions.context }) === true) {
         let activeStep = this.activeStep;
         this.activeStep = destinationStep;
       }
@@ -248,46 +264,46 @@ export class Wizard implements IWizard {
     return destinationStep;
   }
 
-  gotoNextStep(destination?: number | string | Partial<IWizardStep>) {
+  gotoNextStep(destination?: number | string | Partial<IWorkflowStep>) {
     this.log(`gotoNextStep ...`)
-    let nextStep: IWizardStep = null;
+    let nextStep: IWorkflowStep = null;
     let activeStep = this.activeStep;
     if (!destination) {
       // if nothing specified (i.e no branching) then just do the default behavior based on nextIndex
       if (activeStep) {
         nextStep = this.findStep(activeStep.nextIndex);
-        this.log(`found next step = ${nextStep.name} ...`);
+        this.log(`Found next step = ${nextStep.name} ...`);
       }
       else {
         // if no active step then the firstStep is the next step
         this.activeStep = this.firstStep();
-        this.log(`found next step = ${this.activeStep.name} ...`);
+        this.log(`Found next step = ${this.activeStep.name} ...`);
         return this.activeStep;
       }
     }
     else {
       // otherwise 'branch' to specified step
       nextStep = this.findStep(destination);
-      this.log(`found next step = ${nextStep.name} ...`);
+      this.log(`Found next step = ${nextStep.name} ...`);
     }
     if (!nextStep) {
       let currentStep = "";
       if (this.activeStep) {
         currentStep = ` for ${this.activeStep.name}`;
       }
-      this.log(`gotoNextStep ... no next step  for step=${currentStep} ...`);
+      this.log(`gotoNextStep ... no next step for the current step = ${currentStep} ...`);
     }
     // setup the previous step handler and transition to nextstep if the step is valid
     if (nextStep) {
       let priorHandler = nextStep.gotoPreviousStep;
       // by dynamically adding the gotoNextStep function using a closure to retrieve previous step
       nextStep.gotoPreviousStep = () => {
-        let step = this.gotoStep(activeStep, { direction: StepDirection.PREVIOUS });
+        let step = this.gotoStep(activeStep, { continue:true, direction: TransitionDirection.PREVIOUS });
         // restore prior handler
         nextStep.gotoPreviousStep = priorHandler;
         return step;
       }
-      this.gotoStep(nextStep.index, { direction: StepDirection.NEXT })
+      this.gotoStep(nextStep.index, { continue:true, direction: TransitionDirection.NEXT,context:{} })
     }
     return nextStep;
   }
@@ -302,29 +318,34 @@ export class Wizard implements IWizard {
     }
     return previousStep;
   }
-  //TODO needs to return a promice to cater for async step continuation
-  private isStepTransitionCancelled(options: Partial<IWizardStepTransition> = { cancel: false, context: { direction: StepDirection.GO } }): boolean {
-    let transition = new WizardStepTransition(options);
-    this.log(`isStepTransitionCancelled: notifying subscribers.`);
-    this.stepTransitionsSubject.next(transition);
-    this.log(`IsStepTransitionCancelled =${transition.cancel}`);
-    return transition.cancel;
+  //TODO needs to return a promise to cater for async step continuation
+  private workflowTransitionShouldContinue(options: Partial<IWorkflowTransition> = { continue: false, context: { direction: TransitionDirection.GO } }): boolean {
+    let transition = new WorkflowTransition(options);
+    this.log(`Notify workflow transition subscribers of an upcoming '${transition.direction}' transition from '${transition.from?transition.from.name:"null"}' to '${transition.to?transition.to.name:"null"}' `);
+    this.workflowTransitionSubject.next(transition);
+    this.log(`workflowTransitionShouldContinue = ${transition.continue}`);
+    if(transition.continue===false)
+    {
+      this.log({message:`Note: workflow will not proceed from '${transition.from?transition.from.name:"null"}' to '${transition.to?transition.to.name:"null"}' because transition.continue=${transition.continue}`,warning:true});
+
+    }
+    return transition.continue;
   }
 
-  get stepTransitionsSubject(): Subject<IWizardStepTransition> {
-    this._stepTransitionsSubject = this._stepTransitionsSubject || new Subject<IWizardStepTransition>();
-    return this._stepTransitionsSubject;
+  get workflowTransitionSubject(): Subject<IWorkflowTransition> {
+    this._workflowTransitionSubject = this._workflowTransitionSubject || new Subject<IWorkflowTransition>();
+    return this._workflowTransitionSubject;
   }
-  set stepTransitionsSubject(value: Subject<IWizardStepTransition>) {
-    this._stepTransitionsSubject = value;
+  set workflowTransitionSubject(value: Subject<IWorkflowTransition>) {
+    this._workflowTransitionSubject = value;
   }
 
   //Note: every subscriber gets an observable instance
-  get transitions(): Observable<IWizardStepTransition> {
+  get transitions(): Observable<IWorkflowTransition> {
     let me = this;
-    let transitions: Observable<IWizardStepTransition> = Observable.create((observer: Observer<IWizardStepTransition>) => {
-      this.log("Adding an observer that can subscribe to wizard step transitions ...");
-      me.stepTransitionsSubject.subscribe(observer)
+    let transitions: Observable<IWorkflowTransition> = Observable.create((observer: Observer<IWorkflowTransition>) => {
+      me.workflowTransitionSubject.subscribe(observer)
+      this.log("Observer is now subscribed to workflow transitions ...");
 
     });
     return transitions;
