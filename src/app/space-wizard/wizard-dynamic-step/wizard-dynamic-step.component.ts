@@ -1,11 +1,12 @@
 import { Component, OnInit, OnChanges, OnDestroy, SimpleChanges, SimpleChange, Input, Inject } from '@angular/core';
 import { Router } from '@angular/router';
 
-import { IWorkflowStep, IWorkflowTransition, IWorkflow, TransitionDirection } from '../domain/workflow';
-import { getLogger, ILoggerDelegate } from '../domain/logger';
-import { INotifyPropertyChanged } from '../domain/component'
+import { IWorkflowStep, IWorkflowTransition, IWorkflow, TransitionDirection } from '../models/workflow';
+import { getLogger, ILoggerDelegate } from '../models/logger';
+import { INotifyPropertyChanged } from '../models/component'
 
 import { IFieldInfo, IFieldSet, IFieldSetService, IFieldSetServiceProvider } from '../services/field-set.service'
+import { ISpaceMagicServiceProvider } from '../services/space-magic.service'
 
 @Component({
   host: {
@@ -14,7 +15,7 @@ import { IFieldInfo, IFieldSet, IFieldSetService, IFieldSetServiceProvider } fro
   selector: 'wizard-dynamic-step',
   templateUrl: './wizard-dynamic-step.component.html',
   styleUrls: ['./wizard-dynamic-step.component.scss'],
-  providers: [IFieldSetServiceProvider.FactoryProvider]
+  providers: [IFieldSetServiceProvider.FactoryProvider,ISpaceMagicServiceProvider.FactoryProvider]
 
 })
 export class WizardDynamicStepComponent implements OnInit, OnDestroy, OnChanges {

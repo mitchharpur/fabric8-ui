@@ -8,12 +8,12 @@ import { Broadcaster, User } from 'ngx-login-client';
 
 import { DummyService } from '../shared/dummy.service';
 
-import { IModalHost } from './domain/modal-host';
+import { IModalHost } from './models/modal-host';
 
-import {WorkflowFactory, IWorkflow, IWorkflowStep } from './domain/workflow';
+import {WorkflowFactory, IWorkflow, IWorkflowStep } from './models/workflow';
 
-import { SpaceConfigurator } from './domain/codebase';
-import { getLogger, ILoggerDelegate } from './domain/logger';
+import { SpaceConfigurator } from './models/codebase';
+import { getLogger, ILoggerDelegate } from './models/logger';
 
 @Component({
   host: {

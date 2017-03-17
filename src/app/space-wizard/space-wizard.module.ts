@@ -3,11 +3,13 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { SpaceWizardComponent } from './space-wizard.component';
 import { WizardDynamicStepComponent } from './wizard-dynamic-step/wizard-dynamic-step.component';
-
+import { ISpaceMagicServiceProvider } from './services/space-magic.service'
+import { IFieldSetServiceProvider } from './services/field-set.service'
 @NgModule({
   imports: [CommonModule, FormsModule ],
   declarations: [SpaceWizardComponent,WizardDynamicStepComponent],
-  exports: [SpaceWizardComponent]
+  exports: [SpaceWizardComponent],
+  providers:[IFieldSetServiceProvider.FactoryProvider,ISpaceMagicServiceProvider.FactoryProvider]
 })
 export class SpaceWizardModule {
 

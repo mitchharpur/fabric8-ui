@@ -1,4 +1,4 @@
-import { Observable,  Subscriber } from 'rxjs/Rx';
+import { Observable, Observer, Subscriber } from 'rxjs/Rx';
 
 export interface IFieldInfo {
   name: string;
@@ -30,4 +30,12 @@ export interface IFieldSetService {
 /** FieldSetService contract using abstract base class */
 export abstract class FieldSetServiceBase implements IFieldSetService {
   abstract GetFieldSet(options?:any): Observable<IFieldSet>;
+}
+
+export function getEmptyFieldSet():Observable<IFieldSet>
+{
+    return Observable.create((observer:Observer<IFieldSet>) => {
+      observer.next([]);
+      observer.complete();
+    });
 }

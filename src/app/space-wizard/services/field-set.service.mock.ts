@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Observable, Observer } from 'rxjs/Rx';
-import { IFieldSet, IFieldInfo ,FieldSet, FieldSetServiceBase} from '../domain/field-set'
+import { getEmptyFieldSet, IFieldSet, IFieldInfo ,FieldSet, FieldSetServiceBase} from '../models/field-set'
 
 /** field set mock service */
 @Injectable()
@@ -18,19 +18,12 @@ export class MockFieldSetService extends FieldSetServiceBase {
         return getSecondFieldSet();
       }
       default:{
-        return getDefaultFieldSet();
+        return getEmptyFieldSet();
       }
     }
   }
 }
 
-function getDefaultFieldSet():Observable<IFieldSet>
-{
-    return Observable.create((observer:Observer<IFieldSet>) => {
-      observer.next([]);
-      observer.complete();
-    });
-}
 
 function getFirstFieldSet():Observable<IFieldSet>
 {
