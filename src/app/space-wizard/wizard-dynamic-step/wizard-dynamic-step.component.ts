@@ -7,8 +7,6 @@ import { INotifyPropertyChanged } from '../domain/component'
 
 import { IFieldInfo, IFieldSet, IFieldSetService, IFieldSetServiceProvider } from '../services/field-set.service'
 
-
-
 @Component({
   host: {
     'class': 'wizard-step'
@@ -81,33 +79,29 @@ export class WizardDynamicStepComponent implements OnInit, OnDestroy, OnChanges 
     }
   }
 
-  private isTransitioningToThisStep(transition:IWorkflowTransition):boolean
-  {
+  private isTransitioningToThisStep(transition: IWorkflowTransition): boolean {
     return transition.to && transition.to.name.toLowerCase() === this.stepName.toLowerCase()
   }
-  private isTransitioningFromThisStep(transition:IWorkflowTransition):boolean
-  {
+  private isTransitioningFromThisStep(transition: IWorkflowTransition): boolean {
     return transition.from && transition.from.name.toLowerCase() === this.stepName.toLowerCase()
   }
 
-  private _fieldSet:IFieldSet;
-  get fieldSet():IFieldSet{
-    this._fieldSet=this._fieldSet||[];
+  private _fieldSet: IFieldSet;
+  get fieldSet(): IFieldSet {
+    this._fieldSet = this._fieldSet || [];
     return this._fieldSet;
   }
-  set fieldSet(value:IFieldSet)
-  {
-    this._fieldSet=value;
+  set fieldSet(value: IFieldSet) {
+    this._fieldSet = value;
   }
 
-  private _fieldSetHistory:Array<IFieldSet>;
-  get fieldSetHistory():Array<IFieldSet>{
-    this._fieldSetHistory=this._fieldSetHistory||[];
+  private _fieldSetHistory: Array<IFieldSet>;
+  get fieldSetHistory(): Array<IFieldSet> {
+    this._fieldSetHistory = this._fieldSetHistory || [];
     return this._fieldSetHistory;
   }
-  set fieldSetHistory(value:Array<IFieldSet>)
-  {
-    this._fieldSetHistory=value;
+  set fieldSetHistory(value: Array<IFieldSet>) {
+    this._fieldSetHistory = value;
   }
 
   private subscribeToWorkflowTransitions(workflow: IWorkflow) {
@@ -118,19 +112,18 @@ export class WizardDynamicStepComponent implements OnInit, OnDestroy, OnChanges 
     workflow.transitions.subscribe((transition) => {
       try {
         this.log({ message: `Subscriber responding to an observed '${transition.direction}' workflow transition: from ${transition.from ? transition.from.name : "null"} to ${transition.to ? transition.to.name : "null"}.` });
-        if (this.isTransitioningToThisStep(transition)){
+        if (this.isTransitioningToThisStep(transition)) {
           switch (transition.direction) {
             case TransitionDirection.NEXT:
               {
                 if (transition.from != transition.to) {
                   //handle first fieldset
-                  this._fieldSetService.GetFieldSet({command:"first"}).subscribe((fieldSet) => {
-                    let prevFieldSet=this.fieldSet;
-                    if(this.fieldSetHistory.length>0)
-                    {
+                  this._fieldSetService.GetFieldSet({ command: "first" }).subscribe((fieldSet) => {
+                    let prevFieldSet = this.fieldSet;
+                    if (this.fieldSetHistory.length > 0) {
                       this.fieldSetHistory.push(prevFieldSet);
                     }
-                    this.fieldSet=fieldSet
+                    this.fieldSet = fieldSet
                     this.log(`stored fieldset[${prevFieldSet.length}] into history ... there are ${this.fieldSetHistory.length} items in history ...`);
                   })
                 }
@@ -139,9 +132,9 @@ export class WizardDynamicStepComponent implements OnInit, OnDestroy, OnChanges 
             case TransitionDirection.PREVIOUS:
               {
                 if (transition.from === transition.to) {
-                  let fieldSet=this.fieldSetHistory.pop();
+                  let fieldSet = this.fieldSetHistory.pop();
 
-                  this.fieldSet=fieldSet;
+                  this.fieldSet = fieldSet;
                   this.log(`restored fieldset[${fieldSet.length}] from history ... there are ${this.fieldSetHistory.length} items in history ...`);
                 }
                 break;
@@ -155,20 +148,19 @@ export class WizardDynamicStepComponent implements OnInit, OnDestroy, OnChanges 
               {
                 if (transition.from != transition.to) {
                   //handle first fieldset
-                  this._fieldSetService.GetFieldSet({command:"second"}).subscribe((fieldSet) => {
-                    let prevFieldSet=this.fieldSet;
+                  this._fieldSetService.GetFieldSet({ command: "second" }).subscribe((fieldSet) => {
+                    let prevFieldSet = this.fieldSet;
                     this.fieldSetHistory.push(prevFieldSet);
-                    this.fieldSet=fieldSet
+                    this.fieldSet = fieldSet
                     this.log(`stored fieldset[${prevFieldSet.length}] into history ... there are ${this.fieldSetHistory.length} items in history ...`);
                   })
                   //keep at this point
-                  transition.to=transition.from;
+                  transition.to = transition.from;
                 }
                 // transition.continue = false to prevent transitions;
                 break;
               }
           }
-
         }
       }
       catch (err) {
@@ -176,9 +168,4 @@ export class WizardDynamicStepComponent implements OnInit, OnDestroy, OnChanges 
       }
     })
   }
-
-
-
-
-
 }
