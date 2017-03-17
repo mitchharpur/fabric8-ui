@@ -1,11 +1,23 @@
 import { Injectable } from '@angular/core';
 import { Observable, Observer } from 'rxjs/Rx';
 import { getEmptyFieldSet, IFieldSet, IFieldInfo ,FieldSet, FieldSetServiceBase} from '../models/field-set'
+import { getLogger, ILoggerDelegate } from '../models/logger';
 
 /** field set mock service */
 @Injectable()
 export class MockFieldSetService extends FieldSetServiceBase {
-  constructor() { super() }
+  static instanceCount: number = 0;
+  private _instance: number = 0;
+  private log: ILoggerDelegate = () => { };
+
+  constructor() { 
+    super() 
+    MockFieldSetService.instanceCount++;
+    this._instance=MockFieldSetService.instanceCount;
+    this.log = getLogger(this.constructor.name, this._instance);
+    this.log(`New instance...`);
+  
+ }
   GetFieldSet(options:any={}): Observable<IFieldSet> {
     switch(options.command)
     {
@@ -31,7 +43,7 @@ function getFirstFieldSet():Observable<IFieldSet>
       let items:IFieldInfo[]=
       [
         {
-          name: "f1",
+          name: "mock-f1",
           label: "label-f1",
           display: true,
           enabled: true,
@@ -41,7 +53,7 @@ function getFirstFieldSet():Observable<IFieldSet>
           value: "f1-value"
         },
         {
-          name: "f2",
+          name: "mock-f2",
           label: "label-f2",
           display: true,
           enabled: true,
@@ -62,7 +74,7 @@ function getSecondFieldSet():Observable<IFieldSet>
     return Observable.create((observer:Observer<IFieldSet>) => {
       observer.next([
         {
-          name: "f3",
+          name: "mock-f3",
           label: "label-f3",
           display: true,
           enabled: true,
@@ -72,7 +84,7 @@ function getSecondFieldSet():Observable<IFieldSet>
           value: "f3-value"
         },
         {
-          name: "f4",
+          name: "mock-f4",
           label: "label-f4",
           display: true,
           enabled: true,
@@ -82,7 +94,7 @@ function getSecondFieldSet():Observable<IFieldSet>
           value: "f4-value-4"
         },
         {
-          name: "f5",
+          name: "mock-f5",
           label: "label-f5",
           display: true,
           enabled: true,

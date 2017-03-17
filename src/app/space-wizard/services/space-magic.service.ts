@@ -5,14 +5,16 @@ import { Observable,  Subscriber } from 'rxjs/Rx';
 import { ISpaceMagicService , SpaceMagicServiceBase  } from '../models/space-magic'
 
 
-export { ISpaceMagicService, IMagicRequest, IMagicResponse } from '../models/space-magic';
+export { ISpaceMagicService, SpaceMagicServiceBase, IMagicRequest, IMagicResponse } from '../models/space-magic';
 
 import { MockSpaceMagicService } from './space-magic.service.mock'
+import { ConcreteSpaceMagicService } from './space-magic.service.concrete'
 
 /**
  * service dependency injection helper constructs
  */
 const  serviceBaseClassTypeName =  "SpaceMagicServiceBase";
+const  serviceClassTypeName =  "SpaceMagicService";
 const  serviceInterfaceTypeName = "ISpaceMagicService";
 const  serviceInterfaceTypeToken = new OpaqueToken(serviceInterfaceTypeName);
 
@@ -25,6 +27,14 @@ const  serviceInterfaceTypeToken = new OpaqueToken(serviceInterfaceTypeName);
  * This type name if just used for logging purposes.
  */
 function createServiceFactory(typeName: string) {
+  let serviceFactory= () => {
+    let tmp = new ConcreteSpaceMagicService();
+    console.log(`SpaceMagicService:serviceFactory: Resolving ${typeName} as an instance of ${tmp.constructor.name}.`);
+    return tmp;
+  };
+  return serviceFactory;
+}
+function createMockServiceFactory(typeName: string) {
   let serviceFactory= () => {
     let tmp = new MockSpaceMagicService();
     console.log(`SpaceMagicService:serviceFactory: Resolving ${typeName} as an instance of ${tmp.constructor.name}.`);
@@ -57,6 +67,12 @@ export class SpaceMagicServiceProvider {
   static get ClassProvider(): ClassProvider {
     return {
       provide: SpaceMagicServiceBase,
+      useClass: ConcreteSpaceMagicService
+    }
+  }
+  static get MockClassProvider(): ClassProvider {
+    return {
+      provide: SpaceMagicServiceBase,
       useClass: MockSpaceMagicService
     }
   }
@@ -64,7 +80,15 @@ export class SpaceMagicServiceProvider {
   static get FactoryProvider(): FactoryProvider {
     return {
       provide: SpaceMagicServiceBase,
-      useFactory: createServiceFactory(serviceBaseClassTypeName),
+      useFactory: createServiceFactory(serviceClassTypeName),
+      deps: [],
+      multi: false
+    }
+  }
+  static get MockFactoryProvider(): FactoryProvider {
+    return {
+      provide: SpaceMagicServiceBase,
+      useFactory: createMockServiceFactory(serviceBaseClassTypeName),
       deps: [],
       multi: false
     }

@@ -5,16 +5,17 @@ import { Observable,  Subscriber } from 'rxjs/Rx';
 import { IFieldSetService , FieldSetServiceBase  } from '../models/field-set'
 
 
-export { IFieldSetService, IFieldSet, IFieldInfo } from '../models/field-set';
+export { IFieldSetService, IFieldSet, IFieldInfo,FieldSetServiceBase } from '../models/field-set';
 
 import { MockFieldSetService } from './field-set.service.mock'
-import { FieldSetService } from './field-set.service.concrete'
+import { ConcreteFieldSetService } from './field-set.service.concrete'
 import { ISpaceMagicServiceProvider, ISpaceMagicService} from './space-magic.service'
 
 /**
  * service dependency injection helper constructs
  */
 const  serviceBaseClassTypeName =  "FieldSetServiceBase";
+const  serviceClassTypeName =  "FieldSetService";
 const  serviceInterfaceTypeName = "IFieldSetService";
 const  serviceInterfaceTypeToken = new OpaqueToken(serviceInterfaceTypeName);
 
@@ -26,7 +27,7 @@ const  serviceInterfaceTypeToken = new OpaqueToken(serviceInterfaceTypeName);
  * @param typeName : the name of the type for which a factory is to be retrieved.
  * This type name if just used for logging purposes.
  */
-function createServiceFactory(typeName: string) {
+function createConcreteServiceFactory(typeName: string) {
   let serviceFactory= () => {
     // directly use angular injector
     // TODO: use class provider to resolve dependecies vi di
@@ -60,7 +61,7 @@ export class IFieldSetServiceProvider {
   static get FactoryProvider(): FactoryProvider {
     return { //serviceInterfaceFactoryProvider;
       provide: serviceInterfaceTypeToken,
-      useFactory: createServiceFactory(serviceInterfaceTypeName)
+      useFactory: createConcreteServiceFactory(serviceInterfaceTypeName)
     }
   }
   static get InjectToken(): OpaqueToken {
@@ -76,7 +77,7 @@ export class FieldSetServiceProvider {
   static get ClassProvider(): ClassProvider {
     return {
       provide: FieldSetServiceBase,
-      useClass: FieldSetService
+      useClass: ConcreteFieldSetService
     }
   }
   static get MockClassProvider(): ClassProvider {
@@ -89,7 +90,7 @@ export class FieldSetServiceProvider {
   static get FactoryProvider(): FactoryProvider {
     return {
       provide: FieldSetServiceBase,
-      useFactory: createServiceFactory(serviceBaseClassTypeName),
+      useFactory: createConcreteServiceFactory(serviceClassTypeName),
       deps: [],
       multi: false
     }

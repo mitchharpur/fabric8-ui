@@ -5,8 +5,8 @@ import { IWorkflowStep, IWorkflowTransition, IWorkflow, TransitionDirection } fr
 import { getLogger, ILoggerDelegate } from '../models/logger';
 import { INotifyPropertyChanged } from '../models/component'
 
-import { IFieldInfo, IFieldSet, IFieldSetService, IFieldSetServiceProvider } from '../services/field-set.service'
-import { ISpaceMagicServiceProvider } from '../services/space-magic.service'
+import { FieldSetServiceBase, IFieldInfo, IFieldSet, IFieldSetService,FieldSetServiceProvider,IFieldSetServiceProvider } from '../services/field-set.service'
+import { ISpaceMagicServiceProvider,SpaceMagicServiceProvider } from '../services/space-magic.service'
 
 @Component({
   host: {
@@ -15,7 +15,7 @@ import { ISpaceMagicServiceProvider } from '../services/space-magic.service'
   selector: 'wizard-dynamic-step',
   templateUrl: './wizard-dynamic-step.component.html',
   styleUrls: ['./wizard-dynamic-step.component.scss'],
-  providers: [IFieldSetServiceProvider.FactoryProvider,ISpaceMagicServiceProvider.FactoryProvider]
+  providers: [FieldSetServiceProvider.MockClassProvider,IFieldSetServiceProvider.FactoryProvider, ISpaceMagicServiceProvider.FactoryProvider,SpaceMagicServiceProvider.MockClassProvider]
 
 })
 export class WizardDynamicStepComponent implements OnInit, OnDestroy, OnChanges {
@@ -37,7 +37,7 @@ export class WizardDynamicStepComponent implements OnInit, OnDestroy, OnChanges 
 
   @Input() stepName: string = "";
 
-  constructor( @Inject(IFieldSetServiceProvider.InjectToken) private _fieldSetService: IFieldSetService) {
+  constructor( /*@Inject(IFieldSetServiceProvider.InjectToken)*/ private _fieldSetService: FieldSetServiceBase) {
     WizardDynamicStepComponent.instanceCount++;
     this._instance = WizardDynamicStepComponent.instanceCount;
     this.log = getLogger(this.constructor.name, this._instance);

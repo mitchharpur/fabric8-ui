@@ -1,13 +1,25 @@
 import { Injectable, Inject } from '@angular/core';
 import { Observable, Observer } from 'rxjs/Rx';
 import { getEmptyFieldSet, IFieldSet, IFieldInfo, FieldSet, FieldSetServiceBase } from '../models/field-set'
-import { ISpaceMagicService, IMagicResponse, IMagicRequest, ISpaceMagicServiceProvider } from '../services/space-magic.service'
+import { ISpaceMagicService,SpaceMagicServiceBase, IMagicResponse, IMagicRequest, ISpaceMagicServiceProvider } from '../services/space-magic.service'
+import { getLogger, ILoggerDelegate } from '../models/logger';
+
 /** field set service */
 @Injectable()
-export class FieldSetService extends FieldSetServiceBase {
-  private spaceMagicService=ISpaceMagicServiceProvider.FactoryProvider.useFactory()
-  constructor( /*@Inject(ISpaceMagicServiceProvider.InjectToken) private spaceMagicService: ISpaceMagicService*/) {
+export class ConcreteFieldSetService extends FieldSetServiceBase {
+  static instanceCount: number = 0;
+  private _instance: number = 0;
+  private log: ILoggerDelegate = () => { };
+
+  //private spaceMagicService=ISpaceMagicServiceProvider.FactoryProvider.useFactory()
+  
+
+  constructor( /*@Inject(ISpaceMagicServiceProvider.InjectToken) private spaceMagicService: ISpaceMagicService*/ private spaceMagicService: SpaceMagicServiceBase) {
     super()
+    ConcreteFieldSetService.instanceCount++;
+    this._instance=ConcreteFieldSetService.instanceCount;
+    this.log = getLogger(this.constructor.name, this._instance);
+    this.log(`New instance...`);
   }
   GetFieldSet(options: any = {}): Observable<IFieldSet> {
     let service: ISpaceMagicService = this.spaceMagicService;
@@ -52,7 +64,7 @@ function mapResponseToFieldSet(response: IMagicResponse): IFieldSet {
   let items: IFieldInfo[] =
     [
       {
-        name: "f1",
+        name: "maped-f1",
         label: "label-f1",
         display: true,
         enabled: true,
@@ -62,7 +74,7 @@ function mapResponseToFieldSet(response: IMagicResponse): IFieldSet {
         value: "f1-value"
       },
       {
-        name: "f2",
+        name: "mapped-f2",
         label: "label-f2",
         display: true,
         enabled: true,
