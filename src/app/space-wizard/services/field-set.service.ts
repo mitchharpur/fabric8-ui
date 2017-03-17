@@ -1,56 +1,29 @@
 import { Injectable, FactoryProvider, ClassProvider, Type, OpaqueToken , ReflectiveInjector } from '@angular/core';
-
 import { Observable,  Subscriber } from 'rxjs/Rx';
 
-import { IFieldSetService , FieldSetServiceBase  } from '../models/field-set'
 
 
-export { IFieldSetService, IFieldSet, IFieldInfo,FieldSetServiceBase } from '../models/field-set';
 
 import { MockFieldSetService } from './field-set.service.mock'
 import { ConcreteFieldSetService } from './field-set.service.concrete'
+
+export { IFieldSetService, IFieldSet, IFieldInfo, FieldSetServiceBase } from '../models/field-set';
+import { IFieldSet,FieldSetServiceBase} from '../models/field-set'
 import { ISpaceMagicServiceProvider, ISpaceMagicService} from './space-magic.service'
 
 /**
  * service dependency injection helper constructs
  */
-const  serviceBaseClassTypeName =  "FieldSetServiceBase";
-const  serviceClassTypeName =  "FieldSetService";
-const  serviceInterfaceTypeName = "IFieldSetService";
-const  serviceInterfaceTypeToken = new OpaqueToken(serviceInterfaceTypeName);
+const  BaseClassName =  "FieldSetServiceBase";
+const  ClassName =  "FieldSetService";
+const  InterfaceName = "IFieldSetService";
+const  InterfaceToken = new OpaqueToken(InterfaceName);
 
 
-/**
- * This function returns a function that operates as the service factory for the Service.
- * the factory creates an instance of the service , but the provider resolves either an interface
- * or an abstract base class.
- * @param typeName : the name of the type for which a factory is to be retrieved.
- * This type name if just used for logging purposes.
- */
-function createConcreteServiceFactory(typeName: string) {
-  let serviceFactory= () => {
-    // directly use angular injector
-    // TODO: use class provider to resolve dependecies vi di
-    let injector=ReflectiveInjector.resolveAndCreate([FieldSetServiceProvider.ClassProvider])
-    let tmp= injector.get(FieldSetServiceBase);
-    // directly use angular injector
-    //let injector=ReflectiveInjector.resolveAndCreate([ISpaceMagicServiceProvider.FactoryProvider])
-    //let spaceMagicService= injector.get(ISpaceMagicServiceProvider.InjectToken);
-    //let tmp=new FieldSetService(spaceMagicService);
-    console.log(`FieldSet:serviceFactory: Resolving ${typeName} as an instance of ${tmp.constructor.name}.`);
-    return tmp;
-  };
-  return serviceFactory;
-}
 
-function createMockServiceFactory(typeName: string) {
-  let serviceFactory= () => {
-    let tmp = new MockFieldSetService();
-    console.log(`FieldSet:serviceFactory: Resolving ${typeName} as an instance of ${tmp.constructor.name}.`);
-    return tmp;
-  };
-  return serviceFactory;
-}
+// TODO: use class provider to resolve dependecies vi di
+//let injector=ReflectiveInjector.resolveAndCreate([FieldSetServiceProvider.ClassProvider])
+//let tmp= injector.get(FieldSetServiceBase);
 
 
 /** When using this provider and you take a dependency on the interface type
@@ -60,12 +33,23 @@ function createMockServiceFactory(typeName: string) {
 export class IFieldSetServiceProvider {
   static get FactoryProvider(): FactoryProvider {
     return { //serviceInterfaceFactoryProvider;
-      provide: serviceInterfaceTypeToken,
-      useFactory: createConcreteServiceFactory(serviceInterfaceTypeName)
+      provide: InterfaceToken,
+      useFactory:(spaceMagicService:ISpaceMagicService)=>{
+        return new ConcreteFieldSetService(spaceMagicService);
+      },
+      deps:[ISpaceMagicServiceProvider.InjectToken]
+    }
+  }
+  static get MockFactoryProvider(): FactoryProvider {
+    return { 
+      provide: InterfaceToken,
+      useFactory:()=>{
+        return new MockFieldSetService();
+      }
     }
   }
   static get InjectToken(): OpaqueToken {
-    return serviceInterfaceTypeToken;
+    return InterfaceToken;
   }
 }
 /** These providers uses the abstract base class as a contract. Does not require
@@ -90,16 +74,19 @@ export class FieldSetServiceProvider {
   static get FactoryProvider(): FactoryProvider {
     return {
       provide: FieldSetServiceBase,
-      useFactory: createConcreteServiceFactory(serviceClassTypeName),
-      deps: [],
+      useFactory:(spaceMagicService:ISpaceMagicService)=>{ 
+        return new ConcreteFieldSetService(spaceMagicService); 
+      },
+      deps: [ISpaceMagicServiceProvider.InjectToken],
       multi: false
     }
   }
   static get MockFactoryProvider(): FactoryProvider {
     return {
       provide: FieldSetServiceBase,
-      useFactory: createMockServiceFactory(serviceBaseClassTypeName),
-      deps: [],
+      useFactory:()=>{ 
+        return new MockFieldSetService(); 
+      },
       multi: false
     }
   }

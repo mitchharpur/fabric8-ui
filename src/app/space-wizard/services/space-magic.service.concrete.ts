@@ -1,8 +1,9 @@
 import { Injectable } from '@angular/core';
+import { Http } from '@angular/http';
+
 import { Observable, Observer } from 'rxjs/Rx';
 import { IMagicRequest, IMagicResponse , SpaceMagicServiceBase} from '../models/space-magic'
 import { getLogger, ILoggerDelegate } from '../models/logger';
-
 /** space magic mock service */
 @Injectable()
 export class ConcreteSpaceMagicService extends SpaceMagicServiceBase {

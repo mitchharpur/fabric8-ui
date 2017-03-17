@@ -14,8 +14,8 @@ import { ISpaceMagicServiceProvider,SpaceMagicServiceProvider } from '../service
   },
   selector: 'wizard-dynamic-step',
   templateUrl: './wizard-dynamic-step.component.html',
-  styleUrls: ['./wizard-dynamic-step.component.scss'],
-  providers: [FieldSetServiceProvider.MockClassProvider,IFieldSetServiceProvider.FactoryProvider, ISpaceMagicServiceProvider.FactoryProvider,SpaceMagicServiceProvider.MockClassProvider]
+  styleUrls: ['./wizard-dynamic-step.component.scss']//,
+  //providers:[IFieldSetServiceProvider.FactoryProvider,ISpaceMagicServiceProvider.FactoryProvider] //[FieldSetServiceProvider.MockClassProvider,IFieldSetServiceProvider.FactoryProvider, ISpaceMagicServiceProvider.FactoryProvider,SpaceMagicServiceProvider.MockClassProvider]
 
 })
 export class WizardDynamicStepComponent implements OnInit, OnDestroy, OnChanges {
@@ -37,7 +37,7 @@ export class WizardDynamicStepComponent implements OnInit, OnDestroy, OnChanges 
 
   @Input() stepName: string = "";
 
-  constructor( /*@Inject(IFieldSetServiceProvider.InjectToken)*/ private _fieldSetService: FieldSetServiceBase) {
+  constructor( @Inject(IFieldSetServiceProvider.InjectToken) private _fieldSetService: IFieldSetService) {
     WizardDynamicStepComponent.instanceCount++;
     this._instance = WizardDynamicStepComponent.instanceCount;
     this.log = getLogger(this.constructor.name, this._instance);

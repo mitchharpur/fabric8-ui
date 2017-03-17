@@ -13,35 +13,12 @@ import { ConcreteSpaceMagicService } from './space-magic.service.concrete'
 /**
  * service dependency injection helper constructs
  */
-const  serviceBaseClassTypeName =  "SpaceMagicServiceBase";
-const  serviceClassTypeName =  "SpaceMagicService";
-const  serviceInterfaceTypeName = "ISpaceMagicService";
-const  serviceInterfaceTypeToken = new OpaqueToken(serviceInterfaceTypeName);
+const  BaseClassName =  "SpaceMagicServiceBase";
+const  ClassName =  "SpaceMagicService";
+const  InterfaceName = "ISpaceMagicService";
+const  InterfaceToken = new OpaqueToken(InterfaceName);
 
 
-/**
- * This function returns a function that operates as the service factory for the Service.
- * the factory creates an instance of the service , but the provider resolves either an interface
- * or an abstract base class.
- * @param typeName : the name of the type for which a factory is to be retrieved.
- * This type name if just used for logging purposes.
- */
-function createServiceFactory(typeName: string) {
-  let serviceFactory= () => {
-    let tmp = new ConcreteSpaceMagicService();
-    console.log(`SpaceMagicService:serviceFactory: Resolving ${typeName} as an instance of ${tmp.constructor.name}.`);
-    return tmp;
-  };
-  return serviceFactory;
-}
-function createMockServiceFactory(typeName: string) {
-  let serviceFactory= () => {
-    let tmp = new MockSpaceMagicService();
-    console.log(`SpaceMagicService:serviceFactory: Resolving ${typeName} as an instance of ${tmp.constructor.name}.`);
-    return tmp;
-  };
-  return serviceFactory;
-}
 
 /** When using this provider and you take a dependency on the interface type
  * it will be neccesary to use the @inject(IFieldSetServiceProvider.TypeToken)
@@ -49,13 +26,23 @@ function createMockServiceFactory(typeName: string) {
  */
 export class ISpaceMagicServiceProvider {
   static get FactoryProvider(): FactoryProvider {
-    return { //serviceInterfaceFactoryProvider;
-      provide: serviceInterfaceTypeToken,
-      useFactory: createServiceFactory(serviceInterfaceTypeName)
+    return { 
+      provide: InterfaceToken,
+      useFactory:()=>{ 
+        return new ConcreteSpaceMagicService()
+      }
+    }
+  }
+  static get MockFactoryProvider(): FactoryProvider {
+    return { 
+      provide: InterfaceToken,
+      useFactory:()=>{ 
+        return new MockSpaceMagicService()
+      }
     }
   }
   static get InjectToken(): OpaqueToken {
-    return serviceInterfaceTypeToken;
+    return InterfaceToken;
   }
 }
 /** These providers uses the abstract base class as a contract. Does not require
@@ -80,16 +67,14 @@ export class SpaceMagicServiceProvider {
   static get FactoryProvider(): FactoryProvider {
     return {
       provide: SpaceMagicServiceBase,
-      useFactory: createServiceFactory(serviceClassTypeName),
-      deps: [],
+      useFactory: ()=>{ return new ConcreteSpaceMagicService();},
       multi: false
     }
   }
   static get MockFactoryProvider(): FactoryProvider {
     return {
       provide: SpaceMagicServiceBase,
-      useFactory: createMockServiceFactory(serviceBaseClassTypeName),
-      deps: [],
+      useFactory: ()=>{ return new MockSpaceMagicService();},
       multi: false
     }
   }

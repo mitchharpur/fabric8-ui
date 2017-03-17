@@ -14,7 +14,7 @@ export class ConcreteFieldSetService extends FieldSetServiceBase {
   //private spaceMagicService=ISpaceMagicServiceProvider.FactoryProvider.useFactory()
   
 
-  constructor( /*@Inject(ISpaceMagicServiceProvider.InjectToken) private spaceMagicService: ISpaceMagicService*/ private spaceMagicService: SpaceMagicServiceBase) {
+  constructor( /*@Inject(ISpaceMagicServiceProvider.InjectToken) private spaceMagicService: ISpaceMagicService*/@Inject(ISpaceMagicServiceProvider.InjectToken) private spaceMagicService:ISpaceMagicService /*SpaceMagicServiceBase*/) {
     super()
     ConcreteFieldSetService.instanceCount++;
     this._instance=ConcreteFieldSetService.instanceCount;
