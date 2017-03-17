@@ -90,7 +90,25 @@ export class WizardDynamicStepComponent implements OnInit, OnDestroy, OnChanges 
     return transition.from && transition.from.name.toLowerCase() === this.stepName.toLowerCase()
   }
 
-  fieldSet:IFieldSet;
+  private _fieldSet:IFieldSet;
+  get fieldSet():IFieldSet{
+    this._fieldSet=this._fieldSet||[];
+    return this._fieldSet;
+  }
+  set fieldSet(value:IFieldSet)
+  {
+    this._fieldSet=value;
+  }
+
+  private _fieldSetHistory:Array<IFieldSet>;
+  get fieldSetHistory():Array<IFieldSet>{
+    this._fieldSetHistory=this._fieldSetHistory||[];
+    return this._fieldSetHistory;
+  }
+  set fieldSetHistory(value:Array<IFieldSet>)
+  {
+    this._fieldSetHistory=value;
+  }
 
   private subscribeToWorkflowTransitions(workflow: IWorkflow) {
     if (!workflow) {
@@ -107,15 +125,25 @@ export class WizardDynamicStepComponent implements OnInit, OnDestroy, OnChanges 
                 if (transition.from != transition.to) {
                   //handle first fieldset
                   this._fieldSetService.GetFieldSet({command:"first"}).subscribe((fieldSet) => {
+                    let prevFieldSet=this.fieldSet;
+                    if(this.fieldSetHistory.length>0)
+                    {
+                      this.fieldSetHistory.push(prevFieldSet);
+                    }
                     this.fieldSet=fieldSet
-                    this.log(`retrieved the first set of ${fieldSet.length} fields ...`);
+                    this.log(`stored fieldset[${prevFieldSet.length}] into history ... there are ${this.fieldSetHistory.length} items in history ...`);
                   })
                 }
                 break;
               }
             case TransitionDirection.PREVIOUS:
               {
-                this.log(`fieldset rollback ...`);
+                if (transition.from === transition.to) {
+                  let fieldSet=this.fieldSetHistory.pop();
+
+                  this.fieldSet=fieldSet;
+                  this.log(`restored fieldset[${fieldSet.length}] from history ... there are ${this.fieldSetHistory.length} items in history ...`);
+                }
                 break;
               }
           }
@@ -128,17 +156,15 @@ export class WizardDynamicStepComponent implements OnInit, OnDestroy, OnChanges 
                 if (transition.from != transition.to) {
                   //handle first fieldset
                   this._fieldSetService.GetFieldSet({command:"second"}).subscribe((fieldSet) => {
+                    let prevFieldSet=this.fieldSet;
+                    this.fieldSetHistory.push(prevFieldSet);
                     this.fieldSet=fieldSet
-                    this.log(`retrieved the next set of ${fieldSet.length} fields ...`);
+                    this.log(`stored fieldset[${prevFieldSet.length}] into history ... there are ${this.fieldSetHistory.length} items in history ...`);
                   })
+                  //keep at this point
                   transition.to=transition.from;
                 }
-                //transition.continue = false;
-                break;
-              }
-            case TransitionDirection.PREVIOUS:
-              {
-                this.log(`fieldset rollback ...`);
+                // transition.continue = false to prevent transitions;
                 break;
               }
           }
