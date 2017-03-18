@@ -5,17 +5,16 @@ import { IWorkflowStep, IWorkflowTransition, IWorkflow, TransitionDirection } fr
 import { getLogger, ILoggerDelegate } from '../models/logger';
 import { INotifyPropertyChanged } from '../models/component'
 
-import { FieldSetServiceBase, IFieldInfo, IFieldSet, IFieldSetService,FieldSetServiceProvider,IFieldSetServiceProvider } from '../services/field-set.service'
+import { IFieldInfo, IFieldSet, IFieldSetService,IFieldSetServiceProvider } from '../services/field-set.service'
 import { ISpaceMagicServiceProvider,SpaceMagicServiceProvider } from '../services/space-magic.service'
 
 @Component({
   host: {
     'class': 'wizard-step'
   },
-  selector: 'wizard-dynamic-step',
+  selector: 'form[wizard-dynamic-step]',
   templateUrl: './wizard-dynamic-step.component.html',
-  styleUrls: ['./wizard-dynamic-step.component.scss']//,
-  //providers:[IFieldSetServiceProvider.FactoryProvider,ISpaceMagicServiceProvider.FactoryProvider] //[FieldSetServiceProvider.MockClassProvider,IFieldSetServiceProvider.FactoryProvider, ISpaceMagicServiceProvider.FactoryProvider,SpaceMagicServiceProvider.MockClassProvider]
+  styleUrls: ['./wizard-dynamic-step.component.scss']
 
 })
 export class WizardDynamicStepComponent implements OnInit, OnDestroy, OnChanges {
@@ -125,7 +124,7 @@ export class WizardDynamicStepComponent implements OnInit, OnDestroy, OnChanges 
                       this.fieldSetHistory.push(prevFieldSet);
                     }
                     this.fieldSet = fieldSet
-                    this.log(`stored fieldset[${prevFieldSet.length}] into history ... there are ${this.fieldSetHistory.length} items in history ...`);
+                    this.log(`Stored fieldset[${prevFieldSet.length}] into fieldset history ... there are ${this.fieldSetHistory.length} items in history ...`);
                   })
                 }
                 break;
@@ -134,9 +133,8 @@ export class WizardDynamicStepComponent implements OnInit, OnDestroy, OnChanges 
               {
                 if (transition.from === transition.to) {
                   let fieldSet = this.fieldSetHistory.pop();
-
                   this.fieldSet = fieldSet;
-                  this.log(`restored fieldset[${fieldSet.length}] from history ... there are ${this.fieldSetHistory.length} items in history ...`);
+                  this.log(`Restored fieldset[${fieldSet.length}] from fieldset history ... there are ${this.fieldSetHistory.length} items in history ...`);
                 }
                 break;
               }

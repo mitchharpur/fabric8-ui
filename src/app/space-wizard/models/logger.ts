@@ -31,6 +31,6 @@
         if (options.info === true) {
           method = "info";
         }
-        console[method].apply(null, [`${name}:${instance}: ${entry.message || ""}`]);
+        console[method].apply(null, [`%c${name}%c :${instance}: %c${entry.message || ""}`,'color:lime;font-style:italic; font-size:1.0rem;border-left:solid 0px orangered;padding:3px;padding-left:6px;','color:orangered;font-weight:bolder;','color:white;']);
       };
   }
