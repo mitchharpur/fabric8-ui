@@ -14,7 +14,7 @@ import {WorkflowFactory, IWorkflow, IWorkflowStep } from './models/workflow';
 
 import { SpaceConfigurator } from './models/codebase';
 
-import { getLogger, ILoggerDelegate } from './shared/logger';
+import { getLogger, ILoggerDelegate } from './common/logger';
 import { INotifyPropertyChanged } from './core/component'
 
 @Component({

@@ -8,7 +8,7 @@ import { IFieldSet, FieldSet, IFieldInfo, IAppGeneratorService, AppGeneratorServ
 import { IForgeService, IForgeResponse, IForgeRequest, IForgeServiceProvider, } from '../forge.service'
 
 
-import { getLogger, ILoggerDelegate } from '../../shared/logger';
+import { getLogger, ILoggerDelegate } from '../../common/logger';
 
 @Injectable()
 export class Fabric8AppGeneratorService extends AppGeneratorService {
@@ -53,7 +53,7 @@ function getFirstFieldSet(options:any,api:IForgeService ):Observable<IFieldSet>
         .map((response: IForgeResponse) => mapResponseToFieldSet(response))
         .subscribe((fieldSet: IFieldSet) => {
           observer.next(fieldSet);
-          observer.complete()
+          observer.complete();
         })
     });
     return observable

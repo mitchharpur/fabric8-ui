@@ -2,7 +2,7 @@ import { Component, OnInit, OnChanges, OnDestroy, SimpleChanges, SimpleChange, I
 import { Router } from '@angular/router';
 
 import { IWorkflowStep, IWorkflowTransition, IWorkflow, WorkflowTransitionDirection } from '../models/workflow';
-import { getLogger, ILoggerDelegate } from '../shared/logger';
+import { getLogger, ILoggerDelegate } from '../common/logger';
 import { INotifyPropertyChanged } from '../core/component'
 
 import { IFieldInfo, IFieldSet, IAppGeneratorService, IAppGeneratorServiceProvider } from '../services/app-generator.service';

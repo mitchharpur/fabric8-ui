@@ -1,6 +1,6 @@
 
 import { Observable, Observer, Subscriber, Subject } from 'rxjs/Rx';
-import { getLogger, ILoggerDelegate } from '../../shared/logger';
+import { getLogger, ILoggerDelegate } from '../../common/logger';
 
 import {IWorkflowStep} from '../contracts/workflow-step';
 import {IWorkflowLocator} from '../contracts/workflow-locator';

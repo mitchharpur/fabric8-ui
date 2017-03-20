@@ -1,7 +1,7 @@
 import { Injectable } from '@angular/core';
 import { Observable, Observer } from 'rxjs/Rx';
 import {  IFieldSet, IFieldInfo ,FieldSet, AppGeneratorService} from '../contracts/app-generator-service'
-import { getLogger, ILoggerDelegate } from '../../shared/logger';
+import { getLogger, ILoggerDelegate } from '../../common/logger';
 
 /** mock app generator service */
 

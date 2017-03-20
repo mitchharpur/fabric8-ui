@@ -4,7 +4,7 @@ import { Http } from '@angular/http';
 import { Observable, Observer } from 'rxjs/Rx';
 import { IForgeRequest, IForgeResponse , ForgeService} from '../contracts/forge-service';
 
-import { getLogger, ILoggerDelegate } from '../../shared/logger';
+import { getLogger, ILoggerDelegate } from '../../common/logger';
 
 @Injectable()
 export class Fabric8ForgeService extends ForgeService {
