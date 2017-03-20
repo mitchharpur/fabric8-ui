@@ -4,6 +4,7 @@
     warning?:boolean,
     error?:boolean,
     info?:boolean,
+    inner?any
   }
   export interface ILoggerDelegate{
     (options:string|ILogEntry):void
