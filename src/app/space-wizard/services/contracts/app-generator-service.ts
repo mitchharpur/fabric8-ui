@@ -1,9 +1,9 @@
 import { Observable, Observer, Subscriber } from 'rxjs/Rx';
 import { OpaqueToken } from '@angular/core';
 
-export { IFieldSet,FieldSet, IFieldInfo} from '../../models/field-set'
+export { IFieldSet,FieldSet, IFieldInfo} from '../../models/app-generator'
 
-import { IFieldSet, IFieldInfo} from '../../models/field-set'
+import { IFieldSet, IFieldInfo} from '../../models/app-generator'
 
 /** AppGenerator contract */
 

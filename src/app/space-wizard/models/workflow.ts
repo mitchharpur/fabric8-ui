@@ -37,13 +37,13 @@ export interface IWorkflowLocator {
 /**
  * Defines the signature of the delegate that will do a deferred retrieval of the workflow
  * */
-export interface IworkflowStepLocator {
+export interface IWorkflowStepLocator {
   (): IWorkflowStep
 }
 /**
  * Defines a generic callback signature
  * */
-export interface ICallback
+export interface IWorkflowCallback
 {
   (options?:any):any;
 }
@@ -74,9 +74,9 @@ export interface IWorkflowOptions {
   /** The delegate that returns a workflow step query */
   firstStep?:IWorkflowStepQuery;
   /** The generic callback to call on workflow cancel  */
-  cancel?:ICallback;
+  cancel?:IWorkflowCallback;
   /** The generic callback to call on workflow finish  */
-  finish?:ICallback;
+  finish?:IWorkflowCallback;
 }
 /**
  * Defines the IWorkflow contract
