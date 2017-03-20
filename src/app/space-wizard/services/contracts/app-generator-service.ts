@@ -1,23 +1,22 @@
 import { Observable, Observer, Subscriber } from 'rxjs/Rx';
 import { OpaqueToken } from '@angular/core';
 
-export { IFieldSet,FieldSet, IFieldInfo} from '../../models/app-generator'
+export { IFieldSet, FieldSet, IFieldInfo } from '../../models/app-generator'
 
-import { IFieldSet, IFieldInfo} from '../../models/app-generator'
+import { IFieldSet, IFieldInfo } from '../../models/app-generator'
 
 /** AppGenerator contract */
 
 export interface IAppGeneratorService {
-  getFieldSet(options?:any): Observable<IFieldSet>
+  getFieldSet(options?: any): Observable<IFieldSet>
 }
 
 /** AppGeneratorService contract using abstract base class */
 
 export abstract class AppGeneratorService implements IAppGeneratorService {
-  abstract getFieldSet(options?:any): Observable<IFieldSet>;
-  protected createEmptyFieldSet():Observable<IFieldSet>
-  {
-    return Observable.create((observer:Observer<IFieldSet>) => {
+  abstract getFieldSet(options?: any): Observable<IFieldSet>;
+  protected createEmptyFieldSet(): Observable<IFieldSet> {
+    return Observable.create((observer: Observer<IFieldSet>) => {
       observer.next([]);
       observer.complete();
     });

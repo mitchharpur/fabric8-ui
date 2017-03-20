@@ -1,5 +1,4 @@
-export interface IForgeResponse
-{
-  payload:any
+export interface IForgeResponse {
+  payload: any
 }
 

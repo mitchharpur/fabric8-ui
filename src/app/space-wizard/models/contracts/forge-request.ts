@@ -1,8 +1,7 @@
-export interface IForgeRequest
-{
-  command:{
-    name:string;
-    parameters?:[any];
+export interface IForgeRequest {
+  command: {
+    name: string;
+    parameters?: [any];
   }
-  payload?:any
+  payload?: any
 }

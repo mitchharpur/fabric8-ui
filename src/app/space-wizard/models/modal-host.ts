@@ -8,4 +8,4 @@ export interface IModalHost {
   onClose();
   open();
   close();
-}
+};

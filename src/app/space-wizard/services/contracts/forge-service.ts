@@ -1,5 +1,5 @@
 import { OpaqueToken } from '@angular/core';
-import { Observable,  Subscriber } from 'rxjs/Rx';
+import { Observable, Subscriber } from 'rxjs/Rx';
 
 import { IForgeRequest, IForgeResponse } from '../../models/forge';
 export { IForgeRequest, IForgeResponse } from '../../models/forge';
@@ -10,13 +10,13 @@ export { IForgeRequest, IForgeResponse } from '../../models/forge';
  * command results
 */
 export interface IForgeService {
-  ExecuteCommand(options:IForgeRequest): Observable<IForgeResponse>
+  ExecuteCommand(options: IForgeRequest): Observable<IForgeResponse>
 }
 
 
 /** ForgeService contract using abstract base class */
 export abstract class ForgeService implements IForgeService {
-  abstract ExecuteCommand(options:IForgeRequest): Observable<IForgeResponse>
+  abstract ExecuteCommand(options: IForgeRequest): Observable<IForgeResponse>
 }
 
 /**

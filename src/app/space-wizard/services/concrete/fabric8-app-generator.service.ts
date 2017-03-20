@@ -12,12 +12,12 @@ import { getLogger, ILoggerDelegate } from '../../common/logger';
 
 @Injectable()
 export class Fabric8AppGeneratorService extends AppGeneratorService {
-  static instanceCount: number = 0;
+  static instanceCount: number = 1;
   private log: ILoggerDelegate = () => { };
 
-  constructor(@Inject(IForgeServiceProvider.InjectToken) private forgeGatewayService:IForgeService ) {
+  constructor( @Inject(IForgeServiceProvider.InjectToken) private forgeGatewayService: IForgeService) {
     super()
-    this.log = getLogger(this.constructor.name,Fabric8AppGeneratorService.instanceCount++);
+    this.log = getLogger(this.constructor.name, Fabric8AppGeneratorService.instanceCount++);
     this.log(`New instance...`);
   }
   getFieldSet(options: any = {}): Observable<IFieldSet> {
@@ -25,11 +25,11 @@ export class Fabric8AppGeneratorService extends AppGeneratorService {
     let observable: Observable<IFieldSet> = this.createEmptyFieldSet();
     switch (options.command) {
       case "first": {
-        observable=getFirstFieldSet(options,this.forgeGatewayService)
+        observable = getFirstFieldSet(options, this.forgeGatewayService)
         break;
       }
       case "second": {
-        observable=getFirstFieldSet(options,this.forgeGatewayService)
+        observable = getFirstFieldSet(options, this.forgeGatewayService)
         break;
       }
       default: {
@@ -41,22 +41,21 @@ export class Fabric8AppGeneratorService extends AppGeneratorService {
 
 }
 
-function getFirstFieldSet(options:any,api:IForgeService ):Observable<IFieldSet>
-{
-    let observable:Observable<IFieldSet> = Observable.create((observer: Observer<IFieldSet>) => {
-      // invoke service and map results to fieldset
-      api.ExecuteCommand({
-        command: {
-          name: "empty",
-        }
+function getFirstFieldSet(options: any, api: IForgeService): Observable<IFieldSet> {
+  let observable: Observable<IFieldSet> = Observable.create((observer: Observer<IFieldSet>) => {
+    // invoke service and map results to fieldset
+    api.ExecuteCommand({
+      command: {
+        name: "empty",
+      }
+    })
+      .map((response: IForgeResponse) => mapResponseToFieldSet(response))
+      .subscribe((fieldSet: IFieldSet) => {
+        observer.next(fieldSet);
+        observer.complete();
       })
-        .map((response: IForgeResponse) => mapResponseToFieldSet(response))
-        .subscribe((fieldSet: IFieldSet) => {
-          observer.next(fieldSet);
-          observer.complete();
-        })
-    });
-    return observable
+  });
+  return observable
 }
 
 function mapResponseToFieldSet(response: IForgeResponse): IFieldSet {

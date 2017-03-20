@@ -1,2 +1,2 @@
-export {IFieldInfo,IFieldSet,FieldSet} from './concrete/field-set'
+export { IFieldInfo, IFieldSet, FieldSet } from './concrete/field-set';
 

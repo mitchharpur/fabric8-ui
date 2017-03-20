@@ -9,7 +9,7 @@ import {MockForgeService} from '../mocks/mock-forge.service'
 
 /**
  * When using this provider and you take a dependency on the interface type
- * it will be neccesary to use the @inject(IFieldSetServiceProvider.TypeToken)
+ * it will be neccesary to use the @inject(IForgeServiceProvider.InjectToken)
  * annotation to resolve the dependency. Benefits are that it is a more strict
  * contract first based approach, thus allowing multiple concrete implementations
  * without requiring a base type hierarchy.

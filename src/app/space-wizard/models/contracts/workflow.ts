@@ -1,15 +1,17 @@
+import { OpaqueToken } from '@angular/core';
 import { Observable } from 'rxjs/Rx';
-import {IWorkflowOptions} from './workflow-options'
-import {IWorkflowStep} from './workflow-step'
-import {IWorkflowTransition} from './workflow-transition'
-import {IWorkflowTransitionContext} from './workflow-transition-context'
+import { IWorkflowOptions } from './workflow-options';
+import { IWorkflowStep } from './workflow-step';
+import { IWorkflowTransition } from './workflow-transition';
+import { IWorkflowTransitionContext } from './workflow-transition-context';
 
+export const IWorkflowToken = new OpaqueToken("IWorkflow");
 /**
  * Defines the IWorkflow contract
  * */
 export interface IWorkflow {
   /** Initializes|reinitializes the workflow steps */
-  initialize(options:IWorkflowOptions);
+  initialize(options: IWorkflowOptions);
   /** Gets or sets the list of workflow steps */
   steps: Array<Partial<IWorkflowStep>>;
   /** Gets or sets the active step */
@@ -17,7 +19,7 @@ export interface IWorkflow {
   /** Checks if the parametrically specified step is active */
   isStepActive(step: number | string | Partial<IWorkflowStep>): boolean;
   /** parametrically activates the specified step but does not keep track the previous step */
-  gotoStep(step: number | string | Partial<IWorkflowStep>,context?:IWorkflowTransitionContext): IWorkflowStep;
+  gotoStep(step: number | string | Partial<IWorkflowStep>, context?: IWorkflowTransitionContext): IWorkflowStep;
   /** activates the default next step, as defined by nextIndex,
    * or as parametrically specified in the optional argument,
    * and records the current step as the previous step */
@@ -27,13 +29,13 @@ export interface IWorkflow {
   /** Find the step parametrically defined */
   findStep(step: number | string | Partial<IWorkflowStep>): IWorkflowStep;
   /** Retrieves the first step */
-  firstStep():IWorkflowStep;
+  firstStep(): IWorkflowStep;
   /** Workflow cancel handler */
-  cancel(options:any):any;
+  cancel(options: any): any;
   /** Workflow finish handler */
-  finish(options:any):any;
+  finish(options: any): any;
   /** Workflow reset handler */
-  reset(options:any):any;
+  reset(options: any): any;
   /** Observable as a way to subscribe to workflow transitions and as well as prevent transitions from occuring or to redirect the next workflow step */
-  transitions:Observable<IWorkflowTransition>;
+  transitions: Observable<IWorkflowTransition>;
 }

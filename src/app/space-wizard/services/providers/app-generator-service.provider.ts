@@ -1,15 +1,15 @@
-import { FactoryProvider, ClassProvider,OpaqueToken } from '@angular/core';
+import { FactoryProvider, ClassProvider, OpaqueToken } from '@angular/core';
 
 
-import {IAppGeneratorServiceToken,AppGeneratorService} from '../contracts/app-generator-service'
-import {Fabric8AppGeneratorService} from '../concrete/fabric8-app-generator.service'
-import {MockAppGeneratorService} from '../mocks/mock-app-generator.service'
+import { IAppGeneratorServiceToken, AppGeneratorService } from '../contracts/app-generator-service'
+import { Fabric8AppGeneratorService } from '../concrete/fabric8-app-generator.service'
+import { MockAppGeneratorService } from '../mocks/mock-app-generator.service'
 
-import {IForgeServiceProvider,IForgeService} from '../forge.service'
+import { IForgeServiceProvider, IForgeService } from '../forge.service'
 
 /**
  * When using this provider and you take a dependency on the interface type
- * it will be neccesary to use the @inject(IFieldSetServiceProvider.TypeToken)
+ * it will be neccesary to use the @inject(IAppGeneratorServiceProvider.InjectToken)
  * annotation to resolve the dependency. Benefits are that it is a more strict
  * contract first based approach, thus allowing multiple concrete implementations
  * without requiring a base type hierarchy.
@@ -18,16 +18,16 @@ export class IAppGeneratorServiceProvider {
   static get FactoryProvider(): FactoryProvider {
     return {
       provide: IAppGeneratorServiceToken,
-      useFactory:(forgeGatewayService:IForgeService)=>{
+      useFactory: (forgeGatewayService: IForgeService) => {
         return new Fabric8AppGeneratorService(forgeGatewayService);
       },
-      deps:[IForgeServiceProvider.InjectToken]
+      deps: [IForgeServiceProvider.InjectToken]
     }
   }
   static get MockFactoryProvider(): FactoryProvider {
     return {
       provide: IAppGeneratorServiceToken,
-      useFactory:()=>{
+      useFactory: () => {
         return new MockAppGeneratorService();
       }
     }
@@ -62,7 +62,7 @@ export class FieldSetServiceProvider {
   static get FactoryProvider(): FactoryProvider {
     return {
       provide: AppGeneratorService,
-      useFactory:(spaceMagicService:IForgeService)=>{
+      useFactory: (spaceMagicService: IForgeService) => {
         return new Fabric8AppGeneratorService(spaceMagicService);
       },
       deps: [IForgeServiceProvider.InjectToken],
@@ -72,7 +72,7 @@ export class FieldSetServiceProvider {
   static get MockFactoryProvider(): FactoryProvider {
     return {
       provide: AppGeneratorService,
-      useFactory:()=>{
+      useFactory: () => {
         return new MockAppGeneratorService();
       },
       multi: false

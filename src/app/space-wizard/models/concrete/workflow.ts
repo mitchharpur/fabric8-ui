@@ -1,24 +1,24 @@
-
+import { Injectable } from '@angular/core';
 import { Observable, Observer, Subscriber, Subject } from 'rxjs/Rx';
-import { getLogger, ILoggerDelegate } from '../../common/logger';
+import { getLogger, LoggerFactory, ILoggerDelegate } from '../../common/logger';
 
-import {IWorkflowStep} from '../contracts/workflow-step';
-import {IWorkflowLocator} from '../contracts/workflow-locator';
-import {IWorkflowTransition} from '../contracts/workflow-transition';
-import {IWorkflowTransitionContext} from '../contracts/workflow-transition-context';
-import {WorkflowTransitionDirection} from '../contracts/workflow-transition-direction';
-import {IWorkflow} from '../contracts/workflow';
-import {IWorkflowOptions} from '../contracts/workflow-options';
+import { IWorkflowStep } from '../contracts/workflow-step';
+import { IWorkflowLocator } from '../contracts/workflow-locator';
+import { IWorkflowTransition } from '../contracts/workflow-transition';
+import { IWorkflowTransitionContext } from '../contracts/workflow-transition-context';
+import { WorkflowTransitionDirection } from '../contracts/workflow-transition-direction';
+import { IWorkflow } from '../contracts/workflow';
+import { IWorkflowOptions } from '../contracts/workflow-options';
 
-import {WorkflowStep} from './workflow-step';
-import {WorkflowTransition} from './workflow-transition';
+import { WorkflowStep } from './workflow-step';
+import { WorkflowTransition } from './workflow-transition';
 
 /** Implementation of the workflow contract */
+@Injectable()
 export class Workflow implements IWorkflow {
 
-  static instanceCount: number = 0;
+  static instanceCount: number = 1;
 
-  private _instance: number = 0;
   private _steps: Array<IWorkflowStep> = [];
   private _workflowTransitionSubject: Subject<IWorkflowTransition>;
   private _activeStep: IWorkflowStep
@@ -26,10 +26,13 @@ export class Workflow implements IWorkflow {
   private log: ILoggerDelegate = () => { };
 
 
-  constructor() {
-    Workflow.instanceCount++;
-    this._instance = Workflow.instanceCount;
-    this.log = getLogger(this.constructor.name, this._instance);
+  constructor(loggerFactory: LoggerFactory) {
+
+    let logger = loggerFactory.createLogger(this.constructor.name, Workflow.instanceCount++);
+    if (logger) {
+      this.log = logger;
+    }
+
     this.log(`New instance...`);
   }
 

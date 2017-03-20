@@ -1,17 +1,17 @@
 import { Injectable } from '@angular/core';
 import { Observable, Observer } from 'rxjs/Rx';
 
-import { IForgeRequest, IForgeResponse , ForgeService} from '../contracts/forge-service';
+import { IForgeRequest, IForgeResponse, ForgeService } from '../contracts/forge-service';
 import { getLogger, ILoggerDelegate } from '../../common/logger';
 
 @Injectable()
 export class MockForgeService extends ForgeService {
-  static instanceCount: number = 0;
+  static instanceCount: number = 1;
   private log: ILoggerDelegate = () => { };
 
   constructor() {
     super();
-    this.log = getLogger(this.constructor.name,MockForgeService.instanceCount++);
+    this.log = getLogger(this.constructor.name, MockForgeService.instanceCount++);
     this.log(`New instance...`);
   }
   ExecuteCommand(options: IForgeRequest = { command: { name: "empty" } }): Observable<IForgeResponse> {
@@ -38,26 +38,27 @@ export class MockForgeService extends ForgeService {
 }
 function getEmptyResponse(): Observable<IForgeResponse> {
   return Observable.create((observer: Observer<IForgeResponse>) => {
-    observer.next({ payload:{}})
+    observer.next({ payload: {} })
   });
 }
 
 function getForgeNewQuickStart(): Observable<IForgeResponse> {
   return Observable.create((observer: Observer<IForgeResponse>) => {
-    observer.next({ payload:{
-    "metadata": {
-        "deprecated": false,
-        "category": "Obsidian",
-        "name": "Obsidian: New Quickstart",
-        "description": "Generate your project from a quickstart"
-      },
-    "state": {
-        "valid": true,
-        "canExecute": true,
-        "wizard": false
-    },
-    "inputs": [
-        {
+    observer.next({
+      payload: {
+        "metadata": {
+          "deprecated": false,
+          "category": "Obsidian",
+          "name": "Obsidian: New Quickstart",
+          "description": "Generate your project from a quickstart"
+        },
+        "state": {
+          "valid": true,
+          "canExecute": true,
+          "wizard": false
+        },
+        "inputs": [
+          {
             "name": "type",
             "shortName": " ",
             "valueType": "org.apache.maven.archetype.catalog.Archetype",
@@ -68,101 +69,101 @@ function getForgeNewQuickStart(): Observable<IForgeResponse> {
             "label": "Project type",
             "description": "",
             "valueChoices": [
-                {
-                    "id": "Creates a new Spring Boot Tomcat - Rest & Config Map",
-                    "artifactId": "rest_configmap_springboot-tomcat-archetype",
-                    "description": "Creates a new Spring Boot Tomcat - Rest & Config Map",
-                    "goals": "[]",
-                    "groupId": "org.obsidiantoaster.quickstarts",
-                    "properties": "{}",
-                    "repository": "https://repository.jboss.org/nexus/service/local/artifact/maven",
-                    "version": "1.0.0-SNAPSHOT"
-                },
-                {
-                    "id": "Creates a new WildFly Swarm - Config Map",
-                    "artifactId": "rest_configmap_swarm-archetype",
-                    "description": "Creates a new WildFly Swarm - Config Map",
-                    "goals": "[]",
-                    "groupId": "org.obsidiantoaster.quickstarts",
-                    "properties": "{}",
-                    "repository": "https://repository.jboss.org/nexus/service/local/artifact/maven",
-                    "version": "1.0.0-SNAPSHOT"
-                },
-                {
-                    "id": "Creates a new Vert.x - Rest & Config Map",
-                    "artifactId": "rest_configmap_vertx-archetype",
-                    "description": "Creates a new Vert.x - Rest & Config Map",
-                    "goals": "[]",
-                    "groupId": "org.obsidiantoaster.quickstarts",
-                    "properties": "{}",
-                    "repository": "https://repository.jboss.org/nexus/service/local/artifact/maven",
-                    "version": "1.0.0-SNAPSHOT"
-                },
-                {
-                    "id": "Creates a new Spring Boot Tomcat - Rest",
-                    "artifactId": "rest_springboot-tomcat-archetype",
-                    "description": "Creates a new Spring Boot Tomcat - Rest",
-                    "goals": "[]",
-                    "groupId": "org.obsidiantoaster.quickstarts",
-                    "properties": "{}",
-                    "repository": "https://repository.jboss.org/nexus/service/local/artifact/maven",
-                    "version": "1.0.0-SNAPSHOT"
-                },
-                {
-                    "id": "Creates a new Vertx - Rest",
-                    "artifactId": "rest_vertx-archetype",
-                    "description": "Creates a new Vertx - Rest",
-                    "goals": "[]",
-                    "groupId": "org.obsidiantoaster.quickstarts",
-                    "properties": "{}",
-                    "repository": "https://repository.jboss.org/nexus/service/local/artifact/maven",
-                    "version": "1.0.0-SNAPSHOT"
-                },
-                {
-                    "id": "Creates a new WildFly Swarm - Rest",
-                    "artifactId": "rest_wildfly-swarm-archetype",
-                    "description": "Creates a new WildFly Swarm - Rest",
-                    "goals": "[]",
-                    "groupId": "org.obsidiantoaster.quickstarts",
-                    "properties": "{}",
-                    "repository": "https://repository.jboss.org/nexus/service/local/artifact/maven",
-                    "version": "1.0.0-SNAPSHOT"
-                },
-                {
-                    "id": "Creates a new Secured Spring Boot Tomcat - Rest & Red Hat SSO",
-                    "artifactId": "secured_rest-springboot-archetype",
-                    "description": "Creates a new Secured Spring Boot Tomcat - Rest & Red Hat SSO",
-                    "goals": "[]",
-                    "groupId": "org.obsidiantoaster.quickstarts",
-                    "properties": "{}",
-                    "repository": "https://repository.jboss.org/nexus/service/local/artifact/maven",
-                    "version": "1.0.0-SNAPSHOT"
-                },
-                {
-                    "id": "Creates a new Secured Vertx - Rest & Red Hat SSO",
-                    "artifactId": "secured_rest-vertx-archetype",
-                    "description": "Creates a new Secured Vertx - Rest & Red Hat SSO",
-                    "goals": "[]",
-                    "groupId": "org.obsidiantoaster.quickstarts",
-                    "properties": "{}",
-                    "repository": "https://repository.jboss.org/nexus/service/local/artifact/maven",
-                    "version": "1.0.0-SNAPSHOT"
-                },
-                {
-                    "id": "Creates a new Secured Swarm - Rest & Red Hat SSO",
-                    "artifactId": "secured_rest_swarm-archetype",
-                    "description": "Creates a new Secured Swarm - Rest & Red Hat SSO",
-                    "goals": "[]",
-                    "groupId": "org.obsidiantoaster.quickstarts",
-                    "properties": "{}",
-                    "repository": "https://repository.jboss.org/nexus/service/local/artifact/maven",
-                    "version": "1.0.0-SNAPSHOT"
-                }
+              {
+                "id": "Creates a new Spring Boot Tomcat - Rest & Config Map",
+                "artifactId": "rest_configmap_springboot-tomcat-archetype",
+                "description": "Creates a new Spring Boot Tomcat - Rest & Config Map",
+                "goals": "[]",
+                "groupId": "org.obsidiantoaster.quickstarts",
+                "properties": "{}",
+                "repository": "https://repository.jboss.org/nexus/service/local/artifact/maven",
+                "version": "1.0.0-SNAPSHOT"
+              },
+              {
+                "id": "Creates a new WildFly Swarm - Config Map",
+                "artifactId": "rest_configmap_swarm-archetype",
+                "description": "Creates a new WildFly Swarm - Config Map",
+                "goals": "[]",
+                "groupId": "org.obsidiantoaster.quickstarts",
+                "properties": "{}",
+                "repository": "https://repository.jboss.org/nexus/service/local/artifact/maven",
+                "version": "1.0.0-SNAPSHOT"
+              },
+              {
+                "id": "Creates a new Vert.x - Rest & Config Map",
+                "artifactId": "rest_configmap_vertx-archetype",
+                "description": "Creates a new Vert.x - Rest & Config Map",
+                "goals": "[]",
+                "groupId": "org.obsidiantoaster.quickstarts",
+                "properties": "{}",
+                "repository": "https://repository.jboss.org/nexus/service/local/artifact/maven",
+                "version": "1.0.0-SNAPSHOT"
+              },
+              {
+                "id": "Creates a new Spring Boot Tomcat - Rest",
+                "artifactId": "rest_springboot-tomcat-archetype",
+                "description": "Creates a new Spring Boot Tomcat - Rest",
+                "goals": "[]",
+                "groupId": "org.obsidiantoaster.quickstarts",
+                "properties": "{}",
+                "repository": "https://repository.jboss.org/nexus/service/local/artifact/maven",
+                "version": "1.0.0-SNAPSHOT"
+              },
+              {
+                "id": "Creates a new Vertx - Rest",
+                "artifactId": "rest_vertx-archetype",
+                "description": "Creates a new Vertx - Rest",
+                "goals": "[]",
+                "groupId": "org.obsidiantoaster.quickstarts",
+                "properties": "{}",
+                "repository": "https://repository.jboss.org/nexus/service/local/artifact/maven",
+                "version": "1.0.0-SNAPSHOT"
+              },
+              {
+                "id": "Creates a new WildFly Swarm - Rest",
+                "artifactId": "rest_wildfly-swarm-archetype",
+                "description": "Creates a new WildFly Swarm - Rest",
+                "goals": "[]",
+                "groupId": "org.obsidiantoaster.quickstarts",
+                "properties": "{}",
+                "repository": "https://repository.jboss.org/nexus/service/local/artifact/maven",
+                "version": "1.0.0-SNAPSHOT"
+              },
+              {
+                "id": "Creates a new Secured Spring Boot Tomcat - Rest & Red Hat SSO",
+                "artifactId": "secured_rest-springboot-archetype",
+                "description": "Creates a new Secured Spring Boot Tomcat - Rest & Red Hat SSO",
+                "goals": "[]",
+                "groupId": "org.obsidiantoaster.quickstarts",
+                "properties": "{}",
+                "repository": "https://repository.jboss.org/nexus/service/local/artifact/maven",
+                "version": "1.0.0-SNAPSHOT"
+              },
+              {
+                "id": "Creates a new Secured Vertx - Rest & Red Hat SSO",
+                "artifactId": "secured_rest-vertx-archetype",
+                "description": "Creates a new Secured Vertx - Rest & Red Hat SSO",
+                "goals": "[]",
+                "groupId": "org.obsidiantoaster.quickstarts",
+                "properties": "{}",
+                "repository": "https://repository.jboss.org/nexus/service/local/artifact/maven",
+                "version": "1.0.0-SNAPSHOT"
+              },
+              {
+                "id": "Creates a new Secured Swarm - Rest & Red Hat SSO",
+                "artifactId": "secured_rest_swarm-archetype",
+                "description": "Creates a new Secured Swarm - Rest & Red Hat SSO",
+                "goals": "[]",
+                "groupId": "org.obsidiantoaster.quickstarts",
+                "properties": "{}",
+                "repository": "https://repository.jboss.org/nexus/service/local/artifact/maven",
+                "version": "1.0.0-SNAPSHOT"
+              }
             ],
             "class": "UISelectOne",
             "value": "Creates a new Spring Boot Tomcat - Rest & Config Map"
-        },
-        {
+          },
+          {
             "name": "named",
             "shortName": " ",
             "valueType": "java.lang.String",
@@ -175,8 +176,8 @@ function getForgeNewQuickStart(): Observable<IForgeResponse> {
             "note": "Downloadable project zip and application jar are based on the project name",
             "class": "UIInput",
             "value": "demo"
-        },
-        {
+          },
+          {
             "name": "topLevelPackage",
             "shortName": " ",
             "valueType": "java.lang.String",
@@ -188,8 +189,8 @@ function getForgeNewQuickStart(): Observable<IForgeResponse> {
             "description": "",
             "class": "UIInput",
             "value": "com.example"
-        },
-        {
+          },
+          {
             "name": "version",
             "shortName": " ",
             "valueType": "java.lang.String",
@@ -201,11 +202,12 @@ function getForgeNewQuickStart(): Observable<IForgeResponse> {
             "description": "",
             "class": "UIInput",
             "value": "1.0.0-SNAPSHOT"
-        }
-    ]
+          }
+        ]
 
 
-    }})
+      }
+    })
   });
 }
 
