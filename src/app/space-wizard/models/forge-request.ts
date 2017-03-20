@@ -1,8 +1,3 @@
-export interface IForgeResponse
-{
-  payload:any
-}
-
 export interface IForgeRequest
 {
   command:{

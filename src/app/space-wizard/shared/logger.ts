@@ -10,8 +10,6 @@
   }
   /** This is just a quick and dirty logger ... refactor later */
 
-  
- 
   export function getLogger(name:string,instance:number):ILoggerDelegate
   {
       return function logger(options:ILogEntry) {

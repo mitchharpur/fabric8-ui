@@ -8,7 +8,7 @@ import { IFieldSet, FieldSet, IFieldInfo, IAppGeneratorService, AppGeneratorServ
 import { IForgeService, IForgeResponse, IForgeRequest, IForgeServiceProvider, } from '../forge.service'
 
 
-import { getLogger, ILoggerDelegate } from '../../models/logger';
+import { getLogger, ILoggerDelegate } from '../../shared/logger';
 
 @Injectable()
 export class Fabric8AppGeneratorService extends AppGeneratorService {

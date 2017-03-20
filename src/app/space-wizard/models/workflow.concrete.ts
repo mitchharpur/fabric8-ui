@@ -2,7 +2,7 @@ import { Observable, Observer, Subscriber, Subject } from 'rxjs/Rx';
 
 import { IWorkflowStep, IWorkflowTransition, IWorkflowTransitionContext, IWorkflow, IWorkflowLocator, IWorkflowOptions, WorkflowDirection, TransitionDirection } from './workflow'
 
-import { getLogger, ILoggerDelegate } from './logger';
+import { getLogger, ILoggerDelegate } from '../shared/logger';
 
 
 export class WorkflowFactory {

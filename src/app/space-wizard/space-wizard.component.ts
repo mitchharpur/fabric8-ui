@@ -13,7 +13,9 @@ import { IModalHost } from './models/modal-host';
 import {WorkflowFactory, IWorkflow, IWorkflowStep } from './models/workflow';
 
 import { SpaceConfigurator } from './models/codebase';
-import { getLogger, ILoggerDelegate } from './models/logger';
+
+import { getLogger, ILoggerDelegate } from './shared/logger';
+import { INotifyPropertyChanged } from './core/component'
 
 @Component({
   host: {

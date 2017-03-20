@@ -2,8 +2,8 @@ import { Component, OnInit, OnChanges, OnDestroy, SimpleChanges, SimpleChange, I
 import { Router } from '@angular/router';
 
 import { IWorkflowStep, IWorkflowTransition, IWorkflow, TransitionDirection } from '../models/workflow';
-import { getLogger, ILoggerDelegate } from '../models/logger';
-import { INotifyPropertyChanged } from '../models/component'
+import { getLogger, ILoggerDelegate } from '../shared/logger';
+import { INotifyPropertyChanged } from '../core/component'
 
 import { IFieldInfo, IFieldSet, IAppGeneratorService, IAppGeneratorServiceProvider } from '../services/app-generator.service';
 import { IForgeServiceProvider } from '../services/forge.service'
@@ -15,7 +15,7 @@ import { IForgeServiceProvider } from '../services/forge.service'
   selector: 'wizard-dynamic-step',
   templateUrl: './wizard-dynamic-step.component.html',
   styleUrls: ['./wizard-dynamic-step.component.scss'],
-  providers:[IAppGeneratorServiceProvider.FactoryProvider,IForgeServiceProvider.MockFactoryProvider]
+  providers:[IAppGeneratorServiceProvider.MockFactoryProvider,IForgeServiceProvider.MockFactoryProvider]
 })
 export class WizardDynamicStepComponent implements OnInit, OnDestroy, OnChanges {
 
