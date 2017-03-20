@@ -1,7 +1,7 @@
 import { Component, OnInit, OnChanges, OnDestroy, SimpleChanges, SimpleChange, Input,Output, Inject,EventEmitter } from '@angular/core';
 import { Router } from '@angular/router';
 
-import { IWorkflowStep, IWorkflowTransition, IWorkflow, TransitionDirection } from '../models/workflow';
+import { IWorkflowStep, IWorkflowTransition, IWorkflow, WorkflowTransitionDirection } from '../models/workflow';
 import { getLogger, ILoggerDelegate } from '../shared/logger';
 import { INotifyPropertyChanged } from '../core/component'
 
@@ -119,7 +119,7 @@ export class WizardDynamicStepComponent implements OnInit, OnDestroy, OnChanges 
         this.log({ message: `Subscriber responding to an observed '${transition.direction}' workflow transition: from ${transition.from ? transition.from.name : "null"} to ${transition.to ? transition.to.name : "null"}.` });
         if (this.isTransitioningToThisStep(transition)) {
           switch (transition.direction) {
-            case TransitionDirection.NEXT:
+            case WorkflowTransitionDirection.NEXT:
               {
                 if (transition.from != transition.to) {
                   //handle first fieldset
@@ -134,7 +134,7 @@ export class WizardDynamicStepComponent implements OnInit, OnDestroy, OnChanges 
                 }
                 break;
               }
-            case TransitionDirection.PREVIOUS:
+            case WorkflowTransitionDirection.PREVIOUS:
               {
                 if (transition.from === transition.to) {
                   let fieldSet = this.fieldSetHistory.pop();
@@ -148,7 +148,7 @@ export class WizardDynamicStepComponent implements OnInit, OnDestroy, OnChanges 
         //leaving the step
         if (this.isTransitioningFromThisStep(transition)) {
           switch (transition.direction) {
-            case TransitionDirection.NEXT:
+            case WorkflowTransitionDirection.NEXT:
               {
                 if (transition.from != transition.to) {
                   //handle first fieldset

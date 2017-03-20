@@ -1,87 +1,17 @@
+
 import { Observable, Observer, Subscriber, Subject } from 'rxjs/Rx';
+import { getLogger, ILoggerDelegate } from '../../shared/logger';
 
-import { IWorkflowStep, IWorkflowTransition, IWorkflowTransitionContext, IWorkflow, IWorkflowLocator, IWorkflowOptions, WorkflowDirection, TransitionDirection } from './workflow'
+import {IWorkflowStep} from '../contracts/workflow-step';
+import {IWorkflowLocator} from '../contracts/workflow-locator';
+import {IWorkflowTransition} from '../contracts/workflow-transition';
+import {IWorkflowTransitionContext} from '../contracts/workflow-transition-context';
+import {WorkflowTransitionDirection} from '../contracts/workflow-transition-direction';
+import {IWorkflow} from '../contracts/workflow';
+import {IWorkflowOptions} from '../contracts/workflow-options';
 
-import { getLogger, ILoggerDelegate } from '../shared/logger';
-
-
-export class WorkflowFactory {
-  static Create(options?: IWorkflowOptions): IWorkflow {
-    let tmp = new Workflow();
-    if (options) {
-      tmp.initialize(options);
-    }
-    return tmp;
-  }
-}
-
-
-/** allows intercepting of workflow transitions  */
-class WorkflowTransition implements IWorkflowTransition {
-  constructor(options: Partial<IWorkflowTransition> = { from: null, to: null, continue: true, direction: TransitionDirection.GO, context: {} }) {
-    this.context = {};
-    this.continue = true;
-    this.direction = TransitionDirection.GO;
-    Object.assign(this, options);
-  }
-  from?: IWorkflowStep;
-  to?: IWorkflowStep;
-  context: IWorkflowTransitionContext
-  continue: boolean = false;
-  direction: WorkflowDirection;
-}
-
-/** implementation of the IWorkflowstep */
-export class WorkflowStep implements IWorkflowStep {
-
-
-  index: number = 0;
-  name: string = "";
-  nextIndex: number;
-
-  constructor(options: Partial<IWorkflowStep>, private workflowLocator: IWorkflowLocator) {
-    Object.assign(this, options);
-  }
-
-  gotoNextStep(step?: number | string | Partial<IWorkflowStep>) {
-    return this.workflowLocator().gotoNextStep(step);
-  }
-
-  gotoPreviousStep() {
-    return null;
-  }
-
-  isActive() {
-    return this.workflowLocator().isStepActive(this);
-  }
-
-  activate() {
-    this.workflowLocator().gotoStep(this);
-    return this;
-  }
-
-  gotoStep(destination: number | string | IWorkflowStep, context: IWorkflowTransitionContext = { direction: TransitionDirection.GO }) {
-    let step: IWorkflowStep = null;
-    if (this.isActive) {
-      //you can only goto a step if 'this' is the active step
-      step = this.workflowLocator().gotoStep(destination, context);
-    }
-    return step;
-  }
-
-  getNextStep() {
-    let step = this.workflowLocator().findStep(this.nextIndex);
-    return step;
-  }
-
-  get workflow() {
-    return this.workflowLocator();
-  }
-
-  set workflow(value: IWorkflow) {
-  }
-
-}
+import {WorkflowStep} from './workflow-step';
+import {WorkflowTransition} from './workflow-transition';
 
 /** Implementation of the workflow contract */
 export class Workflow implements IWorkflow {
@@ -247,12 +177,12 @@ export class Workflow implements IWorkflow {
     return step;
   }
   //TODO: convert to promise for async long running transiitions
-  gotoStep(destination: number | string | Partial<IWorkflowStep>, transitionOptions: Partial<IWorkflowTransition> = { continue: true, direction: TransitionDirection.GO, context: {} }) {
+  gotoStep(destination: number | string | Partial<IWorkflowStep>, transitionOptions: Partial<IWorkflowTransition> = { continue: true, direction: WorkflowTransitionDirection.GO, context: {} }) {
 
     let destinationStep = this.findStep(destination);
     if (destinationStep) {
       transitionOptions.continue = transitionOptions.continue || true;
-      transitionOptions.direction = transitionOptions.direction || TransitionDirection.GO;
+      transitionOptions.direction = transitionOptions.direction || WorkflowTransitionDirection.GO;
       transitionOptions.context = transitionOptions.context || {};
       let transition = this.workflowTransitionShouldContinue({ from: this.activeStep, to: destinationStep, direction: transitionOptions.direction, continue: transitionOptions.continue, context: transitionOptions.context });
       if (transition.continue === true) {
@@ -266,7 +196,7 @@ export class Workflow implements IWorkflow {
           let priorHandler = newDestinationStep.gotoPreviousStep;
           // by dynamically adding the gotoNextStep function using a closure to retrieve previous step
           newDestinationStep.gotoPreviousStep = () => {
-            let step = this.gotoStep(transition.from, { continue: true, direction: TransitionDirection.PREVIOUS });
+            let step = this.gotoStep(transition.from, { continue: true, direction: WorkflowTransitionDirection.PREVIOUS });
             // restore prior handler
             newDestinationStep.gotoPreviousStep = priorHandler;
             return step;
@@ -313,12 +243,12 @@ export class Workflow implements IWorkflow {
       let priorHandler = nextStep.gotoPreviousStep;
       // by dynamically adding the gotoNextStep function using a closure to retrieve previous step
       nextStep.gotoPreviousStep = () => {
-        let step = this.gotoStep(activeStep, { continue: true, direction: TransitionDirection.PREVIOUS });
+        let step = this.gotoStep(activeStep, { continue: true, direction: WorkflowTransitionDirection.PREVIOUS });
         // restore prior handler
         nextStep.gotoPreviousStep = priorHandler;
         return step;
       }
-      this.gotoStep(nextStep.index, { continue: true, direction: TransitionDirection.NEXT, context: {} })
+      this.gotoStep(nextStep.index, { continue: true, direction: WorkflowTransitionDirection.NEXT, context: {} })
     }
     return nextStep;
   }
@@ -335,7 +265,7 @@ export class Workflow implements IWorkflow {
   }
 
   //TODO needs to return a promise to cater for async step continuation
-  private workflowTransitionShouldContinue(options: Partial<IWorkflowTransition> = { continue: false, context: { direction: TransitionDirection.GO } }): IWorkflowTransition {
+  private workflowTransitionShouldContinue(options: Partial<IWorkflowTransition> = { continue: false, context: { direction: WorkflowTransitionDirection.GO } }): IWorkflowTransition {
     let transition = new WorkflowTransition(options);
     this.log(`Notify workflow transition subscribers of an upcoming '${transition.direction}' transition from '${transition.from ? transition.from.name : "null"}' to '${transition.to ? transition.to.name : "null"}' `);
     this.workflowTransitionSubject.next(transition);
@@ -366,6 +296,3 @@ export class Workflow implements IWorkflow {
     return transitions;
   }
 };
-
-
-
