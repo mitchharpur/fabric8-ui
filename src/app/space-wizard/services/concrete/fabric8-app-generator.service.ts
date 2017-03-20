@@ -2,7 +2,7 @@ import { Injectable, Inject } from '@angular/core';
 import { Observable, Observer } from 'rxjs/Rx';
 
 /** contracts  */
-import { IFieldSet, IFieldInfo, IAppGeneratorService, AppGeneratorService } from '../contracts/app-generator-service'
+import { IFieldSet, FieldSet, IFieldInfo, IAppGeneratorService, AppGeneratorService } from '../contracts/app-generator-service'
 
 /** dependencies */
 import { IForgeService, IForgeResponse, IForgeRequest, IForgeServiceProvider, } from '../forge.service'
@@ -20,7 +20,7 @@ export class Fabric8AppGeneratorService extends AppGeneratorService {
     this.log = getLogger(this.constructor.name,Fabric8AppGeneratorService.instanceCount++);
     this.log(`New instance...`);
   }
-  GetFieldSet(options: any = {}): Observable<IFieldSet> {
+  getFieldSet(options: any = {}): Observable<IFieldSet> {
     let service: IForgeService = this.forgeGatewayService;
     let observable: Observable<IFieldSet> = this.createEmptyFieldSet();
     switch (options.command) {

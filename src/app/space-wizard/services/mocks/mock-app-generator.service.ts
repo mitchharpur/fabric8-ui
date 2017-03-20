@@ -16,7 +16,7 @@ export class MockAppGeneratorService extends AppGeneratorService {
     this.log(`New instance...`);
 
  }
-  GetFieldSet(options:any={}): Observable<IFieldSet> {
+  getFieldSet(options:any={}): Observable<IFieldSet> {
     switch(options.command)
     {
       case "first":

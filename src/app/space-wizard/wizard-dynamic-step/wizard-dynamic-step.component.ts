@@ -123,7 +123,7 @@ export class WizardDynamicStepComponent implements OnInit, OnDestroy, OnChanges 
               {
                 if (transition.from != transition.to) {
                   //handle first fieldset
-                  this._fieldSetService.GetFieldSet({ command: "first" }).subscribe((fieldSet) => {
+                  this._fieldSetService.getFieldSet({ command: "first" }).subscribe((fieldSet) => {
                     let prevFieldSet = this.fieldSet;
                     if (this.fieldSetHistory.length > 0) {
                       this.fieldSetHistory.push(prevFieldSet);
@@ -152,7 +152,7 @@ export class WizardDynamicStepComponent implements OnInit, OnDestroy, OnChanges 
               {
                 if (transition.from != transition.to) {
                   //handle first fieldset
-                  this._fieldSetService.GetFieldSet({ command: "second" }).subscribe((fieldSet) => {
+                  this._fieldSetService.getFieldSet({ command: "second" }).subscribe((fieldSet) => {
                     let prevFieldSet = this.fieldSet;
                     this.fieldSetHistory.push(prevFieldSet);
                     this.fieldSet = fieldSet

@@ -8,13 +8,13 @@ import { IFieldSet, IFieldInfo} from '../../models/field-set'
 /** AppGenerator contract */
 
 export interface IAppGeneratorService {
-  GetFieldSet(options?:any): Observable<IFieldSet>
+  getFieldSet(options?:any): Observable<IFieldSet>
 }
 
 /** AppGeneratorService contract using abstract base class */
 
 export abstract class AppGeneratorService implements IAppGeneratorService {
-  abstract GetFieldSet(options?:any): Observable<IFieldSet>;
+  abstract getFieldSet(options?:any): Observable<IFieldSet>;
   protected createEmptyFieldSet():Observable<IFieldSet>
   {
     return Observable.create((observer:Observer<IFieldSet>) => {
