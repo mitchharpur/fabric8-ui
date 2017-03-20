@@ -36,7 +36,6 @@ export class SpaceWizardComponent implements OnInit {
   configurator: SpaceConfigurator;
 
   private _context: Context;
-  private _instance: number = 0;
 
   private _workflow: IWorkflow = null;
   @Input()
@@ -58,9 +57,7 @@ export class SpaceWizardComponent implements OnInit {
     private broadcaster: Broadcaster,
     private spaceService: SpaceService,
     private _contextService: ContextService) {
-    SpaceWizardComponent.instanceCount++;
-    this._instance = SpaceWizardComponent.instanceCount;
-    this.log = getLogger(this.constructor.name, this._instance);
+    this.log = getLogger(this.constructor.name,SpaceWizardComponent.instanceCount++);
     this.log(`New instance ...`);
   }
 

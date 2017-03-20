@@ -1,7 +1,9 @@
 import { Injectable } from '@angular/core';
 import { Observable, Observer } from 'rxjs/Rx';
-import { IForgeRequest, IForgeResponse, ForgeService } from '../../models/forge'
+
+import { IForgeRequest, IForgeResponse , ForgeService} from '../contracts/forge-service';
 import { getLogger, ILoggerDelegate } from '../../models/logger';
+
 @Injectable()
 export class MockForgeService extends ForgeService {
   static instanceCount: number = 0;

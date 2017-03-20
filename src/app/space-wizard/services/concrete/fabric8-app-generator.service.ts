@@ -1,15 +1,19 @@
 import { Injectable, Inject } from '@angular/core';
 import { Observable, Observer } from 'rxjs/Rx';
-import { createEmptyFieldSet, IFieldSet, IFieldInfo, FieldSet, AppGeneratorService } from '../../models/app-generator'
-import { IForgeService, IForgeResponse, IForgeRequest, IForgeServiceProvider } from '../forge.service'
+
+/** contracts  */
+import { IFieldSet, IFieldInfo, IAppGeneratorService, AppGeneratorService } from '../contracts/app-generator-service'
+
+/** dependencies */
+import { IForgeService, IForgeResponse, IForgeRequest, IForgeServiceProvider, } from '../forge.service'
+
+
 import { getLogger, ILoggerDelegate } from '../../models/logger';
 
 @Injectable()
 export class Fabric8AppGeneratorService extends AppGeneratorService {
   static instanceCount: number = 0;
   private log: ILoggerDelegate = () => { };
-
-
 
   constructor(@Inject(IForgeServiceProvider.InjectToken) private forgeGatewayService:IForgeService ) {
     super()
@@ -18,7 +22,7 @@ export class Fabric8AppGeneratorService extends AppGeneratorService {
   }
   GetFieldSet(options: any = {}): Observable<IFieldSet> {
     let service: IForgeService = this.forgeGatewayService;
-    let observable: Observable<IFieldSet> = createEmptyFieldSet();
+    let observable: Observable<IFieldSet> = this.createEmptyFieldSet();
     switch (options.command) {
       case "first": {
         observable=getFirstFieldSet(options,this.forgeGatewayService)
@@ -29,7 +33,7 @@ export class Fabric8AppGeneratorService extends AppGeneratorService {
         break;
       }
       default: {
-        return createEmptyFieldSet();
+        return this.createEmptyFieldSet();
       }
     }
     return observable;

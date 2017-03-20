@@ -1,19 +1,20 @@
 import { Injectable } from '@angular/core';
 import { Observable, Observer } from 'rxjs/Rx';
-import { createEmptyFieldSet, IFieldSet, IFieldInfo ,FieldSet, AppGeneratorService} from '../../models/app-generator'
+import {  IFieldSet, IFieldInfo ,FieldSet, AppGeneratorService} from '../contracts/app-generator-service'
 import { getLogger, ILoggerDelegate } from '../../models/logger';
 
 /** mock app generator service */
+
 @Injectable()
 export class MockAppGeneratorService extends AppGeneratorService {
   static instanceCount: number = 0;
   private log: ILoggerDelegate = () => { };
 
-  constructor() { 
-    super() 
+  constructor() {
+    super()
     this.log = getLogger(this.constructor.name,MockAppGeneratorService.instanceCount++);
     this.log(`New instance...`);
-  
+
  }
   GetFieldSet(options:any={}): Observable<IFieldSet> {
     switch(options.command)
@@ -27,7 +28,7 @@ export class MockAppGeneratorService extends AppGeneratorService {
         return getSecondFieldSet();
       }
       default:{
-        return createEmptyFieldSet();
+        return this.createEmptyFieldSet();
       }
     }
   }

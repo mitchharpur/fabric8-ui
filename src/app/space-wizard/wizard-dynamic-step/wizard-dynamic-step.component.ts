@@ -21,7 +21,6 @@ export class WizardDynamicStepComponent implements OnInit, OnDestroy, OnChanges 
 
   // keep track of the number of instances
   static instanceCount: number = 0;
-  private _instance: number = 0;
   /** logger delegate delegates logging to a logger */
   private log: ILoggerDelegate = () => { };
 
@@ -39,9 +38,7 @@ export class WizardDynamicStepComponent implements OnInit, OnDestroy, OnChanges 
   @Input() stepName: string = "";
 
   constructor( @Inject(IAppGeneratorServiceProvider.InjectToken) private _fieldSetService: IAppGeneratorService) {
-    WizardDynamicStepComponent.instanceCount++;
-    this._instance = WizardDynamicStepComponent.instanceCount;
-    this.log = getLogger(this.constructor.name, this._instance);
+    this.log = getLogger(this.constructor.name,WizardDynamicStepComponent.instanceCount++);
     this.log(`New instance ...`);
 
   }
