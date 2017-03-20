@@ -61,11 +61,11 @@ export class SpaceWizardComponent implements OnInit {
     SpaceWizardComponent.instanceCount++;
     this._instance = SpaceWizardComponent.instanceCount;
     this.log = getLogger(this.constructor.name, this._instance);
-    this.log(`New instance...`);
+    this.log(`New instance ...`);
   }
 
   ngOnInit() {
-    this.log(`ngOnInit`)
+    this.log(`ngInit ...`)
     this.configureComponentHost();
     this.configurator = this.createSpaceConfigurator();
     this._contextService.current.subscribe(val => this._context = val);
@@ -142,13 +142,13 @@ export class SpaceWizardComponent implements OnInit {
     return workflow;
   }
   reset() {
-    this.log(`reset`);
+    this.log(`Reset ...`);
     this.configurator = this.createSpaceConfigurator();
     this.workflow = this.createAndInitializeWorkflow();
   }
 
   finish() {
-    this.log(`finish`);
+    this.log(`Finish ...`);
     console.log('finish!', this._context);
     let space = this.configurator.space;
     space.attributes.name = space.name;
@@ -185,7 +185,7 @@ export class SpaceWizardComponent implements OnInit {
   }
 
   cancel() {
-    this.log(`cancel`);
+    this.log(`Cancel...`);
     if (this.host) {
       this.host.close();
     }

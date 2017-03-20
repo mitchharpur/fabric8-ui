@@ -6,14 +6,15 @@
     info?:boolean,
   }
   export interface ILoggerDelegate{
-    (options:any|string|ILogEntry):void
+    (options:string|ILogEntry):void
   }
   /** This is just a quick and dirty logger ... refactor later */
 
-
+  
+ 
   export function getLogger(name:string,instance:number):ILoggerDelegate
   {
-      return function logger(options: any | string = {}) {
+      return function logger(options:ILogEntry) {
         let entry = { message: "" };
         if (typeof options === "string") {
           entry.message = options || "";
@@ -31,6 +32,9 @@
         if (options.info === true) {
           method = "info";
         }
-        console[method].apply(null, [`%c${name}%c :${instance}: %c${entry.message || ""}`,'color:lime;font-style:italic; font-size:1.0rem;border-left:solid 0px orangered;padding:3px;padding-left:6px;','color:orangered;font-weight:bolder;','color:white;']);
+        let typeStyle="background:linear-gradient(#444, #333); border-radius:15px;padding:4px;color:lime;font-style:italic;border-left:solid 0px orangered;padding:3px;padding-left:10px;padding-right:10px"
+        let instanceStyle="background:linear-gradient(#444, #333);color:orangered; border-radius:10px;padding:3px;margin:3px 0;";
+        let messageStyle="background:linear-gradient(#444, #333);color:white; border-radius:10px;padding:3px 10px;";
+        console[method].apply(null, [`%c${name}%c ${instance} %c${entry.message || ""}`,typeStyle,instanceStyle,messageStyle]);
       };
   }

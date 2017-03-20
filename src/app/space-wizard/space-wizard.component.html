@@ -185,7 +185,7 @@
       <a class="btn btn-default" (click)="finish()">Finish</a>
     </footer>
   </div>
-  <form wizard-dynamic-step class="wizard-step" [class.active]="workflow.isStepActive({name:'dynamic-step'})" stepName="dynamic-step" [workflow]="workflow"  >
-  </form>
+  <wizard-dynamic-step class="wizard-step" [class.active]="workflow.isStepActive({name:'dynamic-step'})"  stepName="dynamic-step" [workflow]="workflow"  >
+  </wizard-dynamic-step>
 
 </div>

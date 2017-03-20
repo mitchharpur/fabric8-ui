@@ -1,35 +1,32 @@
 import { Injectable } from '@angular/core';
 import { Observable, Observer } from 'rxjs/Rx';
-import { IMagicRequest, IMagicResponse, SpaceMagicServiceBase } from '../models/space-magic'
-import { getLogger, ILoggerDelegate } from '../models/logger';
-/** space magic mock service */
+import { IForgeRequest, IForgeResponse, ForgeService } from '../../models/forge'
+import { getLogger, ILoggerDelegate } from '../../models/logger';
 @Injectable()
-export class MockSpaceMagicService extends SpaceMagicServiceBase {
+export class MockForgeService extends ForgeService {
   static instanceCount: number = 0;
-  private _instance: number = 0;
   private log: ILoggerDelegate = () => { };
 
   constructor() {
     super();
-    MockSpaceMagicService.instanceCount++;
-    this._instance = MockSpaceMagicService.instanceCount;
-    this.log = getLogger(this.constructor.name, this._instance);
+    this.log = getLogger(this.constructor.name,MockForgeService.instanceCount++);
     this.log(`New instance...`);
-
   }
-  ExecuteCommand(options: IMagicRequest = { command: { name: "empty" } }): Observable<IMagicResponse> {
+  ExecuteCommand(options: IForgeRequest = { command: { name: "empty" } }): Observable<IForgeResponse> {
     switch (options.command.name) {
-      case "obsidian-new-project": {
+      case "forge-new-project": {
         // base url: /forge/commands/
-        // /obsidian-new-project/next/
-        // /obsidian-new-project/
-        return getObsidianNewProject();
+        // obsidian-new-project/validate/
+        // obsidian-new-project/next/
+        // obsidian-new-project/execute
+        return getForgeNewProject();
       }
-      case "obsidian-new-quickstart": {
+      case "forge-new-quickstart": {
         // base url: /forge/commands/
-        // /obsidian-new-quickstart/next/
+        // obsidian-new-quickstart/next/
+        // obsidian-new-quickstart/validate/
         // /obsidian-new-quickstart/
-        return getObsidianNewQuickStart();
+        return getForgeNewQuickStart();
       }
       default: {
         return getEmptyResponse();
@@ -37,14 +34,14 @@ export class MockSpaceMagicService extends SpaceMagicServiceBase {
     }
   }
 }
-function getEmptyResponse(): Observable<IMagicResponse> {
-  return Observable.create((observer: Observer<IMagicResponse>) => {
+function getEmptyResponse(): Observable<IForgeResponse> {
+  return Observable.create((observer: Observer<IForgeResponse>) => {
     observer.next({ payload:{}})
   });
 }
 
-function getObsidianNewQuickStart(): Observable<IMagicResponse> {
-  return Observable.create((observer: Observer<IMagicResponse>) => {
+function getForgeNewQuickStart(): Observable<IForgeResponse> {
+  return Observable.create((observer: Observer<IForgeResponse>) => {
     observer.next({ payload:{
     "metadata": {
         "deprecated": false,
@@ -212,8 +209,8 @@ function getObsidianNewQuickStart(): Observable<IMagicResponse> {
 
 
 
-function getObsidianNewProject(): Observable<IMagicResponse> {
-  return Observable.create((observer: Observer<IMagicResponse>) => {
+function getForgeNewProject(): Observable<IForgeResponse> {
+  return Observable.create((observer: Observer<IForgeResponse>) => {
     observer.next({
       payload: {
         "metadata": {

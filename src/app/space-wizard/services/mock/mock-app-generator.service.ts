@@ -1,20 +1,17 @@
 import { Injectable } from '@angular/core';
 import { Observable, Observer } from 'rxjs/Rx';
-import { getEmptyFieldSet, IFieldSet, IFieldInfo ,FieldSet, FieldSetServiceBase} from '../models/field-set'
-import { getLogger, ILoggerDelegate } from '../models/logger';
+import { createEmptyFieldSet, IFieldSet, IFieldInfo ,FieldSet, AppGeneratorService} from '../../models/app-generator'
+import { getLogger, ILoggerDelegate } from '../../models/logger';
 
-/** field set mock service */
+/** mock app generator service */
 @Injectable()
-export class MockFieldSetService extends FieldSetServiceBase {
+export class MockAppGeneratorService extends AppGeneratorService {
   static instanceCount: number = 0;
-  private _instance: number = 0;
   private log: ILoggerDelegate = () => { };
 
   constructor() { 
     super() 
-    MockFieldSetService.instanceCount++;
-    this._instance=MockFieldSetService.instanceCount;
-    this.log = getLogger(this.constructor.name, this._instance);
+    this.log = getLogger(this.constructor.name,MockAppGeneratorService.instanceCount++);
     this.log(`New instance...`);
   
  }
@@ -30,7 +27,7 @@ export class MockFieldSetService extends FieldSetServiceBase {
         return getSecondFieldSet();
       }
       default:{
-        return getEmptyFieldSet();
+        return createEmptyFieldSet();
       }
     }
   }

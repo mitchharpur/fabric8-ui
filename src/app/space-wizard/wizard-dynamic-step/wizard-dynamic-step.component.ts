@@ -1,21 +1,21 @@
-import { Component, OnInit, OnChanges, OnDestroy, SimpleChanges, SimpleChange, Input, Inject } from '@angular/core';
+import { Component, OnInit, OnChanges, OnDestroy, SimpleChanges, SimpleChange, Input,Output, Inject,EventEmitter } from '@angular/core';
 import { Router } from '@angular/router';
 
 import { IWorkflowStep, IWorkflowTransition, IWorkflow, TransitionDirection } from '../models/workflow';
 import { getLogger, ILoggerDelegate } from '../models/logger';
 import { INotifyPropertyChanged } from '../models/component'
 
-import { IFieldInfo, IFieldSet, IFieldSetService,IFieldSetServiceProvider } from '../services/field-set.service'
-import { ISpaceMagicServiceProvider,SpaceMagicServiceProvider } from '../services/space-magic.service'
+import { IFieldInfo, IFieldSet, IAppGeneratorService, IAppGeneratorServiceProvider } from '../services/app-generator.service';
+import { IForgeServiceProvider } from '../services/forge.service'
 
 @Component({
   host: {
     'class': 'wizard-step'
   },
-  selector: 'form[wizard-dynamic-step]',
+  selector: 'wizard-dynamic-step',
   templateUrl: './wizard-dynamic-step.component.html',
-  styleUrls: ['./wizard-dynamic-step.component.scss']
-
+  styleUrls: ['./wizard-dynamic-step.component.scss'],
+  providers:[IAppGeneratorServiceProvider.FactoryProvider,IForgeServiceProvider.MockFactoryProvider]
 })
 export class WizardDynamicStepComponent implements OnInit, OnDestroy, OnChanges {
 
@@ -34,28 +34,30 @@ export class WizardDynamicStepComponent implements OnInit, OnDestroy, OnChanges 
     this._workflow = value;
   }
 
+
+
   @Input() stepName: string = "";
 
-  constructor( @Inject(IFieldSetServiceProvider.InjectToken) private _fieldSetService: IFieldSetService) {
+  constructor( @Inject(IAppGeneratorServiceProvider.InjectToken) private _fieldSetService: IAppGeneratorService) {
     WizardDynamicStepComponent.instanceCount++;
     this._instance = WizardDynamicStepComponent.instanceCount;
     this.log = getLogger(this.constructor.name, this._instance);
-    this.log(`New instance...`);
+    this.log(`New instance ...`);
 
   }
 
   /** All inputs are bound and values assigned, but the 'workflow' get a new instance every time the parents host dialog is opened */
   ngOnInit() {
-    this.log(`ngOnInit.`)
+    this.log(`ngOnInit ...`)
     //this.subscribeToWorkflowTransitions(this.workflow);
   }
 
   ngOnDestroy() {
-    this.log(`ngOnDestory.`)
+    this.log(`ngOnDestory ...`)
   }
   /** handle all changes to @Input properties */
   ngOnChanges(changes: SimpleChanges) {
-    this.log(`ngOnChanges.`)
+    this.log(`ngOnChanges ...`)
     for (let propName in changes) {
       switch (propName.toLowerCase()) {
         case "workflow":
@@ -67,6 +69,12 @@ export class WizardDynamicStepComponent implements OnInit, OnDestroy, OnChanges 
       }
     }
   }
+  // @Output() onStepComplete = new EventEmitter();
+  // StepComplete(event: Event,...arg:string[]) {
+  //   this.log("dynamic step custom submit");
+  //   //event.stopPropagation();
+  //   this.onStepComplete.next();
+  // }
 
   private onWorkflowPropertyChanged(change?: INotifyPropertyChanged<IWorkflow>) {
     if (change) {
