@@ -18,7 +18,6 @@ export class IWorkflowProvider {
     return {
       provide: IWorkflowToken,
       useFactory:(loggerFactory)=>{
-        console.info("workflow factory")
         return new Workflow(loggerFactory);
       },
       deps:[LoggerFactory]
