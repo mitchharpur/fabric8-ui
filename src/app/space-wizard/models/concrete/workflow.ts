@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Observable, Observer, Subscriber, Subject } from 'rxjs/Rx';
-import { getLogger, LoggerFactory, ILoggerDelegate } from '../../common/logger';
+import { LoggerFactory, ILoggerDelegate } from '../../common/logger';
 
 import { IWorkflowStep } from '../contracts/workflow-step';
 import { IWorkflowLocator } from '../contracts/workflow-locator';
@@ -28,7 +28,7 @@ export class Workflow implements IWorkflow {
 
   constructor(loggerFactory: LoggerFactory) {
 
-    let logger = loggerFactory.createLogger(this.constructor.name, Workflow.instanceCount++);
+    let logger = loggerFactory.createLoggerDelegate(this.constructor.name, Workflow.instanceCount++);
     if (logger) {
       this.log = logger;
     }

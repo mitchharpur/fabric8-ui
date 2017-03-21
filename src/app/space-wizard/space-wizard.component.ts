@@ -62,7 +62,7 @@ export class SpaceWizardComponent implements OnInit {
     private _injector: Injector,
     private _workflowFactory: WorkflowFactory,
     loggerFactory: LoggerFactory) {
-    let logger = loggerFactory.createLogger(this.constructor.name, SpaceWizardComponent.instanceCount++);
+    let logger = loggerFactory.createLoggerDelegate(this.constructor.name, SpaceWizardComponent.instanceCount++);
     if (logger) {
       this.log = logger;
     }

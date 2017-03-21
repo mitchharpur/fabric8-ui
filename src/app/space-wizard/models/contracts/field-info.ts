@@ -1,30 +1,22 @@
-export interface IFieldOption
-{
-    id:any;
-    description:string;
-}
-
-export type WidgetType="singleSelection"|"multipleSelection"|"textInput";
-
-export class FieldWidgetType
-{
-  static SingleSelection:WidgetType="singleSelection";
-  static MultipleSelection:WidgetType="singleSelection";
-  static TexInput:WidgetType="textInput";
-}
+import { IFieldValueOption} from './field-value-option'; 
+import { FieldValueClassification} from './field-value-classification'; 
 
 export interface IFieldInfo {
   name: string;
-  value: number | string | boolean |Array<IFieldOption> ;
-  display:{
-    valueOptions: Array<any>;
-    hasOptions:boolean;
-    widget:WidgetType;
+  value: string | Array<IFieldValueOption>;
+  display: {
+    valueOptions: Array<IFieldValueOption>;
+    valueHasOptions: boolean;
+    valueClassification: FieldValueClassification;
     label: string;
     enabled: boolean;
     required: boolean;
-    visible:boolean;
-    index:number;
+    visible: boolean;
+    index: number;
+    // other properties
+    [key: string]: any;
   }
-  context?:any;
+  context?: any;
+  // other properties
+  [key: string]: any;
 }

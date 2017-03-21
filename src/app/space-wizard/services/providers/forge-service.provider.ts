@@ -29,9 +29,11 @@ export class IForgeServiceProvider {
   static get MockFactoryProvider(): FactoryProvider {
     return {
       provide: IForgeServiceToken,
-      useFactory:()=>{
-        return new MockForgeService();
-      }
+      useFactory:(loggerFactory)=>{
+        return new MockForgeService(loggerFactory);
+      },
+      deps:[LoggerFactory],
+      
     }
   }
   static get InjectToken(): OpaqueToken {
@@ -74,9 +76,10 @@ export class ForgeServiceProvider {
   static get MockFactoryProvider(): FactoryProvider {
     return {
       provide: ForgeService,
-      useFactory: ()=>{
-        return new MockForgeService();
+      useFactory: (loggerFactory)=>{
+        return new MockForgeService(loggerFactory);
       },
+      deps:[LoggerFactory],
       multi: false
     }
   }

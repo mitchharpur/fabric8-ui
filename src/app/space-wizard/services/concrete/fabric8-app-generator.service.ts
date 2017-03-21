@@ -2,34 +2,41 @@ import { Injectable, Inject } from '@angular/core';
 import { Observable, Observer } from 'rxjs/Rx';
 
 /** contracts  */
-import { IFieldSet, FieldSet, IFieldInfo, WidgetType, FieldWidgetType, IFieldOption, IAppGeneratorService, AppGeneratorService } from '../contracts/app-generator-service'
+import { IFieldSet, FieldSet, IFieldInfo, FieldValueClassification, FieldClassification, IFieldValueOption, IAppGeneratorService, AppGeneratorService } from '../contracts/app-generator-service'
 
 /** dependencies */
-import { IForgeService, IForgeResponse, IForgeRequest, IForgeServiceProvider, IForgeField, IForgeValueChoice } from '../forge.service'
+import { IForgeService, IForgeResponse, IForgeRequest, IForgeServiceProvider, IForgeInput, IForgeValueChoice } from '../forge.service'
 
 
-import { getLogger, ILoggerDelegate } from '../../common/logger';
+import { LoggerFactory, ILoggerDelegate } from '../../common/logger';
 
 @Injectable()
 export class Fabric8AppGeneratorService extends AppGeneratorService {
   static instanceCount: number = 1;
+  // default logger does nothing when called
   private log: ILoggerDelegate = () => { };
 
-  constructor( @Inject(IForgeServiceProvider.InjectToken) private forgeGatewayService: IForgeService) {
-    super()
-    this.log = getLogger(this.constructor.name, Fabric8AppGeneratorService.instanceCount++);
+  constructor(
+    @Inject(IForgeServiceProvider.InjectToken) private forgeService: IForgeService,
+    loggerFactory: LoggerFactory
+  ) {
+    super();
+    let logger = loggerFactory.createLoggerDelegate(this.constructor.name, Fabric8AppGeneratorService.instanceCount++);
+    if (logger) {
+      this.log = logger;
+    }
     this.log(`New instance...`);
   }
   getFieldSet(options: any = {}): Observable<IFieldSet> {
-    let service: IForgeService = this.forgeGatewayService;
+    let service: IForgeService = this.forgeService;
     let observable: Observable<IFieldSet> = this.createEmptyFieldSet();
     switch (options.command) {
       case "quickstart": {
-        observable = executeCommand({command:{name:"quickstart"}}, this.forgeGatewayService)
+        observable = executeCommand({ command: { name: "quickstart" } }, this.forgeService)
         break;
       }
       case "wizard": {
-        observable = executeCommand({command:{name:"wizard"}}, this.forgeGatewayService)
+        observable = executeCommand({ command: { name: "wizard" } }, this.forgeService)
         break;
       }
       default: {
@@ -49,17 +56,17 @@ function executeCommand(options: any, api: IForgeService): Observable<IFieldSet>
         name: options.command.name,
       }
     })
-    .map((response: IForgeResponse) => mapResponseToFieldSet(response))
-    .subscribe((fieldSet: IFieldSet) => {
-      observer.next(fieldSet);
-      observer.complete();
-    })
+      .map((response: IForgeResponse) => mapForgeResponseToFieldSet(response))
+      .subscribe((fieldSet: IFieldSet) => {
+        observer.next(fieldSet);
+        observer.complete();
+      })
   });
   return observable;
 }
 
 
-function mapResponseToFieldSet(response: IForgeResponse): IFieldSet {
+function mapForgeResponseToFieldSet(response: IForgeResponse): IFieldSet {
 
   let fieldSet = new FieldSet();
   //assign the original payload to the fieldset
@@ -69,15 +76,16 @@ function mapResponseToFieldSet(response: IForgeResponse): IFieldSet {
       name: forgeField.name,
       value: forgeField.value,
       display: {
-        widget: mapWidgetType(forgeField),
+        valueClassification: mapValueClassification(forgeField),
         label: forgeField.label,
         required: forgeField.required,
         enabled: forgeField.enabled,
         valueOptions: mapValueOptions(forgeField),
-        hasOptions: mapHasOptions(forgeField),
-        visible: forgeField.deprecated === false,
+        valueHasOptions: mapValueHasOptions(forgeField),
+        visible:forgeField.deprecated === false,
         index: 0
       },
+      //keep the original data for change tracking and revert semantics
       context: forgeField
     };
     fieldSet.push(fieldInfo);
@@ -86,36 +94,41 @@ function mapResponseToFieldSet(response: IForgeResponse): IFieldSet {
   return set;
 }
 
-function mapHasOptions(field: IForgeField): boolean {
+function mapValueHasOptions(field: IForgeInput): boolean {
   if (field.valueChoices) {
     return field.valueChoices.length > 0;
   }
   return false;
 }
-function mapValueOptions(field: IForgeField): Array<IFieldOption> {
-  let items: Array<IFieldOption> = []
+
+function mapValueOptions(field: IForgeInput): Array<IFieldValueOption> {
+  let items: Array<IFieldValueOption> = []
   for (let choice of field.valueChoices) {
     items.push({ id: choice.id, description: choice.description })
   }
   return items;
 }
 
-function mapWidgetType(field: IForgeField): WidgetType {
+function mapValueClassification(field: IForgeInput): FieldValueClassification {
   switch (field.class.toLowerCase()) {
     case "uiinput":
       {
-        return FieldWidgetType.TexInput;
+        return FieldValueClassification.SingleInput;
       }
     case "uiselectone":
       {
-        return FieldWidgetType.SingleSelection;
+        return FieldValueClassification.SingleSelection;
       }
+    case "uiselectmany": {
+      return FieldValueClassification.SingleSelection;
+    }
     default:
       {
-        return FieldWidgetType.TexInput;
+        return FieldValueClassification.SingleInput;
       }
   }
 }
+
 function mapFieldSetToRequest(fieldSet: IFieldSet): IForgeRequest {
   return { command: { name }, payload: {} };
 }

@@ -11,11 +11,12 @@ export class Fabric8ForgeService extends ForgeService {
   static instanceCount: number = 1;
   private log: ILoggerDelegate = () => { };
   private config = {
+    /** forge.api.prod-preview.openshift.io */
     apiUrl: "localhost:8088"
   };
   constructor(private http: Http, loggerFactory: LoggerFactory) {
     super()
-    let logger = loggerFactory.createLogger(this.constructor.name, Fabric8ForgeService.instanceCount++);
+    let logger = loggerFactory.createLoggerDelegate(this.constructor.name, Fabric8ForgeService.instanceCount++);
     if (logger) {
       this.log = logger;
     }
@@ -41,15 +42,19 @@ export class Fabric8ForgeService extends ForgeService {
         command = "/forge/commands/obsidian-new-quickstart/execute";
         break;
       }
-      case "wizard": {
+      case "starter": {
         command = "/forge/commands/obsidian-new-project";
         break;
       }
-      case "wizard-validate": {
+      case "starter-next": {
+        command = "/forge/commands/obsidian-new-project/next";
+        break;
+      }
+      case "starter-validate": {
         command = "/forge/commands/obsidian-new-project/validate";
         break;
       }
-      case "wizard-execute": {
+      case "starter-execute": {
         command = "/forge/commands/obsidian-new-project/execute";
         break;
       }

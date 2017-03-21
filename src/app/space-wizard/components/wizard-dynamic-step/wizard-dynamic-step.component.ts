@@ -40,7 +40,7 @@ export class WizardDynamicStepComponent implements OnInit, OnDestroy, OnChanges 
     @Inject(IAppGeneratorServiceProvider.InjectToken) private _fieldSetService: IAppGeneratorService,
     loggerFactory: LoggerFactory
   ) {
-    let logger = loggerFactory.createLogger(this.constructor.name, WizardDynamicStepComponent.instanceCount++);
+    let logger = loggerFactory.createLoggerDelegate(this.constructor.name, WizardDynamicStepComponent.instanceCount++);
     if (logger) {
       this.log = logger;
     }

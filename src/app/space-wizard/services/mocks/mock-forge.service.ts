@@ -2,16 +2,20 @@ import { Injectable } from '@angular/core';
 import { Observable, Observer } from 'rxjs/Rx';
 
 import { IForgeRequest, IForgeResponse, ForgeService } from '../contracts/forge-service';
-import { getLogger, ILoggerDelegate } from '../../common/logger';
+import { LoggerFactory, ILoggerDelegate } from '../../common/logger';
 
 @Injectable()
 export class MockForgeService extends ForgeService {
   static instanceCount: number = 1;
   private log: ILoggerDelegate = () => { };
 
-  constructor() {
+  constructor(loggerFactory:LoggerFactory) {
     super();
-    this.log = getLogger(this.constructor.name, MockForgeService.instanceCount++);
+    let logger=loggerFactory.createLoggerDelegate(this.constructor.name, MockForgeService.instanceCount++);
+    if(logger)
+    {
+        this.log=logger      
+    }
     this.log(`New instance...`);
   }
   ExecuteCommand(options: IForgeRequest = { command: { name: "empty" } }): Observable<IForgeResponse> {

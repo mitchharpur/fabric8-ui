@@ -6,6 +6,7 @@ import { Fabric8AppGeneratorService } from '../concrete/fabric8-app-generator.se
 import { MockAppGeneratorService } from '../mocks/mock-app-generator.service'
 
 import { IForgeServiceProvider, IForgeService } from '../forge.service'
+import {LoggerFactory} from '../../common/logger'
 
 /**
  * When using this provider and you take a dependency on the interface type
@@ -18,18 +19,20 @@ export class IAppGeneratorServiceProvider {
   static get FactoryProvider(): FactoryProvider {
     return {
       provide: IAppGeneratorServiceToken,
-      useFactory: (forgeGatewayService: IForgeService) => {
-        return new Fabric8AppGeneratorService(forgeGatewayService);
+      useFactory: (forge: IForgeService,loggerFactory) => {
+        return new Fabric8AppGeneratorService(forge,loggerFactory);
       },
-      deps: [IForgeServiceProvider.InjectToken]
+      deps: [IForgeServiceProvider.InjectToken,LoggerFactory]
     }
   }
   static get MockFactoryProvider(): FactoryProvider {
     return {
       provide: IAppGeneratorServiceToken,
-      useFactory: () => {
-        return new MockAppGeneratorService();
-      }
+      useFactory: (loggerFactory) => {
+        return new MockAppGeneratorService(loggerFactory);
+      },
+      deps: [LoggerFactory]
+
     }
   }
   static get InjectToken(): OpaqueToken {
@@ -62,19 +65,20 @@ export class FieldSetServiceProvider {
   static get FactoryProvider(): FactoryProvider {
     return {
       provide: AppGeneratorService,
-      useFactory: (spaceMagicService: IForgeService) => {
-        return new Fabric8AppGeneratorService(spaceMagicService);
+      useFactory: (forge: IForgeService,loggerFactory) => {
+        return new Fabric8AppGeneratorService(forge,loggerFactory);
       },
-      deps: [IForgeServiceProvider.InjectToken],
+      deps: [IForgeServiceProvider.InjectToken,LoggerFactory],
       multi: false
     }
   }
   static get MockFactoryProvider(): FactoryProvider {
     return {
       provide: AppGeneratorService,
-      useFactory: () => {
-        return new MockAppGeneratorService();
+      useFactory: (loggerFactory) => {
+        return new MockAppGeneratorService(loggerFactory);
       },
+      deps:[LoggerFactory],
       multi: false
     }
   }
