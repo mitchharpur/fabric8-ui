@@ -12,7 +12,7 @@ export interface IForgeInput {
   description?: string;
   note?:string;
   class: string;
-  value: string|Array<string>;
+  value:any;// string|Array<string>;
   valueChoices?: Array<IForgeValueChoice>;
   enabled: boolean;
   required: boolean;
@@ -47,6 +47,6 @@ export interface IForgePayload {
 
 
 export interface IForgeResponse {
-  payload: IForgePayload|any ;
+  payload: IForgePayload ;
 }
 

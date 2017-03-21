@@ -29,106 +29,113 @@ export class Fabric8AppGeneratorService extends AppGeneratorService {
   }
   getFieldSet(options: any = {}): Observable<IFieldSet> {
     let service: IForgeService = this.forgeService;
-    let observable: Observable<IFieldSet> = this.createEmptyFieldSet();
-    switch (options.command) {
-      case "quickstart": {
-        observable = executeCommand({ command: { name: "quickstart" } }, this.forgeService)
-        break;
-      }
-      case "wizard": {
-        observable = executeCommand({ command: { name: "wizard" } }, this.forgeService)
-        break;
-      }
-      default: {
-        return this.createEmptyFieldSet();
-      }
-    }
+    let observable = this.executeCommand(options)
+    return observable;
+  }
+  private handleError(err): Observable<any> {
+    let errMessage = err.message ? err.message : err.status ? `${err.status} - ${err.statusText}` : 'Server Error';
+    this.log({ message: errMessage, inner: err, error: true })
+    return Observable.throw(new Error(errMessage));
+  }
+  private executeCommand(options: any): Observable<IFieldSet> {
+    this.log(`Invoking forge service for command = ${options.command.name} ...`)
+    let observable: Observable<IFieldSet> = Observable.create((observer: Observer<IFieldSet>) => {
+      this.forgeService.ExecuteCommand({
+        command: options.command
+      })
+        .map((response: IForgeResponse) => {
+          return this.mapForgeResponseToFieldSet(response)
+        })
+        //.catch(this.handleError)
+        .subscribe((fieldSet: IFieldSet) => {
+          console.dir(fieldSet);
+          observer.next(fieldSet);
+          observer.complete();
+        })
+    });
     return observable;
   }
 
-}
+  private mapForgeResponseToFieldSet(response: IForgeResponse): IFieldSet {
+  //debugger;
+    let fieldSet = new FieldSet();
+    //assign the original payload to the fieldset
+    fieldSet.context = response.payload;
+    for (let input of response.payload.inputs) {
+      let source: IForgeInput = input;
+      let target: IFieldInfo = {
+        name: source.name,
+        value: source.value,
+        display: {
+          valueClassification: this.mapValueClassification(source),
+          label: source.label,
+          required: source.required,
+          enabled: source.enabled,
+          valueOptions: this.mapValueOptions(source),
+          valueHasOptions: this.mapValueHasOptions(source),
+          visible: source.deprecated === false,
+          index: 0
+        },
+        //keep the original data for change tracking and revert semantics
+        context: source
+      };
+      fieldSet.push(target);
+    }
+    let set = new FieldSet(...fieldSet);
+    console.dir(set);
+    return set;
+  }
 
-function executeCommand(options: any, api: IForgeService): Observable<IFieldSet> {
-  let observable: Observable<IFieldSet> = Observable.create((observer: Observer<IFieldSet>) => {
-    // invoke service and map results to fieldset
-    api.ExecuteCommand({
-      command: {
-        name: options.command.name,
+  private mapValueHasOptions(source: IForgeInput): boolean {
+    if (source.valueChoices) {
+      return source.valueChoices.length > 0;
+    }
+    return false;
+  }
+  private mapValueOptions(source: IForgeInput): Array<IFieldValueOption> {
+    let items: Array<IFieldValueOption> = []
+    if(source.valueChoices)
+    {
+      for (let choice of source.valueChoices) {
+        if(source.description)
+        {
+          items.push({ id: choice.id, description: choice.description })
+        }
+        else
+        {
+          items.push({ id: choice.id})
+
+        }
       }
-    })
-      .map((response: IForgeResponse) => mapForgeResponseToFieldSet(response))
-      .subscribe((fieldSet: IFieldSet) => {
-        observer.next(fieldSet);
-        observer.complete();
-      })
-  });
-  return observable;
-}
-
-
-function mapForgeResponseToFieldSet(response: IForgeResponse): IFieldSet {
-
-  let fieldSet = new FieldSet();
-  //assign the original payload to the fieldset
-  fieldSet.context = response.payload;
-  for (let forgeField of response.payload.input) {
-    let fieldInfo: IFieldInfo = {
-      name: forgeField.name,
-      value: forgeField.value,
-      display: {
-        valueClassification: mapValueClassification(forgeField),
-        label: forgeField.label,
-        required: forgeField.required,
-        enabled: forgeField.enabled,
-        valueOptions: mapValueOptions(forgeField),
-        valueHasOptions: mapValueHasOptions(forgeField),
-        visible:forgeField.deprecated === false,
-        index: 0
-      },
-      //keep the original data for change tracking and revert semantics
-      context: forgeField
-    };
-    fieldSet.push(fieldInfo);
+    }
+    return items;
   }
-  let set = new FieldSet(...fieldSet);
-  return set;
-}
 
-function mapValueHasOptions(field: IForgeInput): boolean {
-  if (field.valueChoices) {
-    return field.valueChoices.length > 0;
-  }
-  return false;
-}
-
-function mapValueOptions(field: IForgeInput): Array<IFieldValueOption> {
-  let items: Array<IFieldValueOption> = []
-  for (let choice of field.valueChoices) {
-    items.push({ id: choice.id, description: choice.description })
-  }
-  return items;
-}
-
-function mapValueClassification(field: IForgeInput): FieldValueClassification {
-  switch (field.class.toLowerCase()) {
-    case "uiinput":
-      {
-        return FieldValueClassification.SingleInput;
-      }
-    case "uiselectone":
-      {
+  private mapValueClassification(source: IForgeInput): FieldValueClassification {
+    switch ((source.class||"").toLowerCase()) {
+      case "uiinput":
+        {
+          return FieldValueClassification.SingleInput;
+        }
+      case "uiselectone":
+        {
+          return FieldValueClassification.SingleSelection;
+        }
+      case "uiselectmany": {
         return FieldValueClassification.SingleSelection;
       }
-    case "uiselectmany": {
-      return FieldValueClassification.SingleSelection;
+      default:
+        {
+          return FieldValueClassification.SingleInput;
+        }
     }
-    default:
-      {
-        return FieldValueClassification.SingleInput;
-      }
   }
+
+  private mapFieldSetToRequest(source: IFieldSet): IForgeRequest {
+    return { command: { name }, payload: {} };
+  }
+
 }
 
-function mapFieldSetToRequest(fieldSet: IFieldSet): IForgeRequest {
-  return { command: { name }, payload: {} };
-}
+
+

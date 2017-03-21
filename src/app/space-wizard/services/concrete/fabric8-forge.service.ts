@@ -11,8 +11,8 @@ export class Fabric8ForgeService extends ForgeService {
   static instanceCount: number = 1;
   private log: ILoggerDelegate = () => { };
   private config = {
-    /** forge.api.prod-preview.openshift.io */
-    apiUrl: "localhost:8088"
+    //apiUrl: "http://localhost:8088"
+    apiUrl: "https://forge.api.prod-preview.openshift.io"
   };
   constructor(private http: Http, loggerFactory: LoggerFactory) {
     super()
@@ -24,24 +24,12 @@ export class Fabric8ForgeService extends ForgeService {
   }
   private handleError(err): Observable<any> {
     let errMessage = err.message ? err.message : err.status ? `${err.status} - ${err.statusText}` : 'Server Error';
-    this.log({ message: errMessage, inner: err, error: true })
+    //this.log({ message: errMessage, inner: err, error: true })
     return Observable.throw(new Error(errMessage));
   }
   ExecuteCommand(options: IForgeRequest = { command: { name: "empty" } }): Observable<IForgeResponse> {
     let command = "/forge/version";
     switch (options.command.name) {
-      case "quickstart": {
-        command = "/forge/commands/obsidian-new-quickstart";
-        break;
-      }
-      case "quickstart-validate": {
-        command = "/forge/commands/obsidian-new-quickstart/validate";
-        break;
-      }
-      case "quickstart-execute": {
-        command = "/forge/commands/obsidian-new-quickstart/execute";
-        break;
-      }
       case "starter": {
         command = "/forge/commands/obsidian-new-project";
         break;
@@ -63,10 +51,12 @@ export class Fabric8ForgeService extends ForgeService {
       }
     }
     return Observable.create((observer: Observer<IForgeResponse>) => {
-      this.http.get(`this.config.apiUrl/${command}`)
+      let headers = new Headers();
+      headers.append('Content-Type', 'application/json');
+      this.http.get(`${this.config.apiUrl}${command}`,headers)
         .map((response) => {
           let payload: IForgePayload = response.json();
-          console.dir(payload)
+          //console.dir(payload);
           return { payload: payload };
         })
         .catch(this.handleError)

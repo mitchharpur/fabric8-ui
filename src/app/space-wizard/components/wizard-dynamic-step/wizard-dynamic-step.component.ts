@@ -115,14 +115,16 @@ export class WizardDynamicStepComponent implements OnInit, OnDestroy, OnChanges 
     workflow.transitions.subscribe((transition) => {
       try {
         this.log({ message: `Subscriber responding to an observed '${transition.direction}' workflow transition: from ${transition.from ? transition.from.name : "null"} to ${transition.to ? transition.to.name : "null"}.` });
+        //entering this step
         if (this.isTransitioningToThisStep(transition)) {
           switch (transition.direction) {
             case WorkflowTransitionDirection.NEXT:
               {
                 if (transition.from != transition.to) {
                   //handle first fieldset
-                  this._fieldSetService.getFieldSet({ command: "first" }).subscribe((fieldSet) => {
+                  this._fieldSetService.getFieldSet({ command:{name:"starter"}}).subscribe((fieldSet) => {
                     let prevFieldSet = this.fieldSet;
+                    //dont just store history as this only needs to happen when moving to next
                     if (this.fieldSetHistory.length > 0) {
                       this.fieldSetHistory.push(prevFieldSet);
                     }
@@ -150,7 +152,7 @@ export class WizardDynamicStepComponent implements OnInit, OnDestroy, OnChanges 
               {
                 if (transition.from != transition.to) {
                   //handle first fieldset
-                  this._fieldSetService.getFieldSet({ command: "second" }).subscribe((fieldSet) => {
+                  this._fieldSetService.getFieldSet({ command: "starter-next" }).subscribe((fieldSet) => {
                     let prevFieldSet = this.fieldSet;
                     this.fieldSetHistory.push(prevFieldSet);
                     this.fieldSet = fieldSet

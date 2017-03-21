@@ -3,7 +3,7 @@ import { FieldValueClassification} from './field-value-classification';
 
 export interface IFieldInfo {
   name: string;
-  value: string | Array<IFieldValueOption>;
+  value:any; //string | Array<IFieldValueOption>;
   display: {
     valueOptions: Array<IFieldValueOption>;
     valueHasOptions: boolean;

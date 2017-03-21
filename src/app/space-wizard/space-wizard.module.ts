@@ -12,7 +12,7 @@ import { WorkflowFactory, IWorkflowProvider } from './models/workflow'
   imports: [CommonModule, FormsModule],
   declarations: [SpaceWizardComponent, WizardDynamicStepComponent],
   exports: [SpaceWizardComponent],
-  providers: [IForgeServiceProvider.MockFactoryProvider, LoggerFactory, WorkflowFactory]
+  providers: [IForgeServiceProvider.FactoryProvider, LoggerFactory, WorkflowFactory]
 })
 export class SpaceWizardModule {
 
