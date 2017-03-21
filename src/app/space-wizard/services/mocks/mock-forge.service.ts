@@ -42,171 +42,109 @@ function getEmptyResponse(): Observable<IForgeResponse> {
   });
 }
 
+
+
+
 function getForgeNewQuickStart(): Observable<IForgeResponse> {
   return Observable.create((observer: Observer<IForgeResponse>) => {
-    observer.next({
-      payload: {
-        "metadata": {
+    let payload = {
+      metadata: { "deprecated": false, "category": "Obsidian", "name": "Obsidian: New Quickstart", "description": "Generate your project from a quickstart" },
+      state: { "valid": true, "canExecute": true, "wizard": false },
+      inputs: [
+        {
+          "name": "type",
+          "shortName": " ",
+          "valueType": "org.apache.maven.archetype.catalog.Archetype",
+          "inputType": "org.jboss.forge.inputType.DEFAULT",
+          "enabled": true,
+          "required": true,
           "deprecated": false,
-          "category": "Obsidian",
-          "name": "Obsidian: New Quickstart",
-          "description": "Generate your project from a quickstart"
-        },
-        "state": {
-          "valid": true,
-          "canExecute": true,
-          "wizard": false
-        },
-        "inputs": [
-          {
-            "name": "type",
-            "shortName": " ",
-            "valueType": "org.apache.maven.archetype.catalog.Archetype",
-            "inputType": "org.jboss.forge.inputType.DEFAULT",
-            "enabled": true,
-            "required": true,
-            "deprecated": false,
-            "label": "Project type",
-            "description": "",
-            "valueChoices": [
-              {
-                "id": "Creates a new Spring Boot Tomcat - Rest & Config Map",
-                "artifactId": "rest_configmap_springboot-tomcat-archetype",
-                "description": "Creates a new Spring Boot Tomcat - Rest & Config Map",
-                "goals": "[]",
-                "groupId": "org.obsidiantoaster.quickstarts",
-                "properties": "{}",
-                "repository": "https://repository.jboss.org/nexus/service/local/artifact/maven",
-                "version": "1.0.0-SNAPSHOT"
-              },
-              {
-                "id": "Creates a new WildFly Swarm - Config Map",
-                "artifactId": "rest_configmap_swarm-archetype",
-                "description": "Creates a new WildFly Swarm - Config Map",
-                "goals": "[]",
-                "groupId": "org.obsidiantoaster.quickstarts",
-                "properties": "{}",
-                "repository": "https://repository.jboss.org/nexus/service/local/artifact/maven",
-                "version": "1.0.0-SNAPSHOT"
-              },
-              {
-                "id": "Creates a new Vert.x - Rest & Config Map",
-                "artifactId": "rest_configmap_vertx-archetype",
-                "description": "Creates a new Vert.x - Rest & Config Map",
-                "goals": "[]",
-                "groupId": "org.obsidiantoaster.quickstarts",
-                "properties": "{}",
-                "repository": "https://repository.jboss.org/nexus/service/local/artifact/maven",
-                "version": "1.0.0-SNAPSHOT"
-              },
-              {
-                "id": "Creates a new Spring Boot Tomcat - Rest",
-                "artifactId": "rest_springboot-tomcat-archetype",
-                "description": "Creates a new Spring Boot Tomcat - Rest",
-                "goals": "[]",
-                "groupId": "org.obsidiantoaster.quickstarts",
-                "properties": "{}",
-                "repository": "https://repository.jboss.org/nexus/service/local/artifact/maven",
-                "version": "1.0.0-SNAPSHOT"
-              },
-              {
-                "id": "Creates a new Vertx - Rest",
-                "artifactId": "rest_vertx-archetype",
-                "description": "Creates a new Vertx - Rest",
-                "goals": "[]",
-                "groupId": "org.obsidiantoaster.quickstarts",
-                "properties": "{}",
-                "repository": "https://repository.jboss.org/nexus/service/local/artifact/maven",
-                "version": "1.0.0-SNAPSHOT"
-              },
-              {
-                "id": "Creates a new WildFly Swarm - Rest",
-                "artifactId": "rest_wildfly-swarm-archetype",
-                "description": "Creates a new WildFly Swarm - Rest",
-                "goals": "[]",
-                "groupId": "org.obsidiantoaster.quickstarts",
-                "properties": "{}",
-                "repository": "https://repository.jboss.org/nexus/service/local/artifact/maven",
-                "version": "1.0.0-SNAPSHOT"
-              },
-              {
-                "id": "Creates a new Secured Spring Boot Tomcat - Rest & Red Hat SSO",
-                "artifactId": "secured_rest-springboot-archetype",
-                "description": "Creates a new Secured Spring Boot Tomcat - Rest & Red Hat SSO",
-                "goals": "[]",
-                "groupId": "org.obsidiantoaster.quickstarts",
-                "properties": "{}",
-                "repository": "https://repository.jboss.org/nexus/service/local/artifact/maven",
-                "version": "1.0.0-SNAPSHOT"
-              },
-              {
-                "id": "Creates a new Secured Vertx - Rest & Red Hat SSO",
-                "artifactId": "secured_rest-vertx-archetype",
-                "description": "Creates a new Secured Vertx - Rest & Red Hat SSO",
-                "goals": "[]",
-                "groupId": "org.obsidiantoaster.quickstarts",
-                "properties": "{}",
-                "repository": "https://repository.jboss.org/nexus/service/local/artifact/maven",
-                "version": "1.0.0-SNAPSHOT"
-              },
-              {
-                "id": "Creates a new Secured Swarm - Rest & Red Hat SSO",
-                "artifactId": "secured_rest_swarm-archetype",
-                "description": "Creates a new Secured Swarm - Rest & Red Hat SSO",
-                "goals": "[]",
-                "groupId": "org.obsidiantoaster.quickstarts",
-                "properties": "{}",
-                "repository": "https://repository.jboss.org/nexus/service/local/artifact/maven",
-                "version": "1.0.0-SNAPSHOT"
-              }
-            ],
-            "class": "UISelectOne",
+          "label": "Project type",
+          "description": "",
+          "valueChoices": [
+            {
+              "id": "Creates a new Spring Boot Tomcat - Rest & Config Map",
+              "artifactId": "rest_configmap_springboot-tomcat-archetype",
+              "description": "Creates a new Spring Boot Tomcat - Rest & Config Map", 
+              "goals": "[]", 
+              "groupId": "org.obsidiantoaster.quickstarts", 
+              "properties": "{}",
+              "repository": "jar:file:/private/var/folders/n1/d5gbwypx3gn7h3dxkvz444s00000gn/T/wildfly-self-contained3581772513192948429.d/vfs/wildfly-swarm/wildfly-swarmc63b561a01bc0b13/generator.war-2724a0f83fe8fe74/WEB-INF/addons/org-obsidiantoaster-forge-obsidian-generator-1-0-0-SNAPSHOT/obsidian-generator-1.0.0-SNAPSHOT-forge-addon.jar!/org/obsidiantoaster/generator/ui",
+              "version": "1.0.0-SNAPSHOT"
+            },
+            {
+              "id": "Creates a new WildFly Swarm - Config Map",
+              "artifactId": "rest_configmap_swarm-archetype",
+              "description": "Creates a new WildFly Swarm - Config Map",
+              "goals": "[]",
+              "groupId": "org.obsidiantoaster.quickstarts",
+              "properties": "{}",
+              "repository": "jar:file:/private/var/folders/n1/d5gbwypx3gn7h3dxkvz444s00000gn/T/wildfly-self-contained3581772513192948429.d/vfs/wildfly-swarm/wildfly-swarmc63b561a01bc0b13/generator.war-2724a0f83fe8fe74/WEB-INF/addons/org-obsidiantoaster-forge-obsidian-generator-1-0-0-SNAPSHOT/obsidian-generator-1.0.0-SNAPSHOT-forge-addon.jar!/org/obsidiantoaster/generator/ui", "version": "1.0.0-SNAPSHOT"
+            },
+            {
+              "id": "Creates a new Vert.x - Rest & Config Map",
+              "artifactId": "rest_configmap_vertx-archetype",
+              "description": "Creates a new Vert.x - Rest & Config Map",
+              "goals": "[]",
+              "groupId": "org.obsidiantoaster.quickstarts", 
+              "properties": "{}", 
+              "repository": "jar:file:/private/var/folders/n1/d5gbwypx3gn7h3dxkvz444s00000gn/T/wildfly-self-contained3581772513192948429.d/vfs/wildfly-swarm/wildfly-swarmc63b561a01bc0b13/generator.war-2724a0f83fe8fe74/WEB-INF/addons/org-obsidiantoaster-forge-obsidian-generator-1-0-0-SNAPSHOT/obsidian-generator-1.0.0-SNAPSHOT-forge-addon.jar!/org/obsidiantoaster/generator/ui", 
+              "version": "1.0.0-SNAPSHOT"
+            }, 
+            { 
+              "id": "Creates a new Spring Boot Tomcat - Rest", 
+              "artifactId": "rest_springboot-tomcat-archetype", 
+              "description": "Creates a new Spring Boot Tomcat - Rest", 
+              "goals": "[]", 
+              "groupId": "org.obsidiantoaster.quickstarts", 
+              "properties": "{}", 
+              "repository": "jar:file:/private/var/folders/n1/d5gbwypx3gn7h3dxkvz444s00000gn/T/wildfly-self-contained3581772513192948429.d/vfs/wildfly-swarm/wildfly-swarmc63b561a01bc0b13/generator.war-2724a0f83fe8fe74/WEB-INF/addons/org-obsidiantoaster-forge-obsidian-generator-1-0-0-SNAPSHOT/obsidian-generator-1.0.0-SNAPSHOT-forge-addon.jar!/org/obsidiantoaster/generator/ui", 
+              "version": "1.0.0-SNAPSHOT" 
+            }, 
+            { 
+              "id": "Creates a new Vertx - Rest", 
+              "artifactId": "rest_vertx-archetype", 
+              "description": "Creates a new Vertx - Rest", 
+              "goals": "[]", 
+              "groupId": "org.obsidiantoaster.quickstarts", 
+              "properties": "{}", 
+              "repository": "jar:file:/private/var/folders/n1/d5gbwypx3gn7h3dxkvz444s00000gn/T/wildfly-self-contained3581772513192948429.d/vfs/wildfly-swarm/wildfly-swarmc63b561a01bc0b13/generator.war-2724a0f83fe8fe74/WEB-INF/addons/org-obsidiantoaster-forge-obsidian-generator-1-0-0-SNAPSHOT/obsidian-generator-1.0.0-SNAPSHOT-forge-addon.jar!/org/obsidiantoaster/generator/ui", "version": "1.0.0-SNAPSHOT" }, { "id": "Creates a new WildFly Swarm - Rest", "artifactId": "rest_wildfly-swarm-archetype", "description": "Creates a new WildFly Swarm - Rest", "goals": "[]", "groupId": "org.obsidiantoaster.quickstarts", "properties": "{}", "repository": "jar:file:/private/var/folders/n1/d5gbwypx3gn7h3dxkvz444s00000gn/T/wildfly-self-contained3581772513192948429.d/vfs/wildfly-swarm/wildfly-swarmc63b561a01bc0b13/generator.war-2724a0f83fe8fe74/WEB-INF/addons/org-obsidiantoaster-forge-obsidian-generator-1-0-0-SNAPSHOT/obsidian-generator-1.0.0-SNAPSHOT-forge-addon.jar!/org/obsidiantoaster/generator/ui", "version": "1.0.0-SNAPSHOT" }, { "id": "Creates a new Secured Spring Boot Tomcat - Rest & Red Hat SSO", "artifactId": "secured_rest-springboot-archetype", "description": "Creates a new Secured Spring Boot Tomcat - Rest & Red Hat SSO", "goals": "[]", "groupId": "org.obsidiantoaster.quickstarts", "properties": "{}", "repository": "jar:file:/private/var/folders/n1/d5gbwypx3gn7h3dxkvz444s00000gn/T/wildfly-self-contained3581772513192948429.d/vfs/wildfly-swarm/wildfly-swarmc63b561a01bc0b13/generator.war-2724a0f83fe8fe74/WEB-INF/addons/org-obsidiantoaster-forge-obsidian-generator-1-0-0-SNAPSHOT/obsidian-generator-1.0.0-SNAPSHOT-forge-addon.jar!/org/obsidiantoaster/generator/ui", 
+              "version": "1.0.0-SNAPSHOT" 
+            }, 
+            { 
+              "id": "Creates a new Secured Vertx - Rest & Red Hat SSO", 
+              "artifactId": "secured_rest-vertx-archetype", 
+              "description": "Creates a new Secured Vertx - Rest & Red Hat SSO", 
+              "goals": "[]", 
+              "groupId": "org.obsidiantoaster.quickstarts", 
+              "properties": "{}", 
+              "repository": "jar:file:/private/var/folders/n1/d5gbwypx3gn7h3dxkvz444s00000gn/T/wildfly-self-contained3581772513192948429.d/vfs/wildfly-swarm/wildfly-swarmc63b561a01bc0b13/generator.war-2724a0f83fe8fe74/WEB-INF/addons/org-obsidiantoaster-forge-obsidian-generator-1-0-0-SNAPSHOT/obsidian-generator-1.0.0-SNAPSHOT-forge-addon.jar!/org/obsidiantoaster/generator/ui", 
+              "version": "1.0.0-SNAPSHOT" 
+            }, 
+            { 
+              "id": "Creates a new Secured Swarm - Rest & Red Hat SSO", 
+              "artifactId": "secured_rest_swarm-archetype", 
+              "description": "Creates a new Secured Swarm - Rest & Red Hat SSO", 
+              "goals": "[]", 
+              "groupId": "org.obsidiantoaster.quickstarts", 
+              "properties": "{}", 
+              "repository": "jar:file:/private/var/folders/n1/d5gbwypx3gn7h3dxkvz444s00000gn/T/wildfly-self-contained3581772513192948429.d/vfs/wildfly-swarm/wildfly-swarmc63b561a01bc0b13/generator.war-2724a0f83fe8fe74/WEB-INF/addons/org-obsidiantoaster-forge-obsidian-generator-1-0-0-SNAPSHOT/obsidian-generator-1.0.0-SNAPSHOT-forge-addon.jar!/org/obsidiantoaster/generator/ui", 
+              "version": "1.0.0-SNAPSHOT" 
+            }], 
+            "class": "UISelectOne", 
             "value": "Creates a new Spring Boot Tomcat - Rest & Config Map"
-          },
-          {
-            "name": "named",
-            "shortName": " ",
-            "valueType": "java.lang.String",
-            "inputType": "org.jboss.forge.inputType.DEFAULT",
-            "enabled": true,
-            "required": true,
-            "deprecated": false,
-            "label": "Project name",
-            "description": "",
-            "note": "Downloadable project zip and application jar are based on the project name",
-            "class": "UIInput",
-            "value": "demo"
-          },
-          {
-            "name": "topLevelPackage",
-            "shortName": " ",
-            "valueType": "java.lang.String",
-            "inputType": "org.jboss.forge.inputType.DEFAULT",
-            "enabled": true,
-            "required": false,
-            "deprecated": false,
-            "label": "Top level package",
-            "description": "",
-            "class": "UIInput",
-            "value": "com.example"
-          },
-          {
-            "name": "version",
-            "shortName": " ",
-            "valueType": "java.lang.String",
-            "inputType": "org.jboss.forge.inputType.DEFAULT",
-            "enabled": true,
-            "required": true,
-            "deprecated": false,
-            "label": "Project version",
-            "description": "",
-            "class": "UIInput",
-            "value": "1.0.0-SNAPSHOT"
-          }
-        ]
-
-
-      }
+        }, 
+        { 
+          "name": "named", "shortName": " ", "valueType": "java.lang.String", "inputType": "org.jboss.forge.inputType.DEFAULT", "enabled": true, "required": true, "deprecated": false, "label": "Project name", "description": "The following characters are accepted: -_.a-zA-Z0-9", "note": "Downloadable project zip and application jar are based on the project name", "class": "UIInput", "value": "demo" }, 
+        {
+          "name": "topLevelPackage", "shortName": " ", "valueType": "java.lang.String", "inputType": "org.jboss.forge.inputType.DEFAULT", "enabled": true, "required": true, "deprecated": false, "label": "Top level package", "description": "The following characters are accepted: -_.a-zA-Z0-9", "class": "UIInput", "value": "com.example"
+        },
+        { 
+          "name": "version", "shortName": " ", "valueType": "java.lang.String", "inputType": "org.jboss.forge.inputType.DEFAULT", "enabled": true, "required": true, "deprecated": false, "label": "Project version", "description": "", "class": "UIInput", "value": "1.0.0-SNAPSHOT" 
+        }]
+    };
+    observer.next({
+      payload: payload
     })
   });
 }

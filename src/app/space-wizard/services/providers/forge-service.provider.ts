@@ -1,10 +1,11 @@
 import { FactoryProvider, ClassProvider,OpaqueToken } from '@angular/core';
-
+import { Http  } from '@angular/http';
 
 import {IForgeService,IForgeServiceToken,ForgeService} from '../contracts/forge-service'
 
 import {Fabric8ForgeService} from '../concrete/fabric8-forge.service'
 import {MockForgeService} from '../mocks/mock-forge.service'
+import {LoggerFactory} from '../../common/logger'
 
 
 /**
@@ -19,9 +20,10 @@ export class IForgeServiceProvider {
   static get FactoryProvider(): FactoryProvider {
     return {
       provide: IForgeServiceToken,
-      useFactory:()=>{
-        return new Fabric8ForgeService();
-      }
+      useFactory:(loggerFactory,http)=>{
+        return new Fabric8ForgeService(http,loggerFactory);
+      },
+      deps:[LoggerFactory,Http]
     }
   }
   static get MockFactoryProvider(): FactoryProvider {
@@ -62,9 +64,10 @@ export class ForgeServiceProvider {
   static get FactoryProvider(): FactoryProvider {
     return {
       provide: ForgeService,
-      useFactory: ()=>{
-        return new Fabric8ForgeService();
+      useFactory:(loggerFactory,http)=>{
+        return new Fabric8ForgeService(http,loggerFactory);
       },
+      deps:[LoggerFactory,Http],
       multi: false
     }
   }

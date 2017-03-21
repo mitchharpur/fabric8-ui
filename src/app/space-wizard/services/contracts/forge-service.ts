@@ -2,7 +2,7 @@ import { OpaqueToken } from '@angular/core';
 import { Observable, Subscriber } from 'rxjs/Rx';
 
 import { IForgeRequest, IForgeResponse } from '../../models/forge';
-export { IForgeRequest, IForgeResponse } from '../../models/forge';
+export { IForgeRequest, IForgeResponse , IForgeValueChoice, IForgeField, IForgePayload } from '../../models/forge';
 
 /**
  * IForgeRequest contract functions as an forge client of sorts

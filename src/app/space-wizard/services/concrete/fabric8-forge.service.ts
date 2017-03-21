@@ -1,30 +1,75 @@
 import { Injectable } from '@angular/core';
-import { Http } from '@angular/http';
+import { Http, Response } from '@angular/http';
 
 import { Observable, Observer } from 'rxjs/Rx';
-import { IForgeRequest, IForgeResponse, ForgeService } from '../contracts/forge-service';
+import { IForgeRequest, IForgePayload, IForgeResponse, ForgeService } from '../contracts/forge-service';
 
-import { getLogger, ILoggerDelegate } from '../../common/logger';
+import { LoggerFactory, ILoggerDelegate } from '../../common/logger';
 
 @Injectable()
 export class Fabric8ForgeService extends ForgeService {
   static instanceCount: number = 1;
   private log: ILoggerDelegate = () => { };
-  constructor() {
+  private config = {
+    apiUrl: "localhost:8088"
+  };
+  constructor(private http: Http, loggerFactory: LoggerFactory) {
     super()
-    this.log = getLogger(this.constructor.name, Fabric8ForgeService.instanceCount++);
+    let logger = loggerFactory.createLogger(this.constructor.name, Fabric8ForgeService.instanceCount++);
+    if (logger) {
+      this.log = logger;
+    }
     this.log(`New instance...`);
-
+  }
+  private handleError(err): Observable<any> {
+    let errMessage = err.message ? err.message : err.status ? `${err.status} - ${err.statusText}` : 'Server Error';
+    this.log({ message: errMessage, inner: err, error: true })
+    return Observable.throw(new Error(errMessage));
   }
   ExecuteCommand(options: IForgeRequest = { command: { name: "empty" } }): Observable<IForgeResponse> {
+    let command = "/forge/version";
     switch (options.command.name) {
-      case "empty": {
-        return createEmptyResponse();
+      case "quickstart": {
+        command = "/forge/commands/obsidian-new-quickstart";
+        break;
+      }
+      case "quickstart-validate": {
+        command = "/forge/commands/obsidian-new-quickstart/validate";
+        break;
+      }
+      case "quickstart-execute": {
+        command = "/forge/commands/obsidian-new-quickstart/execute";
+        break;
+      }
+      case "wizard": {
+        command = "/forge/commands/obsidian-new-project";
+        break;
+      }
+      case "wizard-validate": {
+        command = "/forge/commands/obsidian-new-project/validate";
+        break;
+      }
+      case "wizard-execute": {
+        command = "/forge/commands/obsidian-new-project/execute";
+        break;
       }
       default: {
         return createEmptyResponse();
       }
     }
+    return Observable.create((observer: Observer<IForgeResponse>) => {
+      this.http.get(`this.config.apiUrl/${command}`)
+        .map((response) => {
+          let payload: IForgePayload = response.json();
+          console.dir(payload)
+          return { payload: payload };
+        })
+        .catch(this.handleError)
+        .subscribe((response: IForgeResponse) => {
+          observer.next(response);
+          observer.complete();
+        })
+    });
   }
 }
 
@@ -37,39 +82,3 @@ function createEmptyResponse(): Observable<IForgeResponse> {
     observer.complete();
   })
 }
-//     import { Injectable, Inject, ReflectiveInjector } from '@angular/core';
-// import { Http, Response } from '@angular/http';
-// import { Observable } from 'rxjs/Rx';
-
-// import { CONFIG } from './../../config/constants';
-// import { TestModel } from './test.model';
-
-// @Injectable()
-// export class TestService {
-
-//     constructor(private http: Http, @Inject(CONFIG) private config) {}
-
-//     getTestsModels(): Observable<TestModel[]> {
-
-//         let url = this.config.apiUrl + "test";
-
-//         return this.http.get(url)
-//                         .map( (response) => response.json() )
-//                         .map( (results) => {
-//                             return results.map( (current) => {
-//                                 return ReflectiveInjector.resolveAndCreate([TestModel]).get(TestModel);
-//                             })
-//                         })
-//                         .catch(this.handleError);
-
-//     }
-
-//     private handleError(err): Observable<any> {
-
-//         let errMessage = err.message ? err.message : err.status ? `${err.status} - ${err.statusText}` : 'Server Error';
-
-//         return Observable.throw(new Error(errMessage));
-
-//     }
-
-//}
