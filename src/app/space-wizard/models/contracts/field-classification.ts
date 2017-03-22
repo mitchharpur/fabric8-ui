@@ -1,7 +1,7 @@
-export type FieldClassification = "singleSelection" | "multipleSelection" | "singleInput";
+export type FieldWidgetClassification = "singleSelection" | "multipleSelection" | "singleInput";
 
-export class FieldClassificationOptions {
-  static SingleSelection: FieldClassification = "singleSelection";
-  static MultipleSelection: FieldClassification = "multipleSelection";
-  static SingleInput: FieldClassification = "singleInput";
+export class FieldWidgetClassificationOptions {
+  static SingleSelection: FieldWidgetClassification = "singleSelection";
+  static MultipleSelection: FieldWidgetClassification = "multipleSelection";
+  static SingleInput: FieldWidgetClassification = "singleInput";
 }

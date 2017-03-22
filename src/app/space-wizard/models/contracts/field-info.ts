@@ -1,13 +1,14 @@
 import { IFieldValueOption} from './field-value-option'; 
-import { FieldClassification} from './field-classification'; 
+import { FieldWidgetClassification} from './field-classification'; 
 
 export interface IFieldInfo {
   name: string;
   value:any; //string | Array<IFieldValueOption>;
+  valueDataType?:string;
   display: {
     valueOptions?: Array<IFieldValueOption>;
     valueHasOptions: boolean;
-    valueClassification: FieldClassification;
+    widgetClassification: FieldWidgetClassification;
     label: string;
     enabled: boolean;
     required: boolean;

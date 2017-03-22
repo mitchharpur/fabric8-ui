@@ -1,7 +1,7 @@
 import { Observable, Observer, Subscriber } from 'rxjs/Rx';
 import { OpaqueToken } from '@angular/core';
 
-export { IFieldSet, FieldSet, IFieldInfo, FieldClassificationOptions, FieldClassification, IFieldValueOption } from '../../models/app-generator'
+export { IFieldSet, FieldSet, IFieldInfo, FieldWidgetClassificationOptions, FieldWidgetClassification, IFieldValueOption } from '../../models/app-generator'
 
 import { IFieldSet, IFieldInfo } from '../../models/app-generator'
 

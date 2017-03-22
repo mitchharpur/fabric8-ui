@@ -1,6 +1,32 @@
 <header>Header</header>
-<section style="padding:20px;">
-    <div style="padding:20px;" *ngFor="let fieldInfo of fieldSet" >{{fieldInfo.name}}</div>
+ <section class="flex-container in-column-direction flex-grow-1 flex-align-content-stretch margin-top-15 container-fluid">
+    <div class="row">
+      <div  class="col-xs-12">
+        <div class="form-horizontal">
+          <div class="form-group" *ngFor="let field of fieldSet" >
+            <label class="control-label col-xs-4">{{field.display.label}}</label>
+            <div class="col-xs-8" [ngSwitch]="field.display.widgetClassification" >
+              <div *ngSwitchCase="'singleInput'" >
+                <div [ngSwitch]="field.valueDataType">
+                  <input *ngSwitchCase="'string'" name="{{field.name}}" [(ngModel)]="field.value" type="text" class="form-control" placeholder="{{field.description}}" [required]="field.display.required" [disabled]="!field.display.enabled" />
+                  <input *ngSwitchCase="'boolean'" type="checkbox" name="{{field.name}}" [(ngModel)]="field.value" class="form-control" [required]="field.display.required" [disabled]="!field.display.enabled">
+                  <input *ngSwitchCase="'number'" type="number" name="{{field.name}}" [(ngModel)]="field.value" class="form-control" [required]="field.display.required" [disabled]="!field.display.enabled">
+                  <div class="errorLabel help-block">
+                    <span *ngIf="field.display.message">{{field.display.message.description}}</span>
+                    <span *ngIf="!field.display.message">{{field.display.label}} is required</span>
+                  </div>
+                  <span *ngIf="field.display.note"><span class="fa fa-info-circle"></span> <i>{{field.display.note}}</i></span>
+                </div>
+              </div>  
+              <div *ngSwitchCase="'singleSelection'" >
+              </div>
+              <div *ngSwitchCase="'multipleSelection'" >
+              </div>
+            </div>
+          </div>
+      </div>
+    </div>
+  </div>
 </section>
 <footer>
       <a class="btn btn-default margin-right-5" (click)="workflow.cancel()">Cancel</a>

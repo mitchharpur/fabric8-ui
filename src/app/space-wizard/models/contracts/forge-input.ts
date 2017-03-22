@@ -7,6 +7,7 @@ export interface IForgeInput {
   note?:string;
   class: string;
   value:any;// string|Array<string>;
+  valueType?:string,
   valueChoices?: Array<IForgeValueChoice>;
   enabled: boolean;
   required: boolean;

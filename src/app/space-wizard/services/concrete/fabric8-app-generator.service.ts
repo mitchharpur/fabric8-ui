@@ -2,7 +2,7 @@ import { Injectable, Inject } from '@angular/core';
 import { Observable, Observer } from 'rxjs/Rx';
 
 /** contracts  */
-import { IAppGeneratorResponse, IFieldSet, FieldSet, IFieldInfo, FieldClassificationOptions, FieldClassification, IFieldValueOption, IAppGeneratorService, AppGeneratorService } from '../contracts/app-generator-service'
+import { IAppGeneratorResponse, IFieldSet, FieldSet, IFieldInfo, FieldWidgetClassificationOptions, FieldWidgetClassification, IFieldValueOption, IAppGeneratorService, AppGeneratorService } from '../contracts/app-generator-service'
 
 /** dependencies */
 import { IForgeService, IForgeResponse, IForgeRequest, IForgeServiceProvider, IForgeInput, IForgeValueChoice, IForgePayload } from '../forge.service'
@@ -111,18 +111,35 @@ export class Fabric8AppGeneratorService extends AppGeneratorService {
       let targetItem: IFieldInfo = {
         name: sourceItem.name,
         value: sourceItem.value,
+        valueDataType:this.mapFieldValueDataType(sourceItem),
         display: {
           valueOptions: this.mapValueOptions(sourceItem),
           valueHasOptions: this.mapValueHasOptions(sourceItem),
-          valueClassification: this.mapValueClassification(sourceItem),
+          widgetClassification: this.mapWidgetClassification(sourceItem),
           label: sourceItem.label,
           required: sourceItem.required,
           enabled: sourceItem.enabled,
           visible: sourceItem.deprecated === false,
           index: 0
         },
+        
         //context: sourceItem
       };
+      // add dynamic fields that vary with payload
+      if(input.note)
+      {
+        targetItem.display.note=input.note;
+      }
+      if(source.payload.messages)
+      {
+        for(let message of source.payload.messages )
+        {
+          if(message.input == input.name)
+          {
+            input.display.message=message
+          }
+        }
+      }
       targetItems.push(targetItem);
     }
     let response: IAppGeneratorResponse = {
@@ -153,23 +170,46 @@ export class Fabric8AppGeneratorService extends AppGeneratorService {
     }
     return items;
   }
-
-  private mapValueClassification(source: IForgeInput): FieldClassification {
-    switch ((source.class || "").toLowerCase()) {
-      case "uiinput":
+  private mapFieldValueDataType(source: IForgeInput): string {
+    if(!source.valueType)
+    {
+      return "string";
+    }
+    switch ((source.valueType || "").toLowerCase()) {
+      case "string":
         {
-          return FieldClassificationOptions.SingleInput;
+          return FieldWidgetClassificationOptions.SingleInput;
         }
-      case "uiselectone":
+      case "boolean":
         {
-          return FieldClassificationOptions.SingleSelection;
+          return FieldWidgetClassificationOptions.SingleSelection;
         }
-      case "uiselectmany": {
-        return FieldClassificationOptions.SingleSelection;
+      case "java.lang.integer": {
+        return "number";
       }
       default:
         {
-          return FieldClassificationOptions.SingleInput;
+          return "string";
+        }
+    }
+  }
+
+  private mapWidgetClassification(source: IForgeInput): FieldWidgetClassification {
+    switch ((source.class || "").toLowerCase()) {
+      case "uiinput":
+        {
+          return FieldWidgetClassificationOptions.SingleInput;
+        }
+      case "uiselectone":
+        {
+          return FieldWidgetClassificationOptions.SingleSelection;
+        }
+      case "uiselectmany": {
+        return FieldWidgetClassificationOptions.SingleSelection;
+      }
+      default:
+        {
+          return FieldWidgetClassificationOptions.SingleInput;
         }
     }
   }

@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Observable, Observer } from 'rxjs/Rx';
-import { IAppGeneratorResponse, IFieldSet, IFieldInfo, FieldSet, AppGeneratorService, FieldClassificationOptions } from '../contracts/app-generator-service'
+import { IAppGeneratorResponse, IFieldSet, IFieldInfo, FieldSet, AppGeneratorService, FieldWidgetClassificationOptions } from '../contracts/app-generator-service'
 import { LoggerFactory, ILoggerDelegate } from '../../common/logger';
 
 /** mock app generator service */
@@ -46,7 +46,7 @@ function getFirstFieldSet(): Observable<IAppGeneratorResponse> {
           display: {
             valueOptions: [],
             valueHasOptions: false,
-            valueClassification: FieldClassificationOptions.SingleInput,
+            widgetClassification: FieldWidgetClassificationOptions.SingleInput,
             label: "label-f1",
             enabled: true,
             required: true,
@@ -60,7 +60,7 @@ function getFirstFieldSet(): Observable<IAppGeneratorResponse> {
           display: {
             valueOptions: [],
             valueHasOptions: false,
-            valueClassification: FieldClassificationOptions.SingleInput,
+            widgetClassification: FieldWidgetClassificationOptions.SingleInput,
             label: "label-f2",
             enabled: true,
             required: true,
@@ -85,7 +85,7 @@ function getSecondFieldSet(): Observable<IAppGeneratorResponse> {
           display: {
             valueOptions: [],
             valueHasOptions: false,
-            valueClassification: FieldClassificationOptions.SingleInput,
+            widgetClassification: FieldWidgetClassificationOptions.SingleInput,
             label: "label-f3",
             enabled: true,
             required: true,
@@ -99,7 +99,7 @@ function getSecondFieldSet(): Observable<IAppGeneratorResponse> {
           display: {
             valueOptions: [],
             valueHasOptions: false,
-            valueClassification: FieldClassificationOptions.SingleInput,
+            widgetClassification: FieldWidgetClassificationOptions.SingleInput,
             label: "label-f4",
             enabled: true,
             required: true,
@@ -113,7 +113,7 @@ function getSecondFieldSet(): Observable<IAppGeneratorResponse> {
           display: {
             valueOptions: [],
             valueHasOptions: false,
-            valueClassification: FieldClassificationOptions.SingleInput,
+            widgetClassification: FieldWidgetClassificationOptions.SingleInput,
             label: "label-f5",
             enabled: true,
             required: true,
