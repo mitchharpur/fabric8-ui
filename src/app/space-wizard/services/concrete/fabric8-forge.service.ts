@@ -78,7 +78,7 @@ export class Fabric8ForgeService extends ForgeService {
             {
               let url = `${this.config.forge.api.url.https}/forge/commands/obsidian-new-project`;
               this.log(`Executing forge ${url}`);
-              return this.GetCommand(url)
+              return this.GetCommand(url);
             }
           case "next":
             {
