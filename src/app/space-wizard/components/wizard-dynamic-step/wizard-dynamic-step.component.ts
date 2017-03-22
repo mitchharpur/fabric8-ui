@@ -124,12 +124,15 @@ export class WizardDynamicStepComponent implements OnInit, OnDestroy, OnChanges 
             case WorkflowTransitionDirection.NEXT:
               {
                 if (transition.from != transition.to) {
-                  //handle first fieldset
                   this._fieldSetService.getFieldSet({ 
                     command:{
                       name:"starter",
                       parameters:{ 
-                        workflow:{step:"begin"}
+                        workflow:{
+                          step:{
+                            name:"begin"
+                          }
+                        }
                       }
                     }
                   }).subscribe((response) => {
@@ -175,15 +178,9 @@ export class WizardDynamicStepComponent implements OnInit, OnDestroy, OnChanges 
                   //let prevFieldSet = this.fieldSet;
                   //this.responseHistory.push(prevFieldSet);
                   //this.log(`stored fieldset[${prevFieldSet.length}] into history ... there are ${this.responseHistory.length} items in history ...`);
-                  
+                  let command=this.currentResponse.context.nextCommand;
                   this._fieldSetService.getFieldSet({ 
-                    command:{
-                      name: "starter",
-                      parameters:{
-                        workflow:{step:"next"},
-                        data:this.currentResponse
-                      }
-                    }
+                    command:command
                   }).subscribe((response) => {
                     this.currentResponse=response;  
                     this.fieldSet = response.payload;

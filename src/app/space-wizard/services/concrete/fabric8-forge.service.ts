@@ -73,7 +73,7 @@ export class Fabric8ForgeService extends ForgeService {
     switch (options.command.name) {
       case "starter": {
         let parameters: any = options.command.parameters;
-        switch (parameters.workflow.step) {
+        switch (parameters.workflow.step.name) {
           case "begin":
             {
               let url = `${this.config.forge.api.url.https}/forge/commands/obsidian-new-project`;
@@ -84,21 +84,23 @@ export class Fabric8ForgeService extends ForgeService {
             {
               let url = `${this.config.forge.api.url.https}/forge/commands/obsidian-new-project/next`;
               let data = parameters.data || {};
-              let context = data.context || {};
               console.dir(data);
-              let payload: any = {};
-              payload.inputs = context.inputs;
-              payload.state = {};
-              context.stepIndex = 1;
-              this.log(`Executing forge ${url}`);
+              let payload=parameters.data;
+              payload.stepIndex=parameters.workflow.step.index||1;
+              this.log(`posting to forge ${url}`);
               console.dir(payload)
-              //return this.PostCommand(url,payload);
+              return this.PostCommand(url,payload);
             }
           case "execute":
             {
-              let url = `${this.config.forge.api.url.https}/forge/commands/obsidian-new-project/exeute`;
-              this.log(`Executing forge ${url}`);
-              return this.PostCommand(url, {})
+              let url = `${this.config.forge.api.url.https}/forge/commands/obsidian-new-project/execute`;
+              let data = parameters.data || {};
+              console.dir(data);
+              let payload=parameters.data;
+              payload.stepIndex=parameters.workflow.step.index||1;
+              this.log(`posting to forge ${url}`);
+              console.dir(payload)
+              return this.PostCommand(url,payload);
             }
         }
         break;

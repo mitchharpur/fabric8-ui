@@ -43,10 +43,10 @@ export class Fabric8AppGeneratorService extends AppGeneratorService {
       this.forgeService.ExecuteCommand({
         command: options.command
       })
-        .map((fr)=>this.updateForgeResponseContext(fr))
-        .map((fr)=>this.mapForgeResponseToAppGeneratorResponse(fr))
-        .map((ar)=>this.updateAppGeneratorResponseContext(ar))
-        .catch((err)=>this.handleError(err))
+        .map((fr) => this.updateForgeResponseContext(fr, options.command))
+        .map((fr) => this.mapForgeResponseToAppGeneratorResponse(fr))
+        .map((ar) => this.updateAppGeneratorResponseContext(ar))
+        .catch((err) => this.handleError(err))
         .subscribe((appGeneratorResponse: IAppGeneratorResponse) => {
           console.dir(appGeneratorResponse);
           observer.next(appGeneratorResponse);
@@ -55,27 +55,31 @@ export class Fabric8AppGeneratorService extends AppGeneratorService {
     });
     return observable;
   }
-  private updateForgeResponseContext(forgeResponse: IForgeResponse): IForgeResponse {
+  private updateForgeResponseContext(forgeResponse: IForgeResponse, command: any): IForgeResponse {
     let forgePayload: IForgePayload = forgeResponse.payload;
     let workflow: any = {};
     if (forgePayload) {
       // the state we get from forge helps to determine the next workflow steps
-      let state = forgePayload.state
-      if (state.valid == false) {
-        workflow.command = { name: "validate" };
+      let forgeState = forgePayload.state
+      if (forgeState.valid == false) {
+        workflow.step = { name: "validate" };
       }
-      else if (state.wizard && state.canMoveToNextStep) {
-        workflow.command = { name: "next" };
-        workflow.stepIndex = 1;
+      else if (forgeState.wizard === true && forgeState.canMoveToNextStep === true) {
+        workflow.step = { name: "next", index: 1 };
       }
-      if (state.canExecute) {
-        workflow.command = { name: "execute" };
+      if (forgeState.canExecute === true) {
+        workflow.step = { name: "execute" };
       }
     }
     forgeResponse.context = forgeResponse.context || {};
-    forgeResponse.context.workflow = workflow;
-    //preserve original data for subsequesnt requests as well as reset and change notification awareness
-    forgeResponse.context.data=forgePayload
+    // shape the command that will be used for the next command
+    forgeResponse.context.nextCommand = {
+      name: command.name,
+      parameters: {
+        workflow: workflow || {},
+        data: forgePayload
+      }
+    }
     return forgeResponse;
   }
   private updateAppGeneratorResponseContext(response: IAppGeneratorResponse): IAppGeneratorResponse {
