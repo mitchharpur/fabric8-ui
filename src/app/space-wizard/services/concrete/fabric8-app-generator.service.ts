@@ -111,7 +111,7 @@ export class Fabric8AppGeneratorService extends AppGeneratorService {
       let targetItem: IFieldInfo = {
         name: sourceItem.name,
         value: sourceItem.value,
-        valueDataType:this.mapFieldValueDataType(sourceItem),
+        valueType:this.mapFieldValueDataType(sourceItem),
         display: {
           valueOptions: this.mapValueOptions(sourceItem),
           valueHasOptions: this.mapValueHasOptions(sourceItem),
@@ -176,16 +176,20 @@ export class Fabric8AppGeneratorService extends AppGeneratorService {
       return "string";
     }
     switch ((source.valueType || "").toLowerCase()) {
-      case "string":
+      case "java.lang.string":
         {
-          return FieldWidgetClassificationOptions.SingleInput;
+          return "string";
         }
-      case "boolean":
+      case "java.lang.boolean":
         {
-          return FieldWidgetClassificationOptions.SingleSelection;
+          return "boolean";
         }
       case "java.lang.integer": {
         return "number";
+      }
+      case "org.jboss.forge.addon.projects.projectType":
+      {
+        return "projectType"
       }
       default:
         {

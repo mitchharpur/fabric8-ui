@@ -4,7 +4,7 @@ import { FieldWidgetClassification} from './field-classification';
 export interface IFieldInfo {
   name: string;
   value:any; //string | Array<IFieldValueOption>;
-  valueDataType?:string;
+  valueType?:string;
   display: {
     valueOptions?: Array<IFieldValueOption>;
     valueHasOptions: boolean;
