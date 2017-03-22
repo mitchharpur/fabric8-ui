@@ -1,2 +1,2 @@
-export { IFieldInfo, IFieldSet, FieldSet ,FieldClassification ,FieldValueClassification ,IFieldValueOption } from './concrete/field-set';
+export { IFieldInfo, IFieldSet, FieldSet ,FieldClassification ,FieldClassificationOptions ,IFieldValueOption } from './concrete/field-set';
 

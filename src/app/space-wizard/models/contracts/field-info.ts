@@ -1,22 +1,21 @@
 import { IFieldValueOption} from './field-value-option'; 
-import { FieldValueClassification} from './field-value-classification'; 
+import { FieldClassification} from './field-classification'; 
 
 export interface IFieldInfo {
   name: string;
   value:any; //string | Array<IFieldValueOption>;
   display: {
-    valueOptions: Array<IFieldValueOption>;
+    valueOptions?: Array<IFieldValueOption>;
     valueHasOptions: boolean;
-    valueClassification: FieldValueClassification;
+    valueClassification: FieldClassification;
     label: string;
     enabled: boolean;
     required: boolean;
     visible: boolean;
     index: number;
-    // other properties
+    // other dynamic properties
     [key: string]: any;
   }
-  context?: any;
-  // other properties
+  // other dynamic properties
   [key: string]: any;
 }

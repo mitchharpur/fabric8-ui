@@ -5,7 +5,7 @@ import { IWorkflowStep, IWorkflowTransition, IWorkflow, WorkflowTransitionDirect
 import { LoggerFactory, ILoggerDelegate } from '../../common/logger';
 import { INotifyPropertyChanged } from '../../core/component'
 
-import { IFieldInfo, IFieldSet, IAppGeneratorService, IAppGeneratorServiceProvider } from '../../services/app-generator.service';
+import { IFieldInfo, IFieldSet,IAppGeneratorResponse, IAppGeneratorService, IAppGeneratorServiceProvider } from '../../services/app-generator.service';
 
 @Component({
   host: {
@@ -98,14 +98,17 @@ export class WizardDynamicStepComponent implements OnInit, OnDestroy, OnChanges 
     this._fieldSet = value;
   }
 
-  private _fieldSetHistory: Array<IFieldSet>;
-  get fieldSetHistory(): Array<IFieldSet> {
-    this._fieldSetHistory = this._fieldSetHistory || [];
-    return this._fieldSetHistory;
+  // response history assists with tracking response state between workflow steps
+  private _responseHistory: Array<IAppGeneratorResponse>;
+  private get responseHistory(): Array<IAppGeneratorResponse> {
+    this._responseHistory = this._responseHistory || [];
+    return this._responseHistory;
   }
-  set fieldSetHistory(value: Array<IFieldSet>) {
-    this._fieldSetHistory = value;
+  private set responseHistory(value:Array<IAppGeneratorResponse>) {
+    this._responseHistory = value;
   }
+  private currentResponse:IAppGeneratorResponse;
+
 
   private subscribeToWorkflowTransitions(workflow: IWorkflow) {
     if (!workflow) {
@@ -122,14 +125,25 @@ export class WizardDynamicStepComponent implements OnInit, OnDestroy, OnChanges 
               {
                 if (transition.from != transition.to) {
                   //handle first fieldset
-                  this._fieldSetService.getFieldSet({ command:{name:"starter"}}).subscribe((fieldSet) => {
-                    let prevFieldSet = this.fieldSet;
-                    //dont just store history as this only needs to happen when moving to next
-                    if (this.fieldSetHistory.length > 0) {
-                      this.fieldSetHistory.push(prevFieldSet);
+                  this._fieldSetService.getFieldSet({ 
+                    command:{
+                      name:"starter",
+                      parameters:{ 
+                        workflow:{step:"begin"}
+                      }
                     }
-                    this.fieldSet = fieldSet
-                    this.log(`Stored fieldset[${prevFieldSet.length}] into fieldset history ... there are ${this.fieldSetHistory.length} items in history ...`);
+                  }).subscribe((response) => {
+                    
+                    //let fieldSet=response.payload;
+                    //let prevFieldSet = this.fieldSet;
+                    if (this.responseHistory.length > 0) {
+                      let prevResponse=this.currentResponse;
+                      this.responseHistory.push(prevResponse);
+                      //this.responseHistory.push(prevFieldSet);
+                      this.log(`Stored fieldset[${prevResponse.payload.length}] into fieldset history ... there are ${this.responseHistory.length} items in history ...`);
+                    }
+                    this.currentResponse=response;
+                    this.fieldSet = response.payload;
                   })
                 }
                 break;
@@ -137,9 +151,11 @@ export class WizardDynamicStepComponent implements OnInit, OnDestroy, OnChanges 
             case WorkflowTransitionDirection.PREVIOUS:
               {
                 if (transition.from === transition.to) {
-                  let fieldSet = this.fieldSetHistory.pop();
-                  this.fieldSet = fieldSet;
-                  this.log(`Restored fieldset[${fieldSet.length}] from fieldset history ... there are ${this.fieldSetHistory.length} items in history ...`);
+                  //let fieldSet = this.responseHistory.pop();
+                  let response=this.responseHistory.pop();
+                  this.fieldSet=response.payload;
+                  //this.fieldSet = fieldSet;
+                  this.log(`Restored fieldset[${response.payload.length}] from fieldset history ... there are ${this.responseHistory.length} items in history ...`);
                 }
                 break;
               }
@@ -151,15 +167,27 @@ export class WizardDynamicStepComponent implements OnInit, OnDestroy, OnChanges 
             case WorkflowTransitionDirection.NEXT:
               {
                 if (transition.from != transition.to) {
-                  //handle first fieldset
-                  this._fieldSetService.getFieldSet({ command: "starter-next" }).subscribe((fieldSet) => {
-                    let prevFieldSet = this.fieldSet;
-                    this.fieldSetHistory.push(prevFieldSet);
-                    this.fieldSet = fieldSet
-                    this.log(`stored fieldset[${prevFieldSet.length}] into history ... there are ${this.fieldSetHistory.length} items in history ...`);
-                  })
                   //keep at this point
                   transition.to = transition.from;
+                  let prevResponse = this.currentResponse;
+                  this.responseHistory.push(prevResponse);
+                  this.log(`stored fieldset[${prevResponse.payload.length}] into history ... there are ${this.responseHistory.length} items in history ...`);
+                  //let prevFieldSet = this.fieldSet;
+                  //this.responseHistory.push(prevFieldSet);
+                  //this.log(`stored fieldset[${prevFieldSet.length}] into history ... there are ${this.responseHistory.length} items in history ...`);
+                  
+                  this._fieldSetService.getFieldSet({ 
+                    command:{
+                      name: "starter",
+                      parameters:{
+                        workflow:{step:"next"},
+                        data:this.currentResponse
+                      }
+                    }
+                  }).subscribe((response) => {
+                    this.currentResponse=response;  
+                    this.fieldSet = response.payload;
+                  })
                 }
                 // transition.continue = false to prevent transitions;
                 break;

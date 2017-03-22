@@ -12,7 +12,14 @@ export class Fabric8ForgeService extends ForgeService {
   private log: ILoggerDelegate = () => { };
   private config = {
     //apiUrl: "http://localhost:8088"
-    apiUrl: "https://forge.api.prod-preview.openshift.io"
+    forge: {
+      api: {
+        url: {
+          http: "http://forge.api.prod-preview.openshift.io",
+          https: "https://forge.api.prod-preview.openshift.io"
+        }
+      }
+    }
   };
   constructor(private http: Http, loggerFactory: LoggerFactory) {
     super()
@@ -27,33 +34,12 @@ export class Fabric8ForgeService extends ForgeService {
     //this.log({ message: errMessage, inner: err, error: true })
     return Observable.throw(new Error(errMessage));
   }
-  ExecuteCommand(options: IForgeRequest = { command: { name: "empty" } }): Observable<IForgeResponse> {
-    let command = "/forge/version";
-    switch (options.command.name) {
-      case "starter": {
-        command = "/forge/commands/obsidian-new-project";
-        break;
-      }
-      case "starter-next": {
-        command = "/forge/commands/obsidian-new-project/next";
-        break;
-      }
-      case "starter-validate": {
-        command = "/forge/commands/obsidian-new-project/validate";
-        break;
-      }
-      case "starter-execute": {
-        command = "/forge/commands/obsidian-new-project/execute";
-        break;
-      }
-      default: {
-        return createEmptyResponse();
-      }
-    }
+  private GetCommand(url: string): Observable<IForgeResponse> {
     return Observable.create((observer: Observer<IForgeResponse>) => {
       let headers = new Headers();
-      headers.append('Content-Type', 'application/json');
-      this.http.get(`${this.config.apiUrl}${command}`,headers)
+      //headers.append(...) e.g ('Content-Type', 'application/json');
+      //TODO: auth token
+      this.http.get(url, headers)
         .map((response) => {
           let payload: IForgePayload = response.json();
           //console.dir(payload);
@@ -66,14 +52,67 @@ export class Fabric8ForgeService extends ForgeService {
         })
     });
   }
+  private PostCommand(url: string, payload: any): Observable<IForgeResponse> {
+    return Observable.create((observer: Observer<IForgeResponse>) => {
+      let headers = new Headers();
+      //headers.append('Content-Type', 'application/json');
+      this.http.post(url, payload, headers)
+        .map((response) => {
+          let payload: IForgePayload = response.json();
+          //console.dir(payload);
+          return { payload: payload };
+        })
+        .catch(this.handleError)
+        .subscribe((response: IForgeResponse) => {
+          observer.next(response);
+          observer.complete();
+        })
+    });
+  }
+  ExecuteCommand(options: IForgeRequest = { command: { name: "empty" } }): Observable<IForgeResponse> {
+    switch (options.command.name) {
+      case "starter": {
+        let parameters: any = options.command.parameters;
+        switch (parameters.workflow.step) {
+          case "begin":
+            {
+              let url = `${this.config.forge.api.url.https}/forge/commands/obsidian-new-project`;
+              this.log(`Executing forge ${url}`);
+              return this.GetCommand(url)
+            }
+          case "next":
+            {
+              let url = `${this.config.forge.api.url.https}/forge/commands/obsidian-new-project/next`;
+              let data = parameters.data || {};
+              let context = data.context || {};
+              console.dir(data);
+              let payload: any = {};
+              payload.inputs = context.inputs;
+              payload.state = {};
+              context.stepIndex = 1;
+              this.log(`Executing forge ${url}`);
+              console.dir(payload)
+              //return this.PostCommand(url,payload);
+            }
+          case "execute":
+            {
+              let url = `${this.config.forge.api.url.https}/forge/commands/obsidian-new-project/exeute`;
+              this.log(`Executing forge ${url}`);
+              return this.PostCommand(url, {})
+            }
+        }
+        break;
+      }
+      default: {
+        return createEmptyResponse();
+      }
+    }
+  }
 }
 
 function createEmptyResponse(): Observable<IForgeResponse> {
   return Observable.create((observer: Observer<IForgeResponse>) => {
-    observer.next({
-      payload: {
-      }
-    })
+    observer.next({})
     observer.complete();
   })
 }

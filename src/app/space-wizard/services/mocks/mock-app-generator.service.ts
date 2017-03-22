@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Observable, Observer } from 'rxjs/Rx';
-import { IFieldSet, IFieldInfo, FieldSet, AppGeneratorService } from '../contracts/app-generator-service'
+import { IAppGeneratorResponse, IFieldSet, IFieldInfo, FieldSet, AppGeneratorService, FieldClassificationOptions } from '../contracts/app-generator-service'
 import { LoggerFactory, ILoggerDelegate } from '../../common/logger';
 
 /** mock app generator service */
@@ -10,16 +10,15 @@ export class MockAppGeneratorService extends AppGeneratorService {
   static instanceCount: number = 1;
   private log: ILoggerDelegate = () => { };
 
-  constructor(loggerFactory:LoggerFactory) {
+  constructor(loggerFactory: LoggerFactory) {
     super();
-    let logger=loggerFactory.createLoggerDelegate(this.constructor.name, MockAppGeneratorService.instanceCount++);
-    if(logger)
-    {
-        this.log=logger      
+    let logger = loggerFactory.createLoggerDelegate(this.constructor.name, MockAppGeneratorService.instanceCount++);
+    if (logger) {
+      this.log = logger
     }
     this.log(`New instance...`);
   }
-  getFieldSet(options: any = {}): Observable<IFieldSet> {
+  getFieldSet(options: any = {}): Observable<IAppGeneratorResponse> {
     switch (options.command) {
       case "first":
         {
@@ -30,78 +29,100 @@ export class MockAppGeneratorService extends AppGeneratorService {
           return getSecondFieldSet();
         }
       default: {
-        return this.createEmptyFieldSet();
+        return this.createEmptyResponse();
       }
     }
   }
 }
 
 
-function getFirstFieldSet(): Observable<IFieldSet> {
-  let tmp: Observable<IFieldSet> = Observable.create((observer: Observer<IFieldSet>) => {
+function getFirstFieldSet(): Observable<IAppGeneratorResponse> {
+  let tmp: Observable<IAppGeneratorResponse> = Observable.create((observer: Observer<IAppGeneratorResponse>) => {
     let items: IFieldInfo[] =
       [
         {
           name: "mock-f1",
-          label: "label-f1",
-          display: true,
-          enabled: true,
-          required: true,
-          index: 0,
-          valid: true,
-          value: "f1-value"
+          value: "f1-value",
+          display: {
+            valueOptions: [],
+            valueHasOptions: false,
+            valueClassification: FieldClassificationOptions.SingleInput,
+            label: "label-f1",
+            enabled: true,
+            required: true,
+            visible: true,
+            index: 0
+          }
         },
         {
           name: "mock-f2",
-          label: "label-f2",
-          display: true,
-          enabled: true,
-          required: true,
-          index: 0,
-          valid: true,
-          value: "f1-value-2"
+          value: "f2-value",
+          display: {
+            valueOptions: [],
+            valueHasOptions: false,
+            valueClassification: FieldClassificationOptions.SingleInput,
+            label: "label-f2",
+            enabled: true,
+            required: true,
+            visible: true,
+            index: 0
+          }
         }
       ];
     let set = new FieldSet(...items);
-    observer.next(set);
+    observer.next({ payload: set });
     observer.complete();
   });
   return tmp;
 }
-function getSecondFieldSet(): Observable<IFieldSet> {
-  return Observable.create((observer: Observer<IFieldSet>) => {
-    observer.next([
-      {
-        name: "mock-f3",
-        label: "label-f3",
-        display: true,
-        enabled: true,
-        required: true,
-        index: 0,
-        valid: true,
-        value: "f3-value"
-      },
-      {
-        name: "mock-f4",
-        label: "label-f4",
-        display: true,
-        enabled: true,
-        required: true,
-        index: 0,
-        valid: true,
-        value: "f4-value-4"
-      },
-      {
-        name: "mock-f5",
-        label: "label-f5",
-        display: true,
-        enabled: true,
-        required: true,
-        index: 0,
-        valid: true,
-        value: "f5-value-5"
-      }
-    ]);
+function getSecondFieldSet(): Observable<IAppGeneratorResponse> {
+  return Observable.create((observer: Observer<IAppGeneratorResponse>) => {
+    observer.next({
+      payload: [
+        {
+          name: "mock-f3",
+          value: "f3-value",
+          display: {
+            valueOptions: [],
+            valueHasOptions: false,
+            valueClassification: FieldClassificationOptions.SingleInput,
+            label: "label-f3",
+            enabled: true,
+            required: true,
+            visible: true,
+            index: 0
+          }
+        },
+        {
+          name: "mock-f4",
+          value: "f4-value",
+          display: {
+            valueOptions: [],
+            valueHasOptions: false,
+            valueClassification: FieldClassificationOptions.SingleInput,
+            label: "label-f4",
+            enabled: true,
+            required: true,
+            visible: true,
+            index: 0
+          }
+        },
+        {
+          name: "mock-f5",
+          value: "f5-value",
+          display: {
+            valueOptions: [],
+            valueHasOptions: false,
+            valueClassification: FieldClassificationOptions.SingleInput,
+            label: "label-f5",
+            enabled: true,
+            required: true,
+            visible: true,
+            index: 0
+          }
+        }
+      ]
+    });
     observer.complete();
   });
 }
