@@ -57,18 +57,32 @@ export class Fabric8AppGeneratorService extends AppGeneratorService {
   }
   private updateForgeResponseContext(forgeResponse: IForgeResponse, command: any): IForgeResponse {
     let forgePayload: IForgePayload = forgeResponse.payload;
+    this.log({message:"Forge Response...",warning:true});
+    console.dir(forgeResponse);
     let workflow: any = {};
     if (forgePayload) {
       // the state we get from forge helps to determine the next workflow steps
       let forgeState = forgePayload.state
-      if (forgeState.valid == false) {
-        workflow.step = { name: "validate" };
+      if(forgeState.wizard===true)
+      {
+        if (forgeState.canMoveToNextStep === true) {
+          workflow.step = { name: "next", index: 1 };
+        }
+        if (forgeState.canExecute === true) {
+          workflow.step = { name: "execute" };
+        }
+        if (forgeState.valid == false) {
+          workflow.step = { name: "validate" };
+        }
       }
-      else if (forgeState.wizard === true && forgeState.canMoveToNextStep === true) {
-        workflow.step = { name: "next", index: 1 };
-      }
-      if (forgeState.canExecute === true) {
-        workflow.step = { name: "execute" };
+      else
+      {
+          if (forgeState.canExecute === true) {
+            workflow.step = { name: "execute" };
+          }
+          if (forgeState.valid == false) {
+            workflow.step = { name: "validate" };
+          }
       }
     }
     forgeResponse.context = forgeResponse.context || {};
