@@ -91,6 +91,17 @@ export class Fabric8ForgeService extends ForgeService {
               console.dir(payload)
               return this.PostCommand(url,payload);
             }
+          case "validate":
+            {
+              let url = `${this.config.forge.api.url.https}/forge/commands/obsidian-new-project/validate`;
+              let data = parameters.data || {};
+              console.dir(data);
+              let payload=parameters.data;
+              payload.stepIndex=parameters.workflow.step.index||1;
+              this.log(`posting to forge ${url}`);
+              console.dir(payload)
+              return this.PostCommand(url,payload);
+            }
           case "execute":
             {
               let url = `${this.config.forge.api.url.https}/forge/commands/obsidian-new-project/execute`;
@@ -102,8 +113,12 @@ export class Fabric8ForgeService extends ForgeService {
               console.dir(payload)
               return this.PostCommand(url,payload);
             }
+          default:{
+            this.log({message:`invalid forge command:${options.command.name} step:${parameters.workflow.step.name}`,error:true});
+            return createEmptyResponse();
+          }  
         }
-        break;
+        
       }
       default: {
         return createEmptyResponse();
@@ -114,7 +129,7 @@ export class Fabric8ForgeService extends ForgeService {
 
 function createEmptyResponse(): Observable<IForgeResponse> {
   return Observable.create((observer: Observer<IForgeResponse>) => {
-    observer.next({})
+    observer.next({});
     observer.complete();
   })
 }

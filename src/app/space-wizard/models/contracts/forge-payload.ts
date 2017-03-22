@@ -6,7 +6,7 @@ import { IForgeMessage } from './forge-message';
 
 export interface IForgePayload {
   metadata?:IForgeMetadata;
-  state:IForgeState;
+  state?:IForgeState;
   messages?: Array<IForgeMessage>;
   inputs: Array<IForgeInput>;
   [key: string]: any;

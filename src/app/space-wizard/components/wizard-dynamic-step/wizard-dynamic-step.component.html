@@ -24,9 +24,19 @@
                   {{option.id}}
                 </option>
               </select>
+              <div class="errorLabel help-block">
+                <span *ngIf="field.display.message">{{field.display.message.description}}</span>
+                <span *ngIf="!field.display.message">{{field.display.label}} is required</span>
+              </div>
+              <span *ngIf="field.display.note"><span class="fa fa-info-circle"></span> <i>{{field.display.note}}</i></span>
             </div>
             <div *ngSwitchCase="'multipleSelection'">
               <ss-multiselect-dropdown    [(ngModel)]="field.value"  [options]="field.display.options" [texts]="multiSelectTexts" [settings]="multiSelectSettings"   ></ss-multiselect-dropdown>
+              <div class="errorLabel help-block">
+                <span *ngIf="field.display.message">{{field.display.message.description}}</span>
+                <span *ngIf="!field.display.message">{{field.display.label}} is required</span>
+              </div>
+              <span *ngIf="field.display.note"><span class="fa fa-info-circle"></span> <i>{{field.display.note}}</i></span>
             </div>
         </div>
       </div>

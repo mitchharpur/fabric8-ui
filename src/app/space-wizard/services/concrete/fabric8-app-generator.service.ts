@@ -103,6 +103,8 @@ export class Fabric8AppGeneratorService extends AppGeneratorService {
   private mapForgeResponseToAppGeneratorResponse(source: IForgeResponse): IAppGeneratorResponse {
     let targetItems = new FieldSet();
     this.log("mapForgeResponseToAppGeneratorResponse...")
+    source.payload=source.payload||{ inputs:[]};
+    source.payload.inputs=source.payload.inputs||[];
     for (let input of source.payload.inputs) {
       let sourceItem: IForgeInput = input;
       let targetItem: IFieldInfo = {
@@ -136,7 +138,7 @@ export class Fabric8AppGeneratorService extends AppGeneratorService {
         {
           if(message.input == input.name)
           {
-            input.display.message=message
+            targetItem.display.message=message
           }
         }
       }
