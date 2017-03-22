@@ -85,40 +85,40 @@ export class Fabric8ForgeService extends ForgeService {
               let url = `${this.config.forge.api.url.https}/forge/commands/obsidian-new-project/next`;
               let data = parameters.data || {};
               console.dir(data);
-              let payload=parameters.data;
-              payload.stepIndex=parameters.workflow.step.index||1;
+              let payload = parameters.data;
+              payload.stepIndex = parameters.workflow.step.index || 1;
               this.log(`posting to forge ${url}`);
               console.dir(payload)
-              return this.PostCommand(url,payload);
+              return this.PostCommand(url, payload);
             }
           case "validate":
             {
               let url = `${this.config.forge.api.url.https}/forge/commands/obsidian-new-project/validate`;
               let data = parameters.data || {};
               console.dir(data);
-              let payload=parameters.data;
-              payload.stepIndex=parameters.workflow.step.index||1;
+              let payload = parameters.data;
+              payload.stepIndex = parameters.workflow.step.index || 1;
               this.log(`posting to forge ${url}`);
               console.dir(payload)
-              return this.PostCommand(url,payload);
+              return this.PostCommand(url, payload);
             }
           case "execute":
             {
               let url = `${this.config.forge.api.url.https}/forge/commands/obsidian-new-project/execute`;
               let data = parameters.data || {};
               console.dir(data);
-              let payload=parameters.data;
-              payload.stepIndex=parameters.workflow.step.index||1;
+              let payload = parameters.data;
+              payload.stepIndex = parameters.workflow.step.index || 1;
               this.log(`posting to forge ${url}`);
               console.dir(payload)
-              return this.PostCommand(url,payload);
+              return this.PostCommand(url, payload);
             }
-          default:{
-            this.log({message:`invalid forge command:${options.command.name} step:${parameters.workflow.step.name}`,error:true});
+          default: {
+            this.log({ message: `invalid forge command:${options.command.name} step:${parameters.workflow.step.name}`, error: true });
             return createEmptyResponse();
-          }  
+          }
         }
-        
+
       }
       default: {
         return createEmptyResponse();

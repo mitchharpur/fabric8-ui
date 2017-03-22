@@ -5,10 +5,10 @@ import { IWorkflowStep, IWorkflowTransition, IWorkflow, WorkflowTransitionDirect
 import { LoggerFactory, ILoggerDelegate } from '../../common/logger';
 import { INotifyPropertyChanged } from '../../core/component'
 
-import { IFieldInfo, IFieldSet,IAppGeneratorResponse, IAppGeneratorService, IAppGeneratorServiceProvider } from '../../services/app-generator.service';
+import { IFieldInfo, IFieldSet, IAppGeneratorResponse, IAppGeneratorRequest, IAppGeneratorCommand, IAppGeneratorService, IAppGeneratorServiceProvider } from '../../services/app-generator.service';
 
 
-import { IMultiSelectOption,IMultiSelectSettings,IMultiSelectTexts } from 'angular-2-dropdown-multiselect';
+import { IMultiSelectOption, IMultiSelectSettings, IMultiSelectTexts } from 'angular-2-dropdown-multiselect';
 
 @Component({
   host: {
@@ -49,12 +49,12 @@ export class WizardDynamicStepComponent implements OnInit, OnDestroy, OnChanges 
   };
 
   multiSelectTexts: IMultiSelectTexts = {
-      checkAll: 'Check all',
-      uncheckAll: 'Uncheck all',
-      checked: 'checked',
-      checkedPlural: 'checked',
-      searchPlaceholder: 'Search...',
-      defaultTitle: 'Select',
+    checkAll: 'Check all',
+    uncheckAll: 'Uncheck all',
+    checked: 'checked',
+    checkedPlural: 'checked',
+    searchPlaceholder: 'Search...',
+    defaultTitle: 'Select',
   };
 
 
@@ -62,7 +62,7 @@ export class WizardDynamicStepComponent implements OnInit, OnDestroy, OnChanges 
   @Input() stepName: string = "";
 
   constructor(
-    @Inject(IAppGeneratorServiceProvider.InjectToken) private _fieldSetService: IAppGeneratorService,
+    @Inject(IAppGeneratorServiceProvider.InjectToken) private _appGeneratorService: IAppGeneratorService,
     loggerFactory: LoggerFactory
   ) {
     let logger = loggerFactory.createLoggerDelegate(this.constructor.name, WizardDynamicStepComponent.instanceCount++);
@@ -129,10 +129,10 @@ export class WizardDynamicStepComponent implements OnInit, OnDestroy, OnChanges 
     this._responseHistory = this._responseHistory || [];
     return this._responseHistory;
   }
-  private set responseHistory(value:Array<IAppGeneratorResponse>) {
+  private set responseHistory(value: Array<IAppGeneratorResponse>) {
     this._responseHistory = value;
   }
-  private currentResponse:IAppGeneratorResponse;
+  private currentResponse: IAppGeneratorResponse;
 
 
   private subscribeToWorkflowTransitions(workflow: IWorkflow) {
@@ -149,28 +149,32 @@ export class WizardDynamicStepComponent implements OnInit, OnDestroy, OnChanges 
             case WorkflowTransitionDirection.NEXT:
               {
                 if (transition.from != transition.to) {
-                  this._fieldSetService.getFieldSet({ 
-                    command:{
-                      name:"starter",
-                      parameters:{ 
-                        workflow:{
-                          step:{
-                            name:"begin"
+                  let request: IAppGeneratorRequest = {
+                    command: {
+                      name: "starter",
+                      parameters: {
+                        inputs: null,
+                        data: null,
+                        workflow: {
+                          step: {
+                            name: "begin"
                           }
                         }
                       }
                     }
-                  }).subscribe((response) => {
-                    
+                  };
+                  this.log("command being sent to the app generator service:");
+                  this._appGeneratorService.getFieldSet(request).subscribe((response) => {
+
                     //let fieldSet=response.payload;
                     //let prevFieldSet = this.fieldSet;
                     if (this.responseHistory.length > 0) {
-                      let prevResponse=this.currentResponse;
+                      let prevResponse = this.currentResponse;
                       this.responseHistory.push(prevResponse);
                       //this.responseHistory.push(prevFieldSet);
                       this.log(`Stored fieldset[${prevResponse.payload.length}] into fieldset history ... there are ${this.responseHistory.length} items in history ...`);
                     }
-                    this.currentResponse=response;
+                    this.currentResponse = response;
                     this.fieldSet = response.payload;
                   })
                 }
@@ -180,8 +184,8 @@ export class WizardDynamicStepComponent implements OnInit, OnDestroy, OnChanges 
               {
                 if (transition.from === transition.to) {
                   //let fieldSet = this.responseHistory.pop();
-                  let response=this.responseHistory.pop();
-                  this.fieldSet=response.payload;
+                  let response = this.responseHistory.pop();
+                  this.fieldSet = response.payload;
                   //this.fieldSet = fieldSet;
                   this.log(`Restored fieldset[${response.payload.length}] from fieldset history ... there are ${this.responseHistory.length} items in history ...`);
                 }
@@ -200,15 +204,15 @@ export class WizardDynamicStepComponent implements OnInit, OnDestroy, OnChanges 
                   let prevResponse = this.currentResponse;
                   this.responseHistory.push(prevResponse);
                   this.log(`stored fieldset[${prevResponse.payload.length}] into history ... there are ${this.responseHistory.length} items in history ...`);
-                  //let prevFieldSet = this.fieldSet;
-                  //this.responseHistory.push(prevFieldSet);
-                  //this.log(`stored fieldset[${prevFieldSet.length}] into history ... there are ${this.responseHistory.length} items in history ...`);
-                  let command=this.currentResponse.context.nextCommand;
-                  console.dir(this.currentResponse);
-                  this._fieldSetService.getFieldSet({ 
-                    command:command
-                  }).subscribe((response) => {
-                    this.currentResponse=response;  
+                  let command = this.currentResponse.context.nextCommand;
+                  command.parameters.inputs = this.fieldSet;
+                  this.log("command being sent to the app generator service:");
+                  console.dir(command);
+                  let request: IAppGeneratorRequest = {
+                    command: command
+                  };
+                  this._appGeneratorService.getFieldSet(request).subscribe((response) => {
+                    this.currentResponse = response;
                     this.fieldSet = response.payload;
                   })
                 }

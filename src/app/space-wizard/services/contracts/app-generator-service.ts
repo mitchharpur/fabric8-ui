@@ -1,31 +1,23 @@
 import { Observable, Observer, Subscriber } from 'rxjs/Rx';
 import { OpaqueToken } from '@angular/core';
 
-export { IFieldSet, FieldSet, IFieldInfo, FieldWidgetClassificationOptions, FieldWidgetClassification, IFieldValueOption } from '../../models/app-generator'
+export { IFieldSet, FieldSet, IFieldInfo, IAppGeneratorRequest, IAppGeneratorResponse, IAppGeneratorCommand, FieldWidgetClassificationOptions, FieldWidgetClassification, IFieldValueOption } from '../../models/app-generator'
 
-import { IFieldSet, IFieldInfo } from '../../models/app-generator'
+import { IFieldSet, IFieldInfo, IAppGeneratorRequest, IAppGeneratorResponse, IAppGeneratorCommand } from '../../models/app-generator';
 
 /** AppGenerator contract */
 
 export interface IAppGeneratorService {
-  getFieldSet(options?: any): Observable<IAppGeneratorResponse>
-}
-
-export interface IAppGeneratorResponse
-{
-  payload:IFieldSet;
-  context?:any;
-  /** other dynamic fields */
-  [key:string]:any;
+  getFieldSet(options?: IAppGeneratorRequest): Observable<IAppGeneratorResponse>
 }
 
 /** AppGeneratorService contract using abstract base class */
 
 export abstract class AppGeneratorService implements IAppGeneratorService {
-  abstract getFieldSet(options?: any): Observable<IAppGeneratorResponse>;
+  abstract getFieldSet(options?: IAppGeneratorRequest): Observable<IAppGeneratorResponse>;
   protected createEmptyResponse(): Observable<IAppGeneratorResponse> {
     return Observable.create((observer: Observer<IAppGeneratorResponse>) => {
-      observer.next({ payload:[],context:{}});
+      observer.next({ payload: [], context: {} });
       observer.complete();
     });
   }

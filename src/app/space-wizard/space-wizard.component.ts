@@ -124,11 +124,12 @@ export class SpaceWizardComponent implements OnInit {
       steps: () => {
         return [
           { name: "space", index: 0, nextIndex: 1 },
-          { name: "forge", index: 6, nextIndex: 0 },
+          { name: "forge", index: 1, nextIndex: 1 },
           { name: "quickStart", index: 2, nextIndex: 3 },
           { name: "stack", index: 3, nextIndex: 4 },
           { name: "pipeline", index: 4, nextIndex: 4 },
-          { name: "dynamic-step", index: 5, nextIndex: 6 }
+          { name: "forge-wizard", index: 5, nextIndex: 1 },
+          { name: "forge-quick-start", index: 6, nextIndex: 1 }
         ];
       },
       firstStep: () => {

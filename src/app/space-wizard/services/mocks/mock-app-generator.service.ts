@@ -1,6 +1,6 @@
 import { Injectable } from '@angular/core';
 import { Observable, Observer } from 'rxjs/Rx';
-import { IAppGeneratorResponse, IFieldSet, IFieldInfo, FieldSet, AppGeneratorService, FieldWidgetClassificationOptions } from '../contracts/app-generator-service'
+import { IAppGeneratorResponse, IFieldSet, IFieldInfo, FieldSet, IAppGeneratorRequest, AppGeneratorService, FieldWidgetClassificationOptions } from '../contracts/app-generator-service'
 import { LoggerFactory, ILoggerDelegate } from '../../common/logger';
 
 /** mock app generator service */
@@ -18,7 +18,7 @@ export class MockAppGeneratorService extends AppGeneratorService {
     }
     this.log(`New instance...`);
   }
-  getFieldSet(options: any = {}): Observable<IAppGeneratorResponse> {
+  getFieldSet(options: IAppGeneratorRequest): Observable<IAppGeneratorResponse> {
     switch (options.command) {
       case "first":
         {
