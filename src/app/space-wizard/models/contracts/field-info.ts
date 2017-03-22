@@ -3,12 +3,12 @@ import { FieldWidgetClassification} from './field-classification';
 
 export interface IFieldInfo {
   name: string;
-  value:any; //string | Array<IFieldValueOption>;
+  value:string | Array<string>;
   valueType?:string;
   display: {
-    valueOptions?: Array<IFieldValueOption>;
-    valueHasOptions: boolean;
-    widgetClassification: FieldWidgetClassification;
+    options?: Array<IFieldValueOption>;
+    hasOptions: boolean;
+    inputType: FieldWidgetClassification;
     label: string;
     enabled: boolean;
     required: boolean;

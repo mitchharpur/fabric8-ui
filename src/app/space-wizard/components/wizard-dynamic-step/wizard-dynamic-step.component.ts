@@ -7,6 +7,9 @@ import { INotifyPropertyChanged } from '../../core/component'
 
 import { IFieldInfo, IFieldSet,IAppGeneratorResponse, IAppGeneratorService, IAppGeneratorServiceProvider } from '../../services/app-generator.service';
 
+
+import { IMultiSelectOption,IMultiSelectSettings,IMultiSelectTexts } from 'angular-2-dropdown-multiselect';
+
 @Component({
   host: {
     'class': 'wizard-step'
@@ -31,6 +34,28 @@ export class WizardDynamicStepComponent implements OnInit, OnDestroy, OnChanges 
   set workflow(value: IWorkflow) {
     this._workflow = value;
   }
+
+  multiSelectSettings: IMultiSelectSettings = {
+    pullRight: false,
+    enableSearch: true,
+    checkedStyle: 'checkboxes',
+    buttonClasses: 'btn btn-default',
+    selectionLimit: 0,
+    closeOnSelect: false,
+    showCheckAll: true,
+    showUncheckAll: true,
+    dynamicTitleMaxItems: 1,
+    maxHeight: '200px',
+  };
+
+  multiSelectTexts: IMultiSelectTexts = {
+      checkAll: 'Check all',
+      uncheckAll: 'Uncheck all',
+      checked: 'checked',
+      checkedPlural: 'checked',
+      searchPlaceholder: 'Search...',
+      defaultTitle: 'Select',
+  };
 
 
 
@@ -179,6 +204,7 @@ export class WizardDynamicStepComponent implements OnInit, OnDestroy, OnChanges 
                   //this.responseHistory.push(prevFieldSet);
                   //this.log(`stored fieldset[${prevFieldSet.length}] into history ... there are ${this.responseHistory.length} items in history ...`);
                   let command=this.currentResponse.context.nextCommand;
+                  console.dir(this.currentResponse);
                   this._fieldSetService.getFieldSet({ 
                     command:command
                   }).subscribe((response) => {

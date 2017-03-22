@@ -98,14 +98,11 @@ export class Fabric8AppGeneratorService extends AppGeneratorService {
   }
   private updateAppGeneratorResponseContext(response: IAppGeneratorResponse): IAppGeneratorResponse {
     this.log("updateAppGeneratorResponseContext...")
-    //source.payload
     return response;
   }
   private mapForgeResponseToAppGeneratorResponse(source: IForgeResponse): IAppGeneratorResponse {
     let targetItems = new FieldSet();
     this.log("mapForgeResponseToAppGeneratorResponse...")
-    //store the original api response for reset and data changed semantics
-    //targetItems.context = source;
     for (let input of source.payload.inputs) {
       let sourceItem: IForgeInput = input;
       let targetItem: IFieldInfo = {
@@ -113,18 +110,21 @@ export class Fabric8AppGeneratorService extends AppGeneratorService {
         value: sourceItem.value,
         valueType:this.mapFieldValueDataType(sourceItem),
         display: {
-          valueOptions: this.mapValueOptions(sourceItem),
-          valueHasOptions: this.mapValueHasOptions(sourceItem),
-          widgetClassification: this.mapWidgetClassification(sourceItem),
+          options: this.mapValueOptions(sourceItem),
+          hasOptions: this.mapValueHasOptions(sourceItem),
+          inputType: this.mapWidgetClassification(sourceItem),
           label: sourceItem.label,
           required: sourceItem.required,
           enabled: sourceItem.enabled,
           visible: sourceItem.deprecated === false,
           index: 0
         },
-        
-        //context: sourceItem
       };
+      if(targetItem.display.hasOptions && targetItem.display.inputType===FieldWidgetClassificationOptions.MultipleSelection)
+      {
+        //change to an array for binding purposes
+        targetItem.value=[];
+      }
       // add dynamic fields that vary with payload
       if(input.note)
       {
@@ -160,10 +160,10 @@ export class Fabric8AppGeneratorService extends AppGeneratorService {
     if (source.valueChoices) {
       for (let choice of source.valueChoices) {
         if (source.description) {
-          items.push({ id: choice.id, description: choice.description })
+          items.push({ id: choice.id, name:choice.description, description: choice.description })
         }
         else {
-          items.push({ id: choice.id })
+          items.push({ id: choice.id,name:choice.id })
 
         }
       }
@@ -209,7 +209,7 @@ export class Fabric8AppGeneratorService extends AppGeneratorService {
           return FieldWidgetClassificationOptions.SingleSelection;
         }
       case "uiselectmany": {
-        return FieldWidgetClassificationOptions.SingleSelection;
+        return FieldWidgetClassificationOptions.MultipleSelection;
       }
       default:
         {

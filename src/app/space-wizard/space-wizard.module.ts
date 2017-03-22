@@ -3,13 +3,14 @@ import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 import { SpaceWizardComponent } from './space-wizard.component';
 import { WizardDynamicStepComponent } from './components/wizard-dynamic-step/wizard-dynamic-step.component';
+import {MultiselectDropdownModule } from 'angular-2-dropdown-multiselect'//'./components/multi-select/multi-select'
 
 import { IForgeServiceProvider } from './services/forge.service'
 import { LoggerFactory } from './common/logger'
 import { WorkflowFactory, IWorkflowProvider } from './models/workflow'
 
 @NgModule({
-  imports: [CommonModule, FormsModule],
+  imports: [CommonModule, FormsModule,MultiselectDropdownModule],
   declarations: [SpaceWizardComponent, WizardDynamicStepComponent],
   exports: [SpaceWizardComponent],
   providers: [IForgeServiceProvider.FactoryProvider, LoggerFactory, WorkflowFactory]
