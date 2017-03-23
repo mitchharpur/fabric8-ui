@@ -55,6 +55,7 @@
     <footer>
       <button class="btn btn-default margin-right-5" type="button" (click)="workflow.cancel()">Cancel</button>
       <button class="btn btn-default" [disabled]="!spaceForm.form.valid" type="submit">Create Space</button>
+      <button class="btn btn-default"  type="button" (click)="workflow.gotoNextStep()" >Forge</button>
     </footer>
   </form>
   <div class="wizard-step" [class.active]="workflow.isStepActive({name:steps.forge})">
