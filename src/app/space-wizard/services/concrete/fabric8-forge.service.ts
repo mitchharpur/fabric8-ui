@@ -1,5 +1,5 @@
-import { Injectable ,OpaqueToken} from '@angular/core';
-import { Http, Headers, Response,RequestOptions,RequestOptionsArgs } from '@angular/http';
+import { Injectable, OpaqueToken } from '@angular/core';
+import { Http, Headers, Response, RequestOptions, RequestOptionsArgs } from '@angular/http';
 
 import { Observable, Observer } from 'rxjs/Rx';
 import { IForgeRequest, IForgeCommandPayload, IForgeResponse, ForgeService, ForgeCommands } from '../contracts/forge-service';
@@ -22,14 +22,14 @@ export class Fabric8ForgeService extends ForgeService {
     }
     this.log(`New instance...`);
     this.apiUrl = apiLocator.forgeApiUrl;
-    this.log(`forge api is ${this.apiUrl}`);
+    this.log({message:`forge api is ${this.apiUrl}`,warning:true});
   }
 
   private handleError(error): Observable<any> {
     let errorMessage: string;
     if (error instanceof Response) {
       const body = error.json() || '';
-      const err = body.error || JSON.stringify(body,);
+      const err = body.error || JSON.stringify(body, );
       errorMessage = `${error.status} - ${error.statusText || ''} ${error}`;
     } else {
       errorMessage = error.message ? error.message : error.toString();
@@ -38,14 +38,11 @@ export class Fabric8ForgeService extends ForgeService {
     return Observable.throw(errorMessage);
   }
 
-  private addAuthorizationToken(headers:Headers)
-  {
+  private addAuthorizationToken(headers: Headers) {
     var token = localStorage.getItem('auth_token');
-    if(token)
-    {
+    if (token) {
       headers.set('Authorization', "Bearer " + token)
     }
-
   }
   private GetCommand(url: string): Observable<IForgeResponse> {
     return Observable.create((observer: Observer<IForgeResponse>) => {
@@ -53,7 +50,7 @@ export class Fabric8ForgeService extends ForgeService {
       this.addAuthorizationToken(headers);
       let options = new RequestOptions(<RequestOptionsArgs>{ headers: headers });
       this.log(`forge GET : ${url}`);
-      this.http.get(url,options)
+      this.http.get(url, options)
         .map((response) => {
           let forgeResponse: IForgeResponse = { payload: response.json() };
           this.log(`forge GET response : ${url}`);
@@ -72,10 +69,10 @@ export class Fabric8ForgeService extends ForgeService {
     return Observable.create((observer: Observer<IForgeResponse>) => {
       this.log(`forge POST : ${url}`);
       console.dir(body)
-      let headers = new Headers({'Content-Type': 'application/json'});
+      let headers = new Headers({ 'Content-Type': 'application/json' });
       this.addAuthorizationToken(headers);
       let options = new RequestOptions(<RequestOptionsArgs>{ headers: headers });
-      this.http.post(url, body,options)
+      this.http.post(url, body, options)
         .map((response) => {
           let forgeResponse: IForgeResponse = { payload: response.json() };
           this.log(`forge POST response : ${url}`);
@@ -109,10 +106,9 @@ export class Fabric8ForgeService extends ForgeService {
   private forgeWorkflowCommandRequest(request: IForgeRequest): Observable<IForgeResponse> {
     let parameters: any = request.command.parameters;
     let forgeCommandName = request.command.forgeCommandName;
-    let api:string=this.apiUrl||"";
-    if(api.endsWith("/")===false)
-    {
-      api=`${api}/`;
+    let api: string = this.apiUrl || "";
+    if (api.endsWith("/") === false) {
+      api = `${api}/`;
     }
 
     switch (parameters.workflow.step.name) {
