@@ -2,7 +2,7 @@ import { OpaqueToken } from '@angular/core';
 import { Observable, Subscriber } from 'rxjs/Rx';
 
 import { IForgeRequest, IForgeResponse } from '../../models/forge';
-export { IForgeRequest, IForgeResponse , IForgeValueChoice, IForgeInput, IForgePayload } from '../../models/forge';
+export { IForgeRequest, IForgeResponse , IForgeValueChoice, IForgeInput, IForgeCommandPayload } from '../../models/forge';
 
 export const ForgeCommands={
   forgeQuickStart:"forge-quick-start",

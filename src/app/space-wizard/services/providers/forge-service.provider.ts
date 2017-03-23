@@ -8,6 +8,9 @@ import {MockForgeService} from '../mocks/mock-forge.service'
 import {LoggerFactory} from '../../common/logger'
 
 
+import {ApiLocatorService} from '../../../shared/api-locator.service'
+
+
 /**
  * When using this provider and you take a dependency on the interface type
  * it will be neccesary to use the @inject(IForgeServiceProvider.InjectToken)
@@ -20,10 +23,10 @@ export class IForgeServiceProvider {
   static get FactoryProvider(): FactoryProvider {
     return {
       provide: IForgeServiceToken,
-      useFactory:(loggerFactory,http)=>{
-        return new Fabric8ForgeService(http,loggerFactory);
+      useFactory:(loggerFactory,http,apiLocator)=>{
+        return new Fabric8ForgeService(http,loggerFactory,apiLocator);
       },
-      deps:[LoggerFactory,Http]
+      deps:[LoggerFactory,Http,ApiLocatorService]
     }
   }
   static get MockFactoryProvider(): FactoryProvider {
@@ -66,10 +69,10 @@ export class ForgeServiceProvider {
   static get FactoryProvider(): FactoryProvider {
     return {
       provide: ForgeService,
-      useFactory:(loggerFactory,http)=>{
-        return new Fabric8ForgeService(http,loggerFactory);
+      useFactory:(loggerFactory,http,apiLocator)=>{
+        return new Fabric8ForgeService(http,loggerFactory,apiLocator);
       },
-      deps:[LoggerFactory,Http],
+      deps:[LoggerFactory,Http,ApiLocatorService],
       multi: false
     }
   }

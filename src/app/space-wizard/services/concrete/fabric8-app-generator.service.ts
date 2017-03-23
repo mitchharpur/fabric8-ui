@@ -5,7 +5,7 @@ import { Observable, Observer } from 'rxjs/Rx';
 import { IAppGeneratorResponse, IAppGeneratorRequest, IAppGeneratorCommand, IFieldSet, FieldSet, IFieldInfo, FieldWidgetClassificationOptions, FieldWidgetClassification, IFieldValueOption, IAppGeneratorService, AppGeneratorService } from '../contracts/app-generator-service'
 
 /** dependencies */
-import { IForgeService, IForgeResponse, IForgeRequest, IForgeServiceProvider, IForgeInput, IForgeValueChoice, IForgePayload } from '../forge.service'
+import { IForgeService, IForgeResponse, IForgeRequest, IForgeServiceProvider, IForgeInput, IForgeValueChoice, IForgeCommandPayload } from '../forge.service'
 
 
 import { LoggerFactory, ILoggerDelegate } from '../../common/logger';
@@ -72,7 +72,7 @@ export class Fabric8AppGeneratorService extends AppGeneratorService {
     return observable;
   }
   private updateForgeResponseContext(forgeResponse: IForgeResponse, command: any): IForgeResponse {
-    let forgePayload: IForgePayload = forgeResponse.payload;
+    let forgePayload: IForgeCommandPayload = forgeResponse.payload;
     this.log({ message: "Forge Response...", warning: true });
     console.dir(forgeResponse);
     let workflow: any = {};

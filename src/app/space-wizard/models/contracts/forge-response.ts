@@ -1,8 +1,8 @@
-import { IForgePayload} from './forge-payload';
+import { IForgeCommandPayload} from './forge-payload';
 
 export interface IForgeResponse {
-  payload?: IForgePayload ;
-  /** for out of band data */
+  payload?: IForgeCommandPayload|any ;
+  /** for any other out of band data */
   context?:any
 }
 

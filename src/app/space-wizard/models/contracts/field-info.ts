@@ -1,5 +1,6 @@
-import { IFieldValueOption} from './field-value-option'; 
-import { FieldWidgetClassification} from './field-classification'; 
+import { IFieldValueOption} from './field-value-option';
+import { FieldWidgetClassification} from './field-classification';
+import { IFieldMessage} from './field-message';
 
 export interface IFieldInfo {
   name: string;
@@ -14,6 +15,8 @@ export interface IFieldInfo {
     required: boolean;
     visible: boolean;
     index: number;
+    note?:string;
+    message?:IFieldMessage|string;
     // other dynamic properties
     [key: string]: any;
   }

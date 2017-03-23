@@ -4,7 +4,7 @@ import { IForgeMetadata } from './forge-metadata';
 import { IForgeMessage } from './forge-message';
 
 
-export interface IForgePayload {
+export interface IForgeCommandPayload {
   metadata?:IForgeMetadata;
   state?:IForgeState;
   messages?: Array<IForgeMessage>;
