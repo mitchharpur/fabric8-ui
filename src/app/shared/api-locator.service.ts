@@ -38,7 +38,6 @@ export class ApiLocatorService {
   
   get forgeApiUrl(): string {
     let tmp=this.buildApiUrl('forge');
-    console.warn(`FORGE:${tmp}`);
     return tmp
   }
 
