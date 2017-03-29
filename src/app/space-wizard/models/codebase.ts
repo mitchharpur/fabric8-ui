@@ -1,9 +1,10 @@
-import { Space } from 'ngx-fabric8-wit';
+import {Space} from "ngx-fabric8-wit";
 
 export class CodebaseType {
   description: string;
 
-  constructor() { }
+  constructor() {
+  }
 
 }
 
@@ -16,7 +17,8 @@ export class CodebaseInfo {
   stack: StackInfo;
   pipeline: PipelineInfo;
 
-  constructor() { }
+  constructor() {
+  }
 
 }
 
@@ -52,27 +54,27 @@ export class SpaceConfigurator {
 
   // TODO:dynamic observable list
   availableProjectTypes: Array<CodebaseType> = [
-    { description: 'Creates a new Obsidian :: QuickStart :: Spring Boot Tomcate - Rest' }
+    {description: 'Creates a new Obsidian :: QuickStart :: Spring Boot Tomcate - Rest'}
   ];
   // TODO:dynamic observable list
   availableStacks: Array<StackInfo> = [
-    { name: 'Django', icon: 'icon-stack-python' },
-    { name: 'From Archetype', icon: 'icon-stack-maven' },
-    { name: 'From Archetype Catalog', icon: 'icon-stack-maven' },
-    { name: 'Funktion', icon: 'icon-stack-funktion' },
-    { name: 'Generic', icon: 'icon-stack-java' },
-    { name: 'Go', icon: 'icon-stack-go' },
-    { name: 'Integration', icon: 'icon-stack-camel' },
-    { name: 'Java Enterprise Archive (EAR)', icon: 'icon-stack-java' },
-    { name: 'Java Library (JAR)', icon: 'icon-stack-java' },
-    { name: 'Java Web Application (WAR)', icon: 'icon-stack-java' },
-    { name: 'Microservice', icon: 'icon-stack-microservice' },
-    { name: 'NodeJS', icon: 'icon-stack-nodejs' },
-    { name: 'Rails', icon: 'icon-stack-rails' },
-    { name: 'Spring Boot', icon: 'icon-stack-spring' },
-    { name: 'Swift', icon: 'icon-stack-swift' },
-    { name: 'Vert.x', icon: 'icon-stack-vertx' },
-    { name: 'Wildfly Swarm', icon: 'icon-stack-wildfly' },
+    {name: 'Django', icon: 'icon-stack-python'},
+    {name: 'From Archetype', icon: 'icon-stack-maven'},
+    {name: 'From Archetype Catalog', icon: 'icon-stack-maven'},
+    {name: 'Funktion', icon: 'icon-stack-funktion'},
+    {name: 'Generic', icon: 'icon-stack-java'},
+    {name: 'Go', icon: 'icon-stack-go'},
+    {name: 'Integration', icon: 'icon-stack-camel'},
+    {name: 'Java Enterprise Archive (EAR)', icon: 'icon-stack-java'},
+    {name: 'Java Library (JAR)', icon: 'icon-stack-java'},
+    {name: 'Java Web Application (WAR)', icon: 'icon-stack-java'},
+    {name: 'Microservice', icon: 'icon-stack-microservice'},
+    {name: 'NodeJS', icon: 'icon-stack-nodejs'},
+    {name: 'Rails', icon: 'icon-stack-rails'},
+    {name: 'Spring Boot', icon: 'icon-stack-spring'},
+    {name: 'Swift', icon: 'icon-stack-swift'},
+    {name: 'Vert.x', icon: 'icon-stack-vertx'},
+    {name: 'Wildfly Swarm', icon: 'icon-stack-wildfly'}
   ];
   // TODO:dynamic observable list
   availablePipelines: Array<PipelineInfo> = [
@@ -87,8 +89,7 @@ export class SpaceConfigurator {
           ]
         }
       ],
-      environments: [
-      ]
+      environments: []
     },
     {
       name: 'Canary Release And Stage',
@@ -105,13 +106,13 @@ export class SpaceConfigurator {
         },
         {
           tasks: [
-            { name: 'rolling upgrade Staging' }
+            {name: 'rolling upgrade Staging'}
           ]
         }
       ],
       environments: [
-        { name: 'testing' },
-        { name: 'staging' }
+        {name: 'testing'},
+        {name: 'staging'}
       ]
 
     },
@@ -120,26 +121,26 @@ export class SpaceConfigurator {
       stages: [
         {
           tasks: [
-            { name: 'canary image' },
-            { name: 'integration test' }
+            {name: 'canary image'},
+            {name: 'integration test'}
           ]
         },
         {
           tasks: [
-            { name: 'rolling upgrade Staging' },
-            { name: 'approve' }
+            {name: 'rolling upgrade Staging'},
+            {name: 'approve'}
           ]
         },
         {
           tasks: [
-            { name: 'rolling upgrade Production' }
+            {name: 'rolling upgrade Production'}
           ]
         }
       ],
       environments: [
-        { name: 'testing' },
-        { name: 'staging' },
-        { name: 'production' }
+        {name: 'testing'},
+        {name: 'staging'},
+        {name: 'production'}
       ]
     },
     {

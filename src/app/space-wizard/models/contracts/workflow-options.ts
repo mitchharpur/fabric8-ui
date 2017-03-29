@@ -1,6 +1,6 @@
-import { IWorkflowStep } from './workflow-step';
-import { IWorkflowStepQuery } from './workflow-step-query';
-import { IWorkflowCallback } from './workflow-callback';
+import {IWorkflowStep} from "./workflow-step";
+import {IWorkflowStepQuery} from "./workflow-step-query";
+import {IWorkflowCallback} from "./workflow-callback";
 /**
  * Defines the shape of the options used to initialize a workflow
  * */

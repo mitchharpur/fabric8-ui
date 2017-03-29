@@ -1,9 +1,9 @@
-import { OpaqueToken } from '@angular/core';
-import { Observable } from 'rxjs/Rx';
-import { IWorkflowOptions } from './workflow-options';
-import { IWorkflowStep } from './workflow-step';
-import { IWorkflowTransition } from './workflow-transition';
-import { IWorkflowTransitionContext } from './workflow-transition-context';
+import {OpaqueToken} from "@angular/core";
+import {Observable} from "rxjs/Rx";
+import {IWorkflowOptions} from "./workflow-options";
+import {IWorkflowStep} from "./workflow-step";
+import {IWorkflowTransition} from "./workflow-transition";
+import {IWorkflowTransitionContext} from "./workflow-transition-context";
 
 export const IWorkflowToken = new OpaqueToken("IWorkflow");
 /**

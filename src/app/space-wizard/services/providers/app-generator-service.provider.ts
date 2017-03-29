@@ -1,12 +1,12 @@
-import { FactoryProvider, ClassProvider, OpaqueToken } from '@angular/core';
+import {ClassProvider, FactoryProvider, OpaqueToken} from "@angular/core";
 
 
-import { IAppGeneratorServiceToken, AppGeneratorService } from '../contracts/app-generator-service'
-import { Fabric8AppGeneratorService } from '../concrete/fabric8-app-generator.service'
-import { MockAppGeneratorService } from '../mocks/mock-app-generator.service'
+import {AppGeneratorService, IAppGeneratorServiceToken} from "../contracts/app-generator-service";
+import {Fabric8AppGeneratorService} from "../concrete/fabric8-app-generator.service";
+import {MockAppGeneratorService} from "../mocks/mock-app-generator.service";
 
-import { IForgeServiceProvider, IForgeService } from '../forge.service'
-import {LoggerFactory} from '../../common/logger'
+import {IForgeService, IForgeServiceProvider} from "../forge.service";
+import {LoggerFactory} from "../../common/logger";
 
 /**
  * When using this provider and you take a dependency on the interface type
@@ -19,12 +19,13 @@ export class IAppGeneratorServiceProvider {
   static get FactoryProvider(): FactoryProvider {
     return {
       provide: IAppGeneratorServiceToken,
-      useFactory: (forge: IForgeService,loggerFactory) => {
-        return new Fabric8AppGeneratorService(forge,loggerFactory);
+      useFactory: (forge: IForgeService, loggerFactory) => {
+        return new Fabric8AppGeneratorService(forge, loggerFactory);
       },
-      deps: [IForgeServiceProvider.InjectToken,LoggerFactory]
-    }
+      deps: [IForgeServiceProvider.InjectToken, LoggerFactory]
+    };
   }
+
   static get MockFactoryProvider(): FactoryProvider {
     return {
       provide: IAppGeneratorServiceToken,
@@ -33,8 +34,9 @@ export class IAppGeneratorServiceProvider {
       },
       deps: [LoggerFactory]
 
-    }
+    };
   }
+
   static get InjectToken(): OpaqueToken {
     return IAppGeneratorServiceToken;
   }
@@ -53,34 +55,36 @@ export class FieldSetServiceProvider {
     return {
       provide: AppGeneratorService,
       useClass: Fabric8AppGeneratorService
-    }
+    };
   }
+
   static get MockClassProvider(): ClassProvider {
     return {
       provide: AppGeneratorService,
       useClass: MockAppGeneratorService
-    }
+    };
   }
 
   static get FactoryProvider(): FactoryProvider {
     return {
       provide: AppGeneratorService,
-      useFactory: (forge: IForgeService,loggerFactory) => {
-        return new Fabric8AppGeneratorService(forge,loggerFactory);
+      useFactory: (forge: IForgeService, loggerFactory) => {
+        return new Fabric8AppGeneratorService(forge, loggerFactory);
       },
-      deps: [IForgeServiceProvider.InjectToken,LoggerFactory],
+      deps: [IForgeServiceProvider.InjectToken, LoggerFactory],
       multi: false
-    }
+    };
   }
+
   static get MockFactoryProvider(): FactoryProvider {
     return {
       provide: AppGeneratorService,
       useFactory: (loggerFactory) => {
         return new MockAppGeneratorService(loggerFactory);
       },
-      deps:[LoggerFactory],
+      deps: [LoggerFactory],
       multi: false
-    }
+    };
   }
 }
 

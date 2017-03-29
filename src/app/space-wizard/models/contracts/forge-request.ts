@@ -2,6 +2,6 @@ export interface IForgeRequest {
   command: {
     name: string;
     parameters?: [any];
-  }|any;
+  } | any;
   payload?: any
 }

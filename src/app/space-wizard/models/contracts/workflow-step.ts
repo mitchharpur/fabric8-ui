@@ -1,5 +1,5 @@
-import { IWorkflow } from './workflow';
-import { IWorkflowTransitionContext } from './workflow-transition-context';
+import {IWorkflow} from "./workflow";
+import {IWorkflowTransitionContext} from "./workflow-transition-context";
 
 /**
  * Defines the IWorkflowStep contract
