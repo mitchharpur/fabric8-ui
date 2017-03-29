@@ -138,18 +138,3 @@ $wizard-block-header-color: $navbar-default-bg;
   }
 }
 
-.wizard-step-create-space {
-
-  section {
-    //TODO Fix defect : correct cascade should not require !important
-    padding-top: $wizard-padding !important;
-
-  }
-}
-
-.wizard-step-options {
-  section: {
-    padding: $wizard-padding !important;
-
-  }
-}

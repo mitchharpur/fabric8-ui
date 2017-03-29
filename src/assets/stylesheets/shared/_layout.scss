@@ -22,6 +22,46 @@
   }
 }
 
+@mixin create-padding-x-standard-offset() {
+
+    .padding-standard-offset {
+      padding: $grid-gutter-width/2 !important;
+    }
+
+    .padding-top-standard-offset {
+      padding-top: $grid-gutter-width/2 !important;
+    }
+    .padding-left-standard-offset {
+      padding-left: $grid-gutter-width/2 !important;
+    }
+    .padding-right-standard-offset {
+      padding-right: $grid-gutter-width/2 !important;
+    }
+    .padding-bottom-standard-offset {
+      padding-bottom: $grid-gutter-width/2 !important;
+    }
+}
+
+@mixin create-margin-x-standard-offset() {
+    .margin-standard-spacing {
+      margin: $grid-gutter-width/2 !important;
+    }
+
+    .margin-top-standard-offset {
+      margin-top: $grid-gutter-width/2 !important;
+    }
+    .margin-left-standard-offset {
+      margin-left: $grid-gutter-width/2 !important;
+    }
+    .margin-right-standard-offset {
+      margin-right: $grid-gutter-width/2 !important;
+    }
+    .margin-bottom-standard-offset {
+      margin-bottom: $grid-gutter-width/2 !important;
+    }
+}
+
+
 @mixin margin-x($count:15) {
   @for $i from 0 through $count {
     .margin-#{$i} {
@@ -44,6 +84,17 @@
 
 @include padding-x;
 @include margin-x;
+@include create-margin-x-standard-offset();
+@include create-padding-x-standard-offset();
+
+.margin-none
+{
+  margin: 0;
+}
+.padding-none
+{
+  padding: 0;
+}
 
 .width-100
 {
@@ -94,8 +145,6 @@ body
   display:flex;
   font-size:$font-size-base;
 }
-
-
 
 .app{
   @extend .flex-grow-1;
