@@ -1,12 +1,12 @@
-import {Injectable} from "@angular/core";
-import {Headers, Http, RequestOptions, RequestOptionsArgs, Response} from "@angular/http";
+import { Injectable } from "@angular/core";
+import { Headers, Http, RequestOptions, RequestOptionsArgs, Response } from "@angular/http";
 
-import {Observable, Observer} from "rxjs/Rx";
-import {ForgeCommands, ForgeService, IForgeRequest, IForgeResponse} from "../contracts/forge-service";
+import { Observable, Observer } from "rxjs/Rx";
+import { ForgeCommands, ForgeService, IForgeRequest, IForgeResponse } from "../contracts/forge-service";
 
-import {ILoggerDelegate, LoggerFactory} from "../../common/logger";
-import {ApiLocatorService} from "../../../shared/api-locator.service";
-import {AuthenticationService} from "ngx-login-client";
+import { ILoggerDelegate, LoggerFactory } from "../../common/logger";
+import { ApiLocatorService } from "../../../shared/api-locator.service";
+import { AuthenticationService } from "ngx-login-client";
 
 @Injectable()
 export class Fabric8ForgeService extends ForgeService {
@@ -24,9 +24,9 @@ export class Fabric8ForgeService extends ForgeService {
     }
     this.log(`New instance...`);
     this.apiUrl = apiLocator.forgeApiUrl;
-    this.log({message: `forge api is ${this.apiUrl}`, warning: true});
+    this.log({ message: `forge api is ${this.apiUrl}`, warning: true });
     if (this._authService == null) {
-      this.log({message: `Injected AuthenticationService is null`, warning: true});
+      this.log({ message: `Injected AuthenticationService is null`, warning: true });
     }
   }
 
@@ -39,47 +39,41 @@ export class Fabric8ForgeService extends ForgeService {
     } else {
       errorMessage = error.message ? error.message : error.toString();
     }
-    this.log({message: errorMessage, inner: error, error: true});
+    this.log({ message: errorMessage, inner: error, error: true });
     return Observable.throw(errorMessage);
   }
 
-  private addAuthorizationToken(headers: Headers): Observable<void> {
+  private addAuthorizationHeaders(headers: Headers): Observable<void> {
     return Observable.create((s) => {
-      // let tmp = localStorage.getItem('auth_token');
-      // headers.set('Authorization', `Bearer ${tmp}`);
-      // s.next();
 
-      let token = this._authService.getToken();
-      headers.set('Authorization', `Bearer ${token}`);
-      s.next();
+            let token  =  this._authService.getToken();
+            headers.set('Authorization',  `Bearer ${token}`);
+            s.next();
 
-      // this._authService.getOpenShiftToken().subscribe( token => {
-      // headers.set('Authorization', `Bearer ${token}`);
-      //     s.next();
-      // });
     });
   }
 
   private GetCommand(url: string): Observable<IForgeResponse> {
     return Observable.create((observer: Observer<IForgeResponse>) => {
       let headers = new Headers();
-      this.log(`retrieving openshift token`);
-      this.addAuthorizationToken(headers).subscribe(() => {
-        let options = new RequestOptions(<RequestOptionsArgs>{headers: headers});
-        this.log(`forge GET : ${url}`);
-        this.http.get(url, options)
-          .map((response) => {
-            let forgeResponse: IForgeResponse = {payload: response.json()};
-            this.log(`forge GET response : ${url}`);
-            console.dir(forgeResponse.payload);
-            return forgeResponse;
-          })
-          .catch((err) => this.handleError(err))
-          .subscribe((response: IForgeResponse) => {
-            observer.next(response);
-            observer.complete();
-          });
-      });
+      this.log(`retrieving authorization token...`);
+      this.addAuthorizationHeaders(headers)
+        .subscribe(() => {
+          let options = new RequestOptions(<RequestOptionsArgs>{ headers: headers });
+          this.log(`forge GET : ${url}`);
+          this.http.get(url, options)
+            .map((response) => {
+              let forgeResponse: IForgeResponse = { payload: response.json() };
+              this.log(`forge GET response : ${url}`);
+              console.dir(forgeResponse.payload);
+              return forgeResponse;
+            })
+            .catch((err) => this.handleError(err))
+            .subscribe((response: IForgeResponse) => {
+              observer.next(response);
+              observer.complete();
+            });
+        });
     });
   }
 
@@ -87,25 +81,28 @@ export class Fabric8ForgeService extends ForgeService {
     return Observable.create((observer: Observer<IForgeResponse>) => {
       this.log(`forge POST : ${url}`);
       console.dir(body);
-      let headers = new Headers({'Content-Type': 'application/json'});
-      this.addAuthorizationToken(headers);
-      let options = new RequestOptions(<RequestOptionsArgs>{headers: headers});
-      this.http.post(url, body, options)
-        .map((response) => {
-          let forgeResponse: IForgeResponse = {payload: response.json()};
-          this.log(`forge POST response : ${url}`);
-          console.dir(forgeResponse.payload);
-          return forgeResponse;
-        })
-        .catch((err) => this.handleError(err))
-        .subscribe((response: IForgeResponse) => {
-          observer.next(response);
-          observer.complete();
+      let headers = new Headers({ 'Content-Type': 'application/json' });
+      this.log(`retrieving authorization token...`);
+      this.addAuthorizationHeaders(headers)
+        .subscribe(() => {
+          let options = new RequestOptions(<RequestOptionsArgs>{ headers: headers });
+          this.http.post(url, body, options)
+            .map((response) => {
+              let forgeResponse: IForgeResponse = { payload: response.json() };
+              this.log(`forge POST response : ${url}`);
+              console.dir(forgeResponse.payload);
+              return forgeResponse;
+            })
+            .catch((err) => this.handleError(err))
+            .subscribe((response: IForgeResponse) => {
+              observer.next(response);
+              observer.complete();
+            });
         });
     });
   }
 
-  ExecuteCommand(request: IForgeRequest = {command: {name: 'empty'}}): Observable<IForgeResponse> {
+  ExecuteCommand(request: IForgeRequest = { command: { name: 'empty' } }): Observable<IForgeResponse> {
     switch (request.command.name) {
       case ForgeCommands.forgeStarter: {
         request.command.forgeCommandName = 'obsidian-new-project';

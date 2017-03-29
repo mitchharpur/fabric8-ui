@@ -15,6 +15,26 @@ import {
 } from "../../services/app-generator.service";
 
 
+class ForgeWorkflow
+{
+  constructor(private workflow:IWorkflow,private appGeneratorService:IAppGeneratorService){
+
+  }
+  gotoNextStep(){
+    if(this.workflow)
+    {
+      this.workflow.gotoNextStep();
+    }
+  }
+
+  gotoPreviousStep(){
+
+  }
+  finish(){
+
+  }
+}
+
 @Component({
   host: {
     'class': 'wizard-step'
@@ -33,6 +53,8 @@ export class ForgeCommandComponent implements OnInit, OnDestroy, OnChanges {
   private _fieldSet: IFieldSet;
   private _responseHistory: Array<IAppGeneratorResponse>;
   private currentResponse: IAppGeneratorResponse;
+
+  forge:ForgeWorkflow=null;
 
   @Input() title: string = 'Forge Command Wizard';
   @Input() stepName: string = '';
@@ -177,6 +199,7 @@ export class ForgeCommandComponent implements OnInit, OnDestroy, OnChanges {
         this.log(`The workflow property changed value ...`);
         let prev: IWorkflow = change.previousValue;
         let current: IWorkflow = change.currentValue;
+        this.forge=new ForgeWorkflow(current,this._appGeneratorService);
         this.subscribeToWorkflowTransitions(current);
       }
     }
@@ -201,6 +224,49 @@ export class ForgeCommandComponent implements OnInit, OnDestroy, OnChanges {
     this._responseHistory = value;
   };
 
+  private subscribeToWorkflowTransitions2(workflow: IWorkflow) {
+    if (!workflow) {
+      return;
+    }
+    this.log(`Subscribing to workflow transitions ...`);
+    workflow.transitions.subscribe((transition) => {
+      this.log({message: `Subscriber responding to an observed '${transition.direction}' workflow transition: from ${transition.from ? transition.from.name : 'null'} to ${transition.to ? transition.to.name : 'null'}.`});
+      if(this.isTransitioningToThisStep(transition))
+      {
+        switch(transition.direction)
+        {
+          case WorkflowTransitionDirection.NEXT:{
+            // arrived at this point in the workflow as the result of a nextStep transition
+            break;
+          }
+          case WorkflowTransitionDirection.PREVIOUS:{
+            // arrived at this point in the workflow as the result of a previousStep transition
+            break;
+          }
+          case WorkflowTransitionDirection.GO:{
+            // arrived at this point in the workflow as the result of a goToStep transition
+            break;
+          }
+
+        }
+      }
+      if(this.isTransitioningFromThisStep(transition))
+      {
+        switch(transition.direction)
+        {
+          case WorkflowTransitionDirection.NEXT:{
+            // arrived at this point in the workflow as the result of a nextStep transition
+            break;
+          }
+          case WorkflowTransitionDirection.GO:{
+            // arrived at this point in the workflow as the result of a goToStep transition
+            break;
+          }
+
+        }
+      }
+    });
+  }
 
   private subscribeToWorkflowTransitions(workflow: IWorkflow) {
     if (!workflow) {
