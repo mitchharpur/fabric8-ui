@@ -2,7 +2,7 @@
   <div class="row">
     <div class="col-xs-12 wizard-step-title">
       <span></span>
-      <h2>{{title}}</h2>
+      <h2><strong>{{title}}</strong></h2>
       <span (click)="workflow.cancel()" class="glyphicon glyphicon-remove"></span>
     </div>
   </div>
@@ -10,7 +10,7 @@
 <section class="container-fluid padding-top-standard-offset">
   <div class="row">
     <div class="col-xs-12">
-      <div style="min-height:50vh;" class="form-horizontal">
+      <div class="form-horizontal">
         <div class="form-group" *ngFor="let field of fieldSet">
           <label class="control-label col-xs-4">{{field.display.label}}</label>
           <div class="col-xs-8" [ngSwitch]="field.display.inputType" >
