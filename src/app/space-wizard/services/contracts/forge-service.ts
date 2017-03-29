@@ -6,7 +6,8 @@ export { IForgeRequest, IForgeResponse , IForgeValueChoice, IForgeInput, IForgeC
 
 export const ForgeCommands={
   forgeQuickStart:"forge-quick-start",
-  forgeStarter:"forge-starter"
+  forgeStarter:"forge-starter",
+  forgeImportGit:"fabric8-import-git"
 };
 
 /**

@@ -86,27 +86,27 @@ export class SpaceWizardComponent implements OnInit {
   }
 
   ngOnInit() {
-    this.log(`ngInit ...`)
+    this.log(`ngInit ...`);
     this.configureComponentHost();
     this.configurator = this.createSpaceConfigurator();
   }
   /**
    * Helps to spacify wizard step names to prevent typos
-   * */
-  steps={
-    space:"space-step",
-    forge:"forge-step",
-    forgeQuickStart:"forge-quick-start-step",
-    forgeStarter:"forge-starter-step",
-    quickStart:"proto-quickStart-step",
-    stack:"proto-stack-step",
-    pipeline:"pipeline-step"
-
+   */
+  steps = {
+    space: 'space-step',
+    forge: 'forge-step',
+    forgeQuickStart: 'forge-quick-start-step',
+    forgeStarter: 'forge-starter-step',
+    forgeImportGit:'forge-import-git-step'
   };
-  commands={
-    forgeQuickStart:ForgeCommands.forgeQuickStart,
-    forgeStarter:ForgeCommands.forgeStarter,
-  }
+
+  commands = {
+    forgeQuickStart: ForgeCommands.forgeQuickStart,
+    forgeStarter: ForgeCommands.forgeStarter,
+    forgeImportGit:ForgeCommands.forgeImportGit,
+  };
+
   /**
    * Create and initializes a new workflow object.
    * */
@@ -115,13 +115,11 @@ export class SpaceWizardComponent implements OnInit {
     let workflow = this.workflowFactory.create({
       steps: () => {
         return [
-          { name:this.steps.space, index: 0, nextIndex: 1 },
-          { name:this.steps.forge, index: 1, nextIndex: 1 },
-          { name: this.steps.quickStart, index: 2, nextIndex: 3 },
-          { name: this.steps.stack, index: 3, nextIndex: 4 },
-          { name: this.steps.pipeline, index: 4, nextIndex: 4 },
-          { name: this.steps.forgeQuickStart, index: 5, nextIndex: 1 },
-          { name: this.steps.forgeStarter, index: 6, nextIndex: 1 }
+          {name: this.steps.space, index: 0, nextIndex: 1},
+          {name: this.steps.forge, index: 1, nextIndex: 1},
+          {name: this.steps.forgeQuickStart, index: 5, nextIndex: 1},
+          {name: this.steps.forgeStarter, index: 6, nextIndex: 1},
+          {name: this.steps.forgeImportGit, index: 7, nextIndex: 1}
         ];
       },
       firstStep: () => {
@@ -256,6 +254,7 @@ export class SpaceWizardComponent implements OnInit {
 
 
   finish() {
+    this.log(`finish ...`);
     this.router.navigate([
       this.configurator.space.relationalData.creator.attributes.username,
       this.configurator.space.attributes.name

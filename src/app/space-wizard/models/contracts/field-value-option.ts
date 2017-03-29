@@ -1,6 +1,8 @@
 export interface IFieldValueOption {
-  id: string ;
+  id: string;
   description?: string;
+  selected: boolean;
+  visible:boolean
   // other properties
   [key: string]: any;
 }
