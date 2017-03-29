@@ -7,13 +7,13 @@
     </div>
   </div>
 </header>
-<section class="container-fluid">
+<section class="container-fluid padding-top-standard-offset">
   <div class="row">
     <div class="col-xs-12">
       <div style="min-height:50vh;" class="form-horizontal">
         <div class="form-group" *ngFor="let field of fieldSet">
           <label class="control-label col-xs-4">{{field.display.label}}</label>
-          <div class="col-xs-8" [ngSwitch]="field.display.inputType">
+          <div class="col-xs-8" [ngSwitch]="field.display.inputType" >
             <div *ngSwitchCase="'singleInput'" [ngSwitch]="field.valueType">
               <input *ngSwitchCase="'string'" name="{{field.name}}" [(ngModel)]="field.value" type="text"
                      class="form-control" placeholder="{{field.description}}"
@@ -81,13 +81,13 @@
               </div>
               <!--<input [disabled]="fieldOption.selected" style="background-color:transparent; width:3.0rem;margin-left:5px;margin-right:5px; text-align: center; vertical-align: center; display:inline-box; "  type="checkbox" name="{{fieldOption.id}}" [(ngModel)]="fieldOption.selected" class="form-control-" >{{fieldOption.id}}</label>-->
             </div>
+            <div class="errorLabel help-block">
+              <span *ngIf="field.display.message">{{field.display.message.description}}</span>
+              <span
+                *ngIf="!field.display.message && field.display.required">{{field.display.label}} is a required field</span>
+            </div>
+            <span *ngIf="field.display.note"><span class="fa fa-info-circle"></span> <i>{{field.display.note}}</i></span>
           </div>
-          <div class="errorLabel help-block">
-            <span *ngIf="field.display.message">{{field.display.message.description}}</span>
-            <span
-              *ngIf="!field.display.message && field.display.required">{{field.display.label}} is a required field</span>
-          </div>
-          <span *ngIf="field.display.note"><span class="fa fa-info-circle"></span> <i>{{field.display.note}}</i></span>
         </div>
       </div>
     </div>
