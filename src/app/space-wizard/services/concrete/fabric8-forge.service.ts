@@ -115,6 +115,10 @@ export class Fabric8ForgeService extends ForgeService {
         request.command.forgeCommandName = 'obsidian-new-quickstart';
         return this.forgeWorkflowCommandRequest(request);
       }
+      case ForgeCommands.forgeImportGit: {
+        request.command.forgeCommandName = 'fabric8-import-git';
+        return this.forgeWorkflowCommandRequest(request);
+      }
       default: {
         return Observable.empty();
       }
