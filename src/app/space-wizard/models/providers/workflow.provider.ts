@@ -1,9 +1,9 @@
-import { FactoryProvider, ClassProvider,OpaqueToken } from '@angular/core';
+import {ClassProvider, FactoryProvider, OpaqueToken} from "@angular/core";
 
 
-import {IWorkflowToken,IWorkflow} from '../contracts/workflow'
-import {Workflow} from '../concrete/workflow'
-import {LoggerFactory} from '../../common/logger'
+import {IWorkflowToken} from "../contracts/workflow";
+import {Workflow} from "../concrete/workflow";
+import {LoggerFactory} from "../../common/logger";
 
 /**
  * When using this provider and you take a dependency on the interface type
@@ -17,14 +17,15 @@ export class IWorkflowProvider {
   static get FactoryProvider(): FactoryProvider {
     return {
       provide: IWorkflowToken,
-      useFactory:(loggerFactory)=>{
+      useFactory: (loggerFactory) => {
         return new Workflow(loggerFactory);
       },
-      deps:[LoggerFactory]
+      deps: [LoggerFactory]
 
 
     }
   }
+
   static get InjectToken(): OpaqueToken {
     return IWorkflowToken;
   }
@@ -49,10 +50,10 @@ export class WorkflowProvider {
   static get FactoryProvider(): FactoryProvider {
     return {
       provide: Workflow,
-      useFactory: (loggerFactory)=>{
+      useFactory: (loggerFactory) => {
         return new Workflow(loggerFactory);
       },
-      deps:[LoggerFactory],
+      deps: [LoggerFactory],
       multi: false
     }
   }

@@ -1,4 +1,4 @@
-import { WorkflowDirection } from './workflow-direction';
+import {WorkflowDirection} from "./workflow-direction";
 /**
  * Defined options to expose transition direction constants for ease of use
  * */

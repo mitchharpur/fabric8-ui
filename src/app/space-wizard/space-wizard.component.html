@@ -17,8 +17,9 @@
               <div class="form-group">
                 <label for="name" class="control-label col-xs-4">Name</label>
                 <div class="col-xs-8">
-                  <input id="name" name="name" type="text" class="form-control" placeholder="Enter a unique name for your space" [(ngModel)]="configurator.space.name"
-                    #name="ngModel" required uniqueSpaceName validSpaceName />
+                  <input id="name" name="name" type="text" class="form-control"
+                         placeholder="Enter a unique name for your space" [(ngModel)]="configurator.space.name"
+                         #name="ngModel" required uniqueSpaceName validSpaceName/>
                   <div *ngIf="name.errors && (name.dirty || name.touched)" class="alert alert-danger">
                     <div [hidden]="!name.errors.required">
                       Name is required
@@ -30,7 +31,8 @@
                       Name cannot be more than {{name.errors.maxLength?.max}} characters long.
                     </div>
                     <div [hidden]="!name.errors.unique">
-                      Name '{{name.errors.unique?.requestedName}}'' is already in use as {{name.errors.unique?.existingSpace.relationalData.creator.attributes.username}}/{{name.errors.unique?.existingSpace.attributes.name}}.
+                      Name '{{name.errors.unique?.requestedName}}'' is already in use as
+                      {{name.errors.unique?.existingSpace.relationalData.creator.attributes.username}}/{{name.errors.unique?.existingSpace.attributes.name}}.
                     </div>
                     <div [hidden]="!name.errors.invalid">
                       Name must contain only letters (upper case or lower case), numbers, underscores (_) or hyphens(-).
@@ -41,9 +43,10 @@
               <div class="form-group">
                 <label class="control-label col-xs-4 ">Development Process</label>
                 <div class="col-xs-8">
-                  <select class="form-control" id="developmentProcess" [(ngModel)]="configurator.space.process" name="developmentProcess">
-                        <option *ngFor="let p of dummy.processTemplates" [ngValue]="p">{{p.name}}</option>
-                    </select>
+                  <select class="form-control" id="developmentProcess" [(ngModel)]="configurator.space.process"
+                          name="developmentProcess">
+                    <option *ngFor="let p of dummy.processTemplates" [ngValue]="p">{{p.name}}</option>
+                  </select>
                 </div>
               </div>
               <div class="form-group">
@@ -51,7 +54,8 @@
                   {{configurator.space.process.description}}
                 </div>
                 <div class="col-xs-8 col-xs-offset-4">
-                  This space will be <strong>public</strong>, which means that anyone can access this code and participate
+                  This space will be <strong>public</strong>, which means that anyone can access this code and
+                  participate
                   in creating the product.
                 </div>
               </div>
@@ -62,7 +66,8 @@
       <footer class="container-fluid">
         <div class="row">
           <div class="col-xs-12 wizard-step-tool-bar with-items-at-end">
-            <button class="btn btn-default margin-right-5" type="button" (click)="workflow.gotoNextStep()">Forge</button>
+            <button class="btn btn-default margin-right-5" type="button" (click)="workflow.gotoNextStep()">Forge
+            </button>
             <!--<button  class="btn btn-default margin-right-5" type="button" (click)="workflow.cancel()">Cancel</button>-->
             <button class="btn btn-default" [disabled]="!spaceForm.form.valid" type="submit">Create Space</button>
           </div>
@@ -75,7 +80,8 @@
       <div class="row">
         <div class="col-xs-12 wizard-step-title">
           <div></div>
-          <h2>Your <strong>{{configurator.space.attributes.name}}</strong> Space is ready! What would you like to do ? </h2>
+          <h2>Your <strong>{{configurator.space.attributes.name}}</strong> Space is ready! What would you like to do ?
+          </h2>
           <span (click)="workflow-cancel()" class="glyphicon glyphicon-remove"></span>
         </div>
       </div>
@@ -100,7 +106,8 @@
               <div class="row">
                 <div class="col-xs-12">
                   <div class="button-bar pull-right">
-                    <a class="btn btn-default" (click)="workflow.gotoNextStep({name:steps.forgeImportGit})">Import Code</a>
+                    <a class="btn btn-default" (click)="workflow.gotoNextStep({name:steps.forgeImportGit})">Import
+                      Code</a>
                   </div>
                 </div>
               </div>
@@ -114,7 +121,8 @@
                 <div class="col-xs-12">
                   <div class="button-bar pull-right">
                     <a class="btn btn-default" (click)="workflow.gotoNextStep({name:steps.forgeStarter})">Wizard</a>
-                    <a class="margin-top-5 btn btn-default" (click)="workflow.gotoNextStep({name:steps.forgeQuickStart})">Quick Start</a>
+                    <a class="margin-top-5 btn btn-default"
+                       (click)="workflow.gotoNextStep({name:steps.forgeQuickStart})">Quick Start</a>
                   </div>
                 </div>
               </div>
@@ -127,18 +135,22 @@
     <footer class="container-fluid">
       <div class="row">
         <div class="col-xs-12 wizard-step-tool-bar with-items-in-center">
-          <a class="btn btn-default" (click)="workflow.finish()">No thanks, just take me to {{configurator.space.attributes.name}}</a>
+          <a class="btn btn-default" (click)="workflow.finish()">No thanks, just take me to
+            {{configurator.space.attributes.name}}</a>
         </div>
       </div>
     </footer>
   </div>
-  <forge-command class="wizard-step" [class.active]="workflow.isStepActive({name:steps.forgeStarter})" title="New Project Wizard "
-    commandName="{{commands.forgeStarter}}" stepName="{{steps.forgeStarter}}" [workflow]="workflow">
+  <forge-command class="wizard-step" [class.active]="workflow.isStepActive({name:steps.forgeStarter})"
+                 title="New Project Wizard "
+                 commandName="{{commands.forgeStarter}}" stepName="{{steps.forgeStarter}}" [workflow]="workflow">
   </forge-command>
-  <forge-command class="wizard-step" [class.active]="workflow.isStepActive({name:steps.forgeQuickStart})" title="Quick Start"
-    commandName="{{commands.forgeQuickStart}}" stepName="{{steps.forgeQuickStart}}" [workflow]="workflow">
+  <forge-command class="wizard-step" [class.active]="workflow.isStepActive({name:steps.forgeQuickStart})"
+                 title="Quick Start"
+                 commandName="{{commands.forgeQuickStart}}" stepName="{{steps.forgeQuickStart}}" [workflow]="workflow">
   </forge-command>
-  <forge-command class="wizard-step" [class.active]="workflow.isStepActive({name:steps.forgeImportGit})" title="Import Code"
-    commandName="{{commands.forgeImportGit}}" stepName="{{steps.forgeImportGit}}" [workflow]="workflow">
+  <forge-command class="wizard-step" [class.active]="workflow.isStepActive({name:steps.forgeImportGit})"
+                 title="Import Code"
+                 commandName="{{commands.forgeImportGit}}" stepName="{{steps.forgeImportGit}}" [workflow]="workflow">
   </forge-command>
 </div>

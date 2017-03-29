@@ -1,20 +1,20 @@
-import { OpaqueToken } from '@angular/core';
-import { Observable, Subscriber } from 'rxjs/Rx';
+import {OpaqueToken} from "@angular/core";
+import {Observable} from "rxjs/Rx";
 
-import { IForgeRequest, IForgeResponse } from '../../models/forge';
-export { IForgeRequest, IForgeResponse , IForgeValueChoice, IForgeInput, IForgeCommandPayload } from '../../models/forge';
+import {IForgeRequest, IForgeResponse} from "../../models/forge";
+export {IForgeRequest, IForgeResponse, IForgeValueChoice, IForgeInput, IForgeCommandPayload} from '../../models/forge';
 
-export const ForgeCommands={
-  forgeQuickStart:"forge-quick-start",
-  forgeStarter:"forge-starter",
-  forgeImportGit:"fabric8-import-git"
+export const ForgeCommands = {
+  forgeQuickStart: "forge-quick-start",
+  forgeStarter: "forge-starter",
+  forgeImportGit: "fabric8-import-git"
 };
 
 /**
  * IForgeRequest contract functions as an forge client of sorts
  * Its is responsible for connecting with the api and retrieving
  * command results
-*/
+ */
 export interface IForgeService {
   ExecuteCommand(options: IForgeRequest): Observable<IForgeResponse>
 }
