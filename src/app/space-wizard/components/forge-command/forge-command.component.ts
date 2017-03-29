@@ -298,12 +298,9 @@ export class ForgeCommandComponent implements OnInit, OnDestroy, OnChanges {
                 this.log('command being sent to the app generator service:');
                 this._appGeneratorService.getFieldSet(request).subscribe((response) => {
 
-                  // let fieldSet=response.payload;
-                  // let prevFieldSet = this.fieldSet;
                   if (this.responseHistory.length > 0) {
                     let prevResponse = this.currentResponse;
                     this.responseHistory.push(prevResponse);
-                    // this.responseHistory.push(prevFieldSet);
                     this.log(`Stored fieldset[${prevResponse.payload.length}] into fieldset history ... there are ${this.responseHistory.length} items in history ...`);
                   }
                   this.currentResponse = response;
@@ -314,10 +311,8 @@ export class ForgeCommandComponent implements OnInit, OnDestroy, OnChanges {
             }
             case WorkflowTransitionDirection.PREVIOUS: {
               if (transition.from === transition.to) {
-                // let fieldSet = this.responseHistory.pop();
                 let response = this.responseHistory.pop();
                 this.fieldSet = response.payload;
-                // this.fieldSet = fieldSet;
                 this.log(`Restored fieldset[${response.payload.length}] from fieldset history ... there are ${this.responseHistory.length} items in history ...`);
               }
               break;
