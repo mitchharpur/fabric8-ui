@@ -128,6 +128,7 @@ export class Fabric8AppGeneratorService extends AppGeneratorService {
         display: {
           options: this.mapValueOptions(sourceItem),
           hasOptions: this.mapValueHasOptions(sourceItem),
+
           inputType: this.mapWidgetClassification(sourceItem),
           label: sourceItem.label,
           required: sourceItem.required,
@@ -171,10 +172,22 @@ export class Fabric8AppGeneratorService extends AppGeneratorService {
     if (source.valueChoices) {
       for (let choice of source.valueChoices) {
         if (source.description) {
-          items.push({ id: choice.id, name: choice.description, description: choice.description })
+          items.push({
+            id: choice.id,
+            name: choice.description,
+            description: choice.description ,
+            visible:true,
+            selected:false
+          })
         }
         else {
-          items.push({ id: choice.id, name: choice.id })
+          items.push({
+            id: choice.id,
+            name: choice.id,
+            description: choice.id,
+            visible:true,
+            selected:false
+          })
 
         }
       }
@@ -199,7 +212,7 @@ export class Fabric8AppGeneratorService extends AppGeneratorService {
       }
       case "org.jboss.forge.addon.projects.projectType":
         {
-          return "projectType"
+          return "stackVariant"
         }
       default:
         {

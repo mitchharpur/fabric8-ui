@@ -6,6 +6,7 @@ import { IForgeRequest, IForgeCommandPayload, IForgeResponse, ForgeService, Forg
 
 import { LoggerFactory, ILoggerDelegate } from '../../common/logger';
 import { ApiLocatorService } from '../../../shared/api-locator.service';
+import {AuthenticationService} from 'ngx-login-client'
 
 @Injectable()
 export class Fabric8ForgeService extends ForgeService {
@@ -14,7 +15,7 @@ export class Fabric8ForgeService extends ForgeService {
   private apiUrl: string;
 
 
-  constructor(private http: Http, loggerFactory: LoggerFactory, apiLocator: ApiLocatorService) {
+  constructor(private http: Http, loggerFactory: LoggerFactory, apiLocator: ApiLocatorService, private _authService:AuthenticationService) {
     super()
     let logger = loggerFactory.createLoggerDelegate(this.constructor.name, Fabric8ForgeService.instanceCount++);
     if (logger) {
@@ -23,6 +24,10 @@ export class Fabric8ForgeService extends ForgeService {
     this.log(`New instance...`);
     this.apiUrl = apiLocator.forgeApiUrl;
     this.log({message:`forge api is ${this.apiUrl}`,warning:true});
+    if(this._authService==null)
+    {
+      this.log({message:`Injected AuthenticationService is null`,warning:true});
+    }
   }
 
   private handleError(error): Observable<any> {
@@ -38,30 +43,34 @@ export class Fabric8ForgeService extends ForgeService {
     return Observable.throw(errorMessage);
   }
 
-  private addAuthorizationToken(headers: Headers) {
-    var token = localStorage.getItem('auth_token');
-    if (token) {
-      headers.set('Authorization', "Bearer " + token)
-    }
+  private addAuthorizationToken(headers: Headers): Observable<void> {
+    return Observable.create((s)=>{
+       this._authService.getOpenShiftToken().subscribe(token=>{
+        headers.set('Authorization', `Bearer ${token}`)
+            s.next();
+       })
+    });
   }
   private GetCommand(url: string): Observable<IForgeResponse> {
     return Observable.create((observer: Observer<IForgeResponse>) => {
       let headers = new Headers();
-      this.addAuthorizationToken(headers);
+      this.log(`retrieving openshift token`);
+      this.addAuthorizationToken(headers).subscribe(()=>{
       let options = new RequestOptions(<RequestOptionsArgs>{ headers: headers });
       this.log(`forge GET : ${url}`);
-      this.http.get(url, options)
-        .map((response) => {
-          let forgeResponse: IForgeResponse = { payload: response.json() };
-          this.log(`forge GET response : ${url}`);
-          console.dir(forgeResponse.payload);
-          return forgeResponse;
-        })
-        .catch((err) => this.handleError(err))
-        .subscribe((response: IForgeResponse) => {
-          observer.next(response);
-          observer.complete();
-        })
+        this.http.get(url, options)
+          .map((response) => {
+            let forgeResponse: IForgeResponse = { payload: response.json() };
+            this.log(`forge GET response : ${url}`);
+            console.dir(forgeResponse.payload);
+            return forgeResponse;
+          })
+          .catch((err) => this.handleError(err))
+          .subscribe((response: IForgeResponse) => {
+            observer.next(response);
+            observer.complete();
+          })
+        });
     });
   }
 

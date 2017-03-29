@@ -1,25 +1,37 @@
 import { Component, OnInit, OnChanges, OnDestroy, SimpleChanges, SimpleChange, Input, Output, Inject, EventEmitter } from '@angular/core';
 import { Router } from '@angular/router';
 
-import { IWorkflowStep, IWorkflowTransition, IWorkflow, WorkflowTransitionDirection } from '../../models/workflow';
+import {
+  IWorkflowStep,
+  IWorkflowTransition,
+  IWorkflow,
+  WorkflowTransitionDirection
+} from '../../models/workflow';
 import { LoggerFactory, ILoggerDelegate } from '../../common/logger';
-import { INotifyPropertyChanged } from '../../core/component'
+import { INotifyPropertyChanged } from '../../core/component';
 
-import { IFieldInfo, IFieldSet, IAppGeneratorResponse, IAppGeneratorRequest, IAppGeneratorCommand, IAppGeneratorService, IAppGeneratorServiceProvider } from '../../services/app-generator.service';
+import {
+  IFieldInfo,
+  IFieldSet,
+  IFieldValueOption,
+  IAppGeneratorResponse,
+  IAppGeneratorRequest,
+  IAppGeneratorCommand,
+  IAppGeneratorService,
+  IAppGeneratorServiceProvider
+} from '../../services/app-generator.service';
 
-
-import { IMultiSelectOption, IMultiSelectSettings, IMultiSelectTexts } from 'angular-2-dropdown-multiselect';
 
 @Component({
   host: {
     'class': 'wizard-step'
   },
-  selector: 'wizard-dynamic-step',
-  templateUrl: './wizard-dynamic-step.component.html',
-  styleUrls: ['./wizard-dynamic-step.component.scss'],
+  selector: 'forge-command',
+  templateUrl: './forge-command.component.html',
+  styleUrls: ['./forge-command.component.scss'],
   providers: [IAppGeneratorServiceProvider.FactoryProvider]
 })
-export class WizardDynamicStepComponent implements OnInit, OnDestroy, OnChanges {
+export class ForgeCommandComponent implements OnInit, OnDestroy, OnChanges {
 
   // keep track of the number of instances
   static instanceCount: number = 1;
@@ -35,38 +47,18 @@ export class WizardDynamicStepComponent implements OnInit, OnDestroy, OnChanges 
     this._workflow = value;
   }
 
-  multiSelectSettings: IMultiSelectSettings = {
-    pullRight: false,
-    enableSearch: true,
-    checkedStyle: 'checkboxes',
-    buttonClasses: 'btn btn-default',
-    selectionLimit: 0,
-    closeOnSelect: false,
-    showCheckAll: true,
-    showUncheckAll: true,
-    dynamicTitleMaxItems: 1,
-    maxHeight: '200px',
-  };
-
-  multiSelectTexts: IMultiSelectTexts = {
-    checkAll: 'Check all',
-    uncheckAll: 'Uncheck all',
-    checked: 'checked',
-    checkedPlural: 'checked',
-    searchPlaceholder: 'Search...',
-    defaultTitle: 'Select',
-  };
+  @Input() title: string = 'Forge Command Wizard';
 
 
 
-  @Input() stepName: string = "";
-  @Input() commandName: string = "";
+  @Input() stepName: string = '';
+  @Input() commandName: string = '';
 
   constructor(
     @Inject(IAppGeneratorServiceProvider.InjectToken) private _appGeneratorService: IAppGeneratorService,
     loggerFactory: LoggerFactory
   ) {
-    let logger = loggerFactory.createLoggerDelegate(this.constructor.name, WizardDynamicStepComponent.instanceCount++);
+    let logger = loggerFactory.createLoggerDelegate(this.constructor.name, ForgeCommandComponent.instanceCount++);
     if (logger) {
       this.log = logger;
     }
@@ -84,10 +76,10 @@ export class WizardDynamicStepComponent implements OnInit, OnDestroy, OnChanges 
   }
   /** handle all changes to @Input properties */
   ngOnChanges(changes: SimpleChanges) {
-    this.log(`ngOnChanges ...`)
     for (let propName in changes) {
+      this.log(`ngOnChanges ...${propName}`)
       switch (propName.toLowerCase()) {
-        case "workflow":
+        case 'workflow':
           {
             let change: INotifyPropertyChanged<IWorkflow> = <any>changes[propName];
             this.onWorkflowPropertyChanged(change);
@@ -95,6 +87,67 @@ export class WizardDynamicStepComponent implements OnInit, OnDestroy, OnChanges 
           }
       }
     }
+  }
+
+  allOptionsSelected(field: IFieldInfo): boolean {
+    let item = field.display.options.find((i) => i.selected === false);
+    if (item) {
+      return false;
+    }
+    return true;
+  }
+
+  selectOption(field: IFieldInfo, option: IFieldValueOption) {
+    option.selected = true;
+    this.updateFieldValue(field);
+  }
+  deselectOption(field: IFieldInfo, option: IFieldValueOption) {
+    option.selected = false;
+    this.updateFieldValue(field);
+  }
+  updateFieldValue(field: IFieldInfo): IFieldInfo {
+    if (!field) {
+      return null;
+    }
+    field.value = field.display.options
+      .filter((o) => o.selected)
+      .map((o) => o.id);
+    return field;
+  }
+  filterUnselectedList(field: IFieldInfo, filter: string) {
+    let r = new RegExp(filter || '', 'ig');
+    field.display.options.filter((o) => {
+      o.visible = false;
+      return ((o.id.match(r)) || []).length > 0;
+    })
+      .forEach(o => {
+        o.visible = true;
+      });
+
+  }
+  selectAllOptions(field: IFieldInfo) {
+    field.display.options.forEach((o) => { o.selected = true; })
+  }
+  deselectAllOptions(field: IFieldInfo) {
+    field.display.options.forEach((o) => { o.selected = false; })
+  }
+  toggleSelectAll(field: IFieldInfo) {
+    if (!field) {
+      return;
+    }
+    //at least one not selected, then selec all , else deselect all
+    let item = field.display.options.find((i) => i.selected === false);
+    if (item) {
+      for (let o of field.display.options) {
+        o.selected = true;
+      }
+    }
+    else {
+      for (let o of field.display.options) {
+        o.selected = false;
+      }
+    }
+    this.updateFieldValue(field)
   }
 
   private onWorkflowPropertyChanged(change?: INotifyPropertyChanged<IWorkflow>) {
@@ -158,13 +211,13 @@ export class WizardDynamicStepComponent implements OnInit, OnDestroy, OnChanges 
                         data: null,
                         workflow: {
                           step: {
-                            name: "begin"
+                            name: 'begin'
                           }
                         }
                       }
                     }
                   };
-                  this.log("command being sent to the app generator service:");
+                  this.log('command being sent to the app generator service:');
                   this._appGeneratorService.getFieldSet(request).subscribe((response) => {
 
                     //let fieldSet=response.payload;
@@ -207,7 +260,7 @@ export class WizardDynamicStepComponent implements OnInit, OnDestroy, OnChanges 
                   this.log(`stored fieldset[${prevResponse.payload.length}] into history ... there are ${this.responseHistory.length} items in history ...`);
                   let command = this.currentResponse.context.nextCommand;
                   command.parameters.inputs = this.fieldSet;
-                  this.log("command being sent to the app generator service:");
+                  this.log('command being sent to the app generator service:');
                   console.dir(command);
                   let request: IAppGeneratorRequest = {
                     command: command

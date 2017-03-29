@@ -1,30 +1,26 @@
-import { runtimeConsoleImports } from './../shared/runtime-console/runtime-console';
 import { NgModule } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormsModule } from '@angular/forms';
 
-import { MultiselectDropdownModule } from 'angular-2-dropdown-multiselect';
+import {runtimeConsoleImports} from './../shared/runtime-console/runtime-console';
+import {UniqueSpaceNameValidatorDirective, ValidSpaceNameValidatorDirective} from "ngx-fabric8-wit";
+import { AuthenticationService } from 'ngx-login-client';
 
-import { UniqueSpaceNameValidatorDirective, ValidSpaceNameValidatorDirective } from 'ngx-fabric8-wit';
-
-
-import { SpaceWizardComponent } from './space-wizard.component';
-import { WizardDynamicStepComponent } from './components/wizard-dynamic-step/wizard-dynamic-step.component';
-
-import { IForgeServiceProvider } from './services/forge.service';
-import { LoggerFactory } from './common/logger';
-import { WorkflowFactory, IWorkflowProvider } from './models/workflow'
+import {IForgeServiceProvider} from './services/forge.service';
+import {IWorkflowProvider } from './models/workflow'
+import {ForgeCommandComponent} from './components/forge-command/forge-command.component';
+import {LoggerFactory} from './common/logger';
+import {SpaceWizardComponent} from './space-wizard.component';
+import {WorkflowFactory} from './models/workflow';
 
 @NgModule({
   imports: [
     CommonModule,
-    FormsModule,
-    MultiselectDropdownModule
-
+    FormsModule
   ],
   declarations: [
     SpaceWizardComponent,
-    WizardDynamicStepComponent,
+    ForgeCommandComponent,
     UniqueSpaceNameValidatorDirective,
     ValidSpaceNameValidatorDirective
   ],
@@ -35,7 +31,8 @@ import { WorkflowFactory, IWorkflowProvider } from './models/workflow'
   providers:[
     IForgeServiceProvider.FactoryProvider,
     LoggerFactory,
-    WorkflowFactory
+    WorkflowFactory,
+    AuthenticationService
   ]
 })
 export class SpaceWizardModule {
