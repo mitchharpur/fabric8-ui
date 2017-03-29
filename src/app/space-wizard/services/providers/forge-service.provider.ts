@@ -9,7 +9,7 @@ import {LoggerFactory} from "../../common/logger";
 
 
 import {ApiLocatorService} from "../../../shared/api-locator.service";
-
+import {AuthenticationService} from 'ngx-login-client';
 
 /**
  * When using this provider and you take a dependency on the interface type
@@ -23,10 +23,10 @@ export class IForgeServiceProvider {
   static get FactoryProvider(): FactoryProvider {
     return {
       provide: IForgeServiceToken,
-      useFactory: (loggerFactory, http, apiLocator) => {
-        return new Fabric8ForgeService(http, loggerFactory, apiLocator);
+      useFactory: (loggerFactory, http, apiLocator, authenticationService) => {
+        return new Fabric8ForgeService(http, loggerFactory, apiLocator, authenticationService);
       },
-      deps: [LoggerFactory, Http, ApiLocatorService]
+      deps: [LoggerFactory, Http, ApiLocatorService, AuthenticationService]
     };
   }
 
@@ -72,10 +72,10 @@ export class ForgeServiceProvider {
   static get FactoryProvider(): FactoryProvider {
     return {
       provide: ForgeService,
-      useFactory: (loggerFactory, http, apiLocator) => {
-        return new Fabric8ForgeService(http, loggerFactory, apiLocator);
+      useFactory: (loggerFactory, http, apiLocator, authenticationService) => {
+        return new Fabric8ForgeService(http, loggerFactory, apiLocator, authenticationService);
       },
-      deps: [LoggerFactory, Http, ApiLocatorService],
+      deps: [LoggerFactory, Http, ApiLocatorService, AuthenticationService],
       multi: false
     };
   }
