@@ -45,13 +45,18 @@ export class Fabric8ForgeService extends ForgeService {
 
   private addAuthorizationToken(headers: Headers): Observable<void> {
     return Observable.create((s) => {
-      let tmp = localStorage.getItem('auth_token');
-      headers.set('Authorization', `Bearer ${tmp}`);
-      s.next();
-      //this._authService.getToken().subscribe(token=>{
-      // headers.set('Authorization', `Bearer ${token}`)
-      //     s.next();
-      //})
+      // let tmp = localStorage.getItem('auth_token');
+      // headers.set('Authorization', `Bearer ${tmp}`);
+      // s.next();
+
+      let token = this._authService.getToken();
+      headers.set('Authorization', `Bearer ${token}`);
+      s.next();
+
+      // this._authService.getOpenShiftToken().subscribe( token => {
+      // headers.set('Authorization', `Bearer ${token}`);
+      //     s.next();
+      // });
     });
   }
 
