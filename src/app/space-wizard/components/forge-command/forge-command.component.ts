@@ -14,23 +14,109 @@ import {
   IFieldValueOption
 } from "../../services/app-generator.service";
 
+//
+import {Observable} from 'rxjs/observable';
+import {IForgeCommandData,IForgeState,IForgeCommand } from '../../models/forge'
 
-class ForgeWorkflow
+
+class AppGeneratorForgeCommand
 {
-  constructor(private workflow:IWorkflow,private appGeneratorService:IAppGeneratorService){
+  static instanceCount: number = 1;
+  /** logger delegate delegates logging to a logger */
+  private log: ILoggerDelegate = () => {}
+  workflow:IWorkflow
+
+  constructor(private _appGeneratorService:IAppGeneratorService,loggerFactory: LoggerFactory){
+    this.log = loggerFactory.createLoggerDelegate(this.constructor.name, AppGeneratorForgeCommand.instanceCount++);
+  }
+  private _fieldSet: IFieldSet;
+  private _responseHistory: Array<IAppGeneratorResponse>;
+
+  private currentResponse: IAppGeneratorResponse;
+
+  private get responseHistory(): Array<IAppGeneratorResponse> {
+    this._responseHistory = this._responseHistory || [];
+    return this._responseHistory;
+  };
+
+  private set responseHistory(value: Array<IAppGeneratorResponse>) {
+    this._responseHistory = value;
+  };
+
+  get fieldSet(): IFieldSet {
+    this._fieldSet = this._fieldSet || [];
+    return this._fieldSet;
+  }
+  set fieldSet(value: IFieldSet) {
+    this._fieldSet = value;
+  }
+
+  name:string;
+  state:IForgeState;
+  begin(){
+        let request: IAppGeneratorRequest = {
+          command: {
+            name: `${this.name}`
+          }
+        };
+        this.log('command being sent to the app generator service:');
+        let tmp=this._appGeneratorService.getFieldSet(request).do((response:IAppGeneratorResponse)=>{
+          let nextCommand:IForgeCommand=response.context.nextCommand;
+          let forgeCommandData:IForgeCommandData=nextCommand.parameters.data;
+          this.state=forgeCommandData.state;
+        }).subscribe(response=>{
+            if (this.responseHistory.length > 0) {
+              let prevResponse = this.currentResponse;
+              this.responseHistory.push(prevResponse);
+              this.log(`Stored fieldset[${prevResponse.payload.data.length}] into fieldset history ... there are ${this.responseHistory.length} items in history ...`);
+            }
+            this.currentResponse = response;
+            this.fieldSet = response.payload.data;
+
+        })
+        return tmp;
+  }
+
+  gotoNextStep()
+  {
+      let prevResponse = this.currentResponse;
+      this.responseHistory.push(prevResponse);
+      this.log(`stored fieldset[${prevResponse.payload.data.length}] into history ... there are ${this.responseHistory.length} items in history ...`);
+      let command = this.currentResponse.context.nextCommand;
+      command.parameters.inputs = this.fieldSet;
+      this.log('command being sent to the app generator service:');
+      console.dir(command);
+      let request: IAppGeneratorRequest = {
+        command: command
+      };
+      this._appGeneratorService.getFieldSet(request).subscribe((response) => {
+        this.currentResponse = response;
+
+        this.fieldSet = response.payload.data;
+      });
+      // need a way to say the command is complete
+      // if(this.workflow)
+      // {
+      //   this.workflow.gotoNextStep();
+      // }
+
 
   }
-  gotoNextStep(){
-    if(this.workflow)
-    {
-      this.workflow.gotoNextStep();
-    }
-  }
+
 
   gotoPreviousStep(){
 
+      let response = this.responseHistory.pop();
+      //this.currentResponse=reponse
+      this.fieldSet = response.payload.data;
+      this.log(`Restored fieldset[${response.payload.data.length}] from fieldset history ... there are ${this.responseHistory.length} items in history ...`);
   }
-  finish(){
+  execute(){
+
+    if(this.state && this.state.canExecute)
+    {
+
+    }
 
   }
 }
@@ -54,7 +140,7 @@ export class ForgeCommandComponent implements OnInit, OnDestroy, OnChanges {
   private _responseHistory: Array<IAppGeneratorResponse>;
   private currentResponse: IAppGeneratorResponse;
 
-  forge:ForgeWorkflow=null;
+  forge:AppGeneratorForgeCommand=null;
 
   @Input() title: string = 'Forge Command Wizard';
   @Input() stepName: string = '';
@@ -67,6 +153,7 @@ export class ForgeCommandComponent implements OnInit, OnDestroy, OnChanges {
       this.log = logger;
     }
     this.log(`New instance ...`);
+    this.forge=new AppGeneratorForgeCommand(this._appGeneratorService,loggerFactory);
   }
 
   @Input()
@@ -84,6 +171,8 @@ export class ForgeCommandComponent implements OnInit, OnDestroy, OnChanges {
    * */
   ngOnInit() {
     this.log(`ngOnInit ...`);
+    this.forge.name=this.commandName;
+    this.forge.workflow=this.workflow;
   }
 
   ngOnDestroy() {
@@ -199,7 +288,7 @@ export class ForgeCommandComponent implements OnInit, OnDestroy, OnChanges {
         this.log(`The workflow property changed value ...`);
         let prev: IWorkflow = change.previousValue;
         let current: IWorkflow = change.currentValue;
-        this.forge=new ForgeWorkflow(current,this._appGeneratorService);
+        this.forge.workflow=current;
         this.subscribeToWorkflowTransitions(current);
       }
     }
@@ -224,7 +313,7 @@ export class ForgeCommandComponent implements OnInit, OnDestroy, OnChanges {
     this._responseHistory = value;
   };
 
-  private subscribeToWorkflowTransitions2(workflow: IWorkflow) {
+  private subscribeToWorkflowTransitions(workflow: IWorkflow) {
     if (!workflow) {
       return;
     }
@@ -233,22 +322,33 @@ export class ForgeCommandComponent implements OnInit, OnDestroy, OnChanges {
       this.log({message: `Subscriber responding to an observed '${transition.direction}' workflow transition: from ${transition.from ? transition.from.name : 'null'} to ${transition.to ? transition.to.name : 'null'}.`});
       if(this.isTransitioningToThisStep(transition))
       {
-        switch(transition.direction)
-        {
-          case WorkflowTransitionDirection.NEXT:{
-            // arrived at this point in the workflow as the result of a nextStep transition
-            break;
-          }
-          case WorkflowTransitionDirection.PREVIOUS:{
-            // arrived at this point in the workflow as the result of a previousStep transition
-            break;
-          }
-          case WorkflowTransitionDirection.GO:{
-            // arrived at this point in the workflow as the result of a goToStep transition
-            break;
-          }
+        this.forge.begin()
+        //.subscribe(response=>{
+        //     if (this.responseHistory.length > 0) {
+        //       let prevResponse = this.currentResponse;
+        //       this.responseHistory.push(prevResponse);
+        //       this.log(`Stored fieldset[${prevResponse.payload.length}] into fieldset history ... there are ${this.responseHistory.length} items in history ...`);
+        //     }
+        //     this.currentResponse = response;
+        //     this.fieldSet = response.payload;
 
-        }
+        // })
+        // switch(transition.direction)
+        // {
+        //   case WorkflowTransitionDirection.NEXT:{
+        //     // arrived at this point in the workflow as the result of a nextStep transition
+        //     break;
+        //   }
+        //   case WorkflowTransitionDirection.PREVIOUS:{
+        //     // arrived at this point in the workflow as the result of a previousStep transition
+        //     break;
+        //   }
+        //   case WorkflowTransitionDirection.GO:{
+        //     // arrived at this point in the workflow as the result of a goToStep transition
+        //     break;
+        //   }
+
+        // }
       }
       if(this.isTransitioningFromThisStep(transition))
       {
@@ -268,7 +368,7 @@ export class ForgeCommandComponent implements OnInit, OnDestroy, OnChanges {
     });
   }
 
-  private subscribeToWorkflowTransitions(workflow: IWorkflow) {
+  private subscribeToWorkflowTransitions2(workflow: IWorkflow) {
     if (!workflow) {
       return;
     }

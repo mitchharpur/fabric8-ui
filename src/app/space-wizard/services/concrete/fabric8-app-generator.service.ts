@@ -1,5 +1,5 @@
-import {Inject, Injectable} from "@angular/core";
-import {Observable, Observer} from "rxjs/Rx";
+import { Inject, Injectable } from '@angular/core';
+import { Observable, Observer } from 'rxjs/Rx';
 /** contracts  */
 import {
   AppGeneratorService,
@@ -11,19 +11,21 @@ import {
   IFieldInfo,
   IFieldSet,
   IFieldValueOption
-} from "../contracts/app-generator-service";
+} from '../contracts/app-generator-service';
 /** dependencies */
 import {
-  IForgeCommandPayload,
+  IForgeCommandData,
   IForgeInput,
   IForgeRequest,
+  IForgeCommandRequest,
   IForgeResponse,
+  IForgeCommandResponse,
   IForgeService,
   IForgeServiceProvider
-} from "../forge.service";
+} from '../forge.service';
 
 
-import {ILoggerDelegate, LoggerFactory} from "../../common/logger";
+import { ILoggerDelegate, LoggerFactory } from "../../common/logger";
 
 @Injectable()
 export class Fabric8AppGeneratorService extends AppGeneratorService {
@@ -32,8 +34,8 @@ export class Fabric8AppGeneratorService extends AppGeneratorService {
   private log: ILoggerDelegate = () => {
   };
 
-  constructor(@Inject(IForgeServiceProvider.InjectToken) private forgeService: IForgeService,
-              loggerFactory: LoggerFactory) {
+  constructor( @Inject(IForgeServiceProvider.InjectToken) private forgeService: IForgeService,
+    loggerFactory: LoggerFactory) {
     super();
     let logger = loggerFactory.createLoggerDelegate(this.constructor.name, Fabric8AppGeneratorService.instanceCount++);
     if (logger) {
@@ -44,13 +46,13 @@ export class Fabric8AppGeneratorService extends AppGeneratorService {
 
   getFieldSet(options: IAppGeneratorRequest): Observable<IAppGeneratorResponse> {
     let service: IForgeService = this.forgeService;
-    let observable = this.executeCommand(options)
+    let observable = this.executeForgeCommand(options)
     return observable;
   }
 
   private handleError(err): Observable<any> {
     let errMessage = err.message ? err.message : err.status ? `${err.status} - ${err.statusText}` : 'Server Error';
-    this.log({message: errMessage, inner: err, error: true})
+    this.log({ message: errMessage, inner: err, error: true })
     return Observable.throw(new Error(errMessage));
   }
 
@@ -69,17 +71,23 @@ export class Fabric8AppGeneratorService extends AppGeneratorService {
     return command;
   }
 
-  private executeCommand(options: IAppGeneratorRequest): Observable<IAppGeneratorResponse> {
+  private executeForgeCommand(options: IAppGeneratorRequest): Observable<IAppGeneratorResponse> {
     let command = this.updateForgeInputsWithAppInputs(options.command);
     this.log(`Invoking forge service for command = ${options.command.name} ...`);
     console.dir(command);
     let observable: Observable<IAppGeneratorResponse> = Observable.create((observer: Observer<IAppGeneratorResponse>) => {
-      this.forgeService.ExecuteCommand({
-        command: options.command
-      })
-        .map((fr) => this.updateForgeResponseContext(fr, options.command))
+      options.command = options.command || {};
+      options.command.parameters = options.command.parameters || {};
+      options.command.parameters.pipeline = options.command.parameters.pipeline || {};
+      options.command.parameters.pipeline.stage = options.command.parameters.pipeline.stage || {};
+      options.command.parameters.pipeline.stage.name = options.command.parameters.pipeline.stage.name || 'begin';
+      let commandRequest: IForgeCommandRequest = {
+        payload: {
+          command: options.command
+        }
+      };
+      this.forgeService.executeCommand(commandRequest)
         .map((fr) => this.mapForgeResponseToAppGeneratorResponse(fr))
-        .map((ar) => this.updateAppGeneratorResponseContext(ar))
         .catch((err) => this.handleError(err))
         .subscribe((appGeneratorResponse: IAppGeneratorResponse) => {
           console.dir(appGeneratorResponse);
@@ -90,57 +98,16 @@ export class Fabric8AppGeneratorService extends AppGeneratorService {
     return observable;
   }
 
-  private updateForgeResponseContext(forgeResponse: IForgeResponse, command: any): IForgeResponse {
-    let forgePayload: IForgeCommandPayload = forgeResponse.payload;
-    this.log({message: "Forge Response...", warning: true});
-    console.dir(forgeResponse);
-    let workflow: any = {};
-    if (forgePayload) {
-      // the state we get from forge helps to determine the next workflow steps
-      let forgeState = forgePayload.state
-      if (forgeState.wizard === true) {
-        if (forgeState.canMoveToNextStep === true) {
-          workflow.step = {name: "next", index: 1};
-        }
-        if (forgeState.canExecute === true) {
-          workflow.step = {name: "execute"};
-        }
-        if (forgeState.valid == false) {
-          workflow.step = {name: "validate"};
-        }
-      }
-      else {
-        if (forgeState.canExecute === true) {
-          workflow.step = {name: "execute"};
-        }
-        if (forgeState.valid == false) {
-          workflow.step = {name: "validate"};
-        }
-      }
-    }
-    forgeResponse.context = forgeResponse.context || {};
-    // shape the command that will be used for the next command
-    forgeResponse.context.nextCommand = {
-      name: command.name,
-      parameters: {
-        workflow: workflow || {},
-        data: forgePayload
-      }
-    }
-    return forgeResponse;
-  }
 
-  private updateAppGeneratorResponseContext(response: IAppGeneratorResponse): IAppGeneratorResponse {
-    this.log("updateAppGeneratorResponseContext...")
-    return response;
-  }
+  private mapForgeResponseToAppGeneratorResponse(source: IForgeCommandResponse): IAppGeneratorResponse {
+    let responseData = new FieldSet();
+    this.log('mapForgeResponseToAppGeneratorResponse...');
 
-  private mapForgeResponseToAppGeneratorResponse(source: IForgeResponse): IAppGeneratorResponse {
-    let targetItems = new FieldSet();
-    this.log("mapForgeResponseToAppGeneratorResponse...")
-    source.payload = source.payload || {inputs: []};
-    source.payload.inputs = source.payload.inputs || [];
-    for (let input of source.payload.inputs) {
+    source.payload = source.payload || { data: { inputs: [] } };
+    source.payload.data = source.payload.data || { inputs: [] };
+    source.payload.data.inputs = source.payload.data.inputs || [];
+
+    for (let input of source.payload.data.inputs) {
       let sourceItem: IForgeInput = input;
       let targetItem: IFieldInfo = {
         name: sourceItem.name,
@@ -166,17 +133,17 @@ export class Fabric8AppGeneratorService extends AppGeneratorService {
       if (input.note) {
         targetItem.display.note = input.note;
       }
-      if (source.payload.messages) {
-        for (let message of source.payload.messages) {
+      if (source.payload.data.messages) {
+        for (let message of source.payload.data.messages) {
           if (message.input == input.name) {
             targetItem.display.message = message
           }
         }
       }
-      targetItems.push(targetItem);
+      responseData.push(targetItem);
     }
     let response: IAppGeneratorResponse = {
-      payload: targetItems,
+      payload: {data:responseData},
       context: source.context
     };
     return response;
@@ -219,36 +186,36 @@ export class Fabric8AppGeneratorService extends AppGeneratorService {
 
   private mapFieldValueDataType(source: IForgeInput): string {
     if (!source.valueType) {
-      return "string";
+      return 'string';
     }
     switch ((source.valueType || "").toLowerCase()) {
-      case "java.lang.string": {
-        return "string";
+      case 'java.lang.string': {
+        return 'string';
       }
-      case "java.lang.boolean": {
-        return "boolean";
+      case 'java.lang.boolean': {
+        return 'boolean';
       }
-      case "java.lang.integer": {
-        return "number";
+      case 'java.lang.integer': {
+        return 'number';
       }
-      case "org.jboss.forge.addon.projects.projectType": {
-        return "stackVariant"
+      case 'org.jboss.forge.addon.projects.projectType': {
+        return 'stackVariant';
       }
       default: {
-        return "string";
+        return 'string';
       }
     }
   }
 
   private mapWidgetClassification(source: IForgeInput): FieldWidgetClassification {
-    switch ((source.class || "").toLowerCase()) {
-      case "uiinput": {
+    switch ((source.class || '').toLowerCase()) {
+      case 'uiinput': {
         return FieldWidgetClassificationOptions.SingleInput;
       }
-      case "uiselectone": {
+      case 'uiselectone': {
         return FieldWidgetClassificationOptions.SingleSelection;
       }
-      case "uiselectmany": {
+      case 'uiselectmany': {
         return FieldWidgetClassificationOptions.MultipleSelection;
       }
       default: {
@@ -257,8 +224,8 @@ export class Fabric8AppGeneratorService extends AppGeneratorService {
     }
   }
 
-  private mapFieldSetToRequest(source: IFieldSet): IForgeRequest {
-    return {command: {name}, payload: {}};
+  private mapFieldSetToRequest(source: IFieldSet): IForgeCommandRequest {
+    return { payload: { command: { name: "" } } };
   }
 
 }
