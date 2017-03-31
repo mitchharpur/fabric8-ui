@@ -247,7 +247,7 @@ export class Fabric8ForgeService extends ForgeService {
       nextParameters.data = response.payload.data;
       nextCommand = { name: currentCommand.name, parameters: nextParameters };
     }
-    response.context=response.context||{};
+    response.context = response.context || {};
     response.context.nextCommand = nextCommand;
   }
 

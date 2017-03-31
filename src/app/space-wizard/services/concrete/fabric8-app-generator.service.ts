@@ -8,17 +8,15 @@ import {
   FieldSet,
   FieldWidgetClassification,
   FieldWidgetClassificationOptions,
+  IAppGeneratorForgeCommand,
   IAppGeneratorRequest,
   IAppGeneratorResponse,
-  IAppGeneratorForgeCommand,
-  IAppGeneratorForgeCommandParameters,
   IFieldInfo,
   IFieldSet,
   IFieldValueOption
 } from '../contracts/app-generator-service';
 /** dependencies */
 import {
-  IForgeCommand,
   IForgeCommandRequest,
   IForgeCommandResponse,
   IForgeInput,
@@ -50,9 +48,10 @@ export class Fabric8AppGeneratorService extends AppGeneratorService {
     this.log({ message: errMessage, inner: err, error: true });
     return Observable.throw(new Error(errMessage));
   }
+
   /** updates the parameters.data values with updated values from the parameters.inputs data */
   private updateForgeInputsWithAppInputs(command: IAppGeneratorForgeCommand): any {
-    if (command.parameters && command.parameters.inputs ) {
+    if ( command.parameters && command.parameters.inputs ) {
       for ( let input of command.parameters.inputs ) {
         let field: IFieldInfo = input;
         let data: Array<IForgeInput> = command.parameters.data.inputs;

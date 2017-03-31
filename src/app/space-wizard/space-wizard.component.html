@@ -141,16 +141,16 @@
       </div>
     </footer>
   </div>
-  <forge-command class="wizard-step" [class.active]="workflow.isStepActive({name:steps.forgeStarter})"
+  <forge-app-generator class="wizard-step" [class.active]="workflow.isStepActive({name:steps.forgeStarter})"
                  title="New Project Wizard "
                  commandName="{{commands.forgeStarter}}" stepName="{{steps.forgeStarter}}" [workflow]="workflow">
-  </forge-command>
-  <forge-command class="wizard-step" [class.active]="workflow.isStepActive({name:steps.forgeQuickStart})"
+  </forge-app-generator>
+  <forge-app-generator class="wizard-step" [class.active]="workflow.isStepActive({name:steps.forgeQuickStart})"
                  title="Quick Start"
                  commandName="{{commands.forgeQuickStart}}" stepName="{{steps.forgeQuickStart}}" [workflow]="workflow">
-  </forge-command>
-  <forge-command class="wizard-step" [class.active]="workflow.isStepActive({name:steps.forgeImportGit})"
+  </forge-app-generator>
+  <forge-app-generator class="wizard-step" [class.active]="workflow.isStepActive({name:steps.forgeImportGit})"
                  title="Import Code"
                  commandName="{{commands.forgeImportGit}}" stepName="{{steps.forgeImportGit}}" [workflow]="workflow">
-  </forge-command>
+  </forge-app-generator>
 </div>
