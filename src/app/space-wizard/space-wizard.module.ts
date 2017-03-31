@@ -1,40 +1,40 @@
-import {NgModule} from "@angular/core";
-import {CommonModule} from "@angular/common";
-import {FormsModule} from "@angular/forms";
+import { CommonModule } from '@angular/common';
+import { NgModule } from '@angular/core';
+import { FormsModule } from '@angular/forms';
+import { UniqueSpaceNameValidatorDirective, ValidSpaceNameValidatorDirective } from 'ngx-fabric8-wit';
+import { AuthenticationService } from 'ngx-login-client';
 
-import {runtimeConsoleImports} from "./../shared/runtime-console/runtime-console";
-import {UniqueSpaceNameValidatorDirective, ValidSpaceNameValidatorDirective} from "ngx-fabric8-wit";
-import {AuthenticationService} from "ngx-login-client";
+import { runtimeConsoleImports } from './../shared/runtime-console/runtime-console';
+import { LoggerFactory } from './common/logger';
+import { ForgeCommandComponent } from './components/forge-command/forge-command.component';
+import { WorkflowFactory } from './models/workflow';
 
-import {IForgeServiceProvider} from "./services/forge.service";
-import {WorkflowFactory} from "./models/workflow";
-import {ForgeCommandComponent} from "./components/forge-command/forge-command.component";
-import {LoggerFactory} from "./common/logger";
-import {SpaceWizardComponent} from "./space-wizard.component";
+import { IForgeServiceProvider } from './services/forge.service';
+import { SpaceWizardComponent } from './space-wizard.component';
 
 @NgModule({
-  imports: [
-    CommonModule,
-    FormsModule
-  ],
-  declarations: [
-    SpaceWizardComponent,
-    ForgeCommandComponent,
-    UniqueSpaceNameValidatorDirective,
-    ValidSpaceNameValidatorDirective
-  ],
-  exports: [
-    SpaceWizardComponent,
-    UniqueSpaceNameValidatorDirective
-  ],
-  providers: [
-    IForgeServiceProvider.FactoryProvider,
-    LoggerFactory,
-    WorkflowFactory,
-    AuthenticationService
-  ]
-})
+            imports: [
+              CommonModule,
+              FormsModule
+            ],
+            declarations: [
+              SpaceWizardComponent,
+              ForgeCommandComponent,
+              UniqueSpaceNameValidatorDirective,
+              ValidSpaceNameValidatorDirective
+            ],
+            exports: [
+              SpaceWizardComponent,
+              UniqueSpaceNameValidatorDirective
+            ],
+            providers: [
+              IForgeServiceProvider.FactoryProvider,
+              LoggerFactory,
+              WorkflowFactory,
+              AuthenticationService
+            ]
+          })
 export class SpaceWizardModule {
 
 }
-;
+

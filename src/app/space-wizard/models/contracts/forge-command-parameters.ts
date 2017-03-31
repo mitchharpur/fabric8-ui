@@ -1,10 +1,10 @@
-import { IForgeCommandPipeline } from './forge-command-pipeline';
 import { IForgeCommandData } from './forge-command-data';
+import { IForgeCommandPipeline } from './forge-command-pipeline';
 
 export interface IForgeCommandParameters {
   pipeline: IForgeCommandPipeline;
   commandName?: string;
   data?: IForgeCommandData;
-  //other dynamic fields
+  // Other dynamic fields
   [propertyName: string]: any;
 }

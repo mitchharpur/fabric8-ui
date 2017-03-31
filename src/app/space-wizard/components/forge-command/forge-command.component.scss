@@ -20,18 +20,16 @@
 }
 
 .btn-left-multi-select-button {
-  min-width: auto;
+  min-width: unset;
   border-left-style: none;
   border-top-style: none;
-  border-bottom-style: none;
   border-bottom: solid 2px #efefef;
 }
 
 .btn-right-multi-select-button {
-  min-width: auto;
+  min-width: unset;
   border-right-style: none;
   border-top-style: none;
-  border-bottom-style: none;
   border-bottom: solid 1px #ddd;
 }
 

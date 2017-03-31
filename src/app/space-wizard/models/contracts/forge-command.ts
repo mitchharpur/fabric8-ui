@@ -1,9 +1,8 @@
-import {IForgeCommandParameters} from './forge-command-parameters';
+import { IForgeCommandParameters } from './forge-command-parameters';
 
-export interface IForgeCommand
-{
+export interface IForgeCommand {
   /** The name of the command */
-  name:string;
+  name: string;
   /** The optional parameters required to execute the command */
-  parameters?:IForgeCommandParameters;
+  parameters?: IForgeCommandParameters;
 }

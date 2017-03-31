@@ -1,8 +1,8 @@
-import {IFieldSet} from "./field-set";
+import { IFieldSet } from './field-set';
 
 export interface IAppGeneratorResponse {
   payload: {
-    data:IFieldSet
+    data: IFieldSet
   };
   context?: any;
   /** other dynamic fields */

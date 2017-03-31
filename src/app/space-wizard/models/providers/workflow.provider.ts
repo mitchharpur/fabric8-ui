@@ -1,13 +1,12 @@
-import {ClassProvider, FactoryProvider, OpaqueToken} from "@angular/core";
+import { ClassProvider, FactoryProvider, OpaqueToken } from '@angular/core';
+import { LoggerFactory } from '../../common/logger';
+import { Workflow } from '../concrete/workflow';
 
-
-import {IWorkflowToken} from "../contracts/workflow";
-import {Workflow} from "../concrete/workflow";
-import {LoggerFactory} from "../../common/logger";
+import { IWorkflowToken } from '../contracts/workflow';
 
 /**
  * When using this provider and you take a dependency on the interface type
- * it will be neccesary to use the @inject(IWorkflowProvider.InjectToken)
+ * it will be necessary to use the @inject(IWorkflowProvider.InjectToken)
  * annotation to resolve the dependency. Benefits are that it is a more strict
  * contract first based approach, thus allowing multiple concrete implementations
  * without requiring a base type hierarchy.
@@ -20,10 +19,9 @@ export class IWorkflowProvider {
       useFactory: (loggerFactory) => {
         return new Workflow(loggerFactory);
       },
-      deps: [LoggerFactory]
+      deps: [ LoggerFactory ]
 
-
-    }
+    };
   }
 
   static get InjectToken(): OpaqueToken {
@@ -32,7 +30,7 @@ export class IWorkflowProvider {
 }
 /**
  * These providers uses the abstract base class as a contract as opposed to
- * an interface. The benefits are that it is simpler becaus does not require
+ * an interface. The benefits are that it is simpler because does not require
  * using the @inject annotation to resolved the contract when  a class that
  * takes the service as a dependency. As typescript adds interface reflective
  * capabilities the interface based approach will probably be the preferred
@@ -44,7 +42,7 @@ export class WorkflowProvider {
     return {
       provide: Workflow,
       useClass: Workflow
-    }
+    };
   }
 
   static get FactoryProvider(): FactoryProvider {
@@ -53,9 +51,9 @@ export class WorkflowProvider {
       useFactory: (loggerFactory) => {
         return new Workflow(loggerFactory);
       },
-      deps: [LoggerFactory],
+      deps: [ LoggerFactory ],
       multi: false
-    }
+    };
   }
 }
 

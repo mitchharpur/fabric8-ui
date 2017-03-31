@@ -1,16 +1,15 @@
-import {ClassProvider, FactoryProvider, OpaqueToken} from "@angular/core";
+import { ClassProvider, FactoryProvider, OpaqueToken } from '@angular/core';
+import { LoggerFactory } from '../../common/logger';
+import { Fabric8AppGeneratorService } from '../concrete/fabric8-app-generator.service';
 
+import { AppGeneratorService, IAppGeneratorServiceToken } from '../contracts/app-generator-service';
 
-import {AppGeneratorService, IAppGeneratorServiceToken} from "../contracts/app-generator-service";
-import {Fabric8AppGeneratorService} from "../concrete/fabric8-app-generator.service";
-import {MockAppGeneratorService} from "../mocks/mock-app-generator.service";
-
-import {IForgeService, IForgeServiceProvider} from "../forge.service";
-import {LoggerFactory} from "../../common/logger";
+import { IForgeService, IForgeServiceProvider } from '../forge.service';
+import { MockAppGeneratorService } from '../mocks/mock-app-generator.service';
 
 /**
  * When using this provider and you take a dependency on the interface type
- * it will be neccesary to use the @inject(IAppGeneratorServiceProvider.InjectToken)
+ * it will be necessary to use the @inject(IAppGeneratorServiceProvider.InjectToken)
  * annotation to resolve the dependency. Benefits are that it is a more strict
  * contract first based approach, thus allowing multiple concrete implementations
  * without requiring a base type hierarchy.
@@ -22,7 +21,7 @@ export class IAppGeneratorServiceProvider {
       useFactory: (forge: IForgeService, loggerFactory) => {
         return new Fabric8AppGeneratorService(forge, loggerFactory);
       },
-      deps: [IForgeServiceProvider.InjectToken, LoggerFactory]
+      deps: [ IForgeServiceProvider.InjectToken, LoggerFactory ]
     };
   }
 
@@ -32,7 +31,7 @@ export class IAppGeneratorServiceProvider {
       useFactory: (loggerFactory) => {
         return new MockAppGeneratorService(loggerFactory);
       },
-      deps: [LoggerFactory]
+      deps: [ LoggerFactory ]
 
     };
   }
@@ -43,7 +42,7 @@ export class IAppGeneratorServiceProvider {
 }
 /**
  * These providers uses the abstract base class as a contract as opposed to
- * an interface. The benefits are that it is simpler becaus does not require
+ * an interface. The benefits are that it is simpler because does not require
  * using the @inject annotation to resolved the contract when  a class that
  * takes the service as a dependency. As typescript adds interface reflective
  * capabilities the interface based approach will probably be the preferred
@@ -71,7 +70,7 @@ export class FieldSetServiceProvider {
       useFactory: (forge: IForgeService, loggerFactory) => {
         return new Fabric8AppGeneratorService(forge, loggerFactory);
       },
-      deps: [IForgeServiceProvider.InjectToken, LoggerFactory],
+      deps: [ IForgeServiceProvider.InjectToken, LoggerFactory ],
       multi: false
     };
   }
@@ -82,7 +81,7 @@ export class FieldSetServiceProvider {
       useFactory: (loggerFactory) => {
         return new MockAppGeneratorService(loggerFactory);
       },
-      deps: [LoggerFactory],
+      deps: [ LoggerFactory ],
       multi: false
     };
   }

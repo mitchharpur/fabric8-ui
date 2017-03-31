@@ -1,6 +1,6 @@
-import {IFieldValueOption} from "./field-value-option";
-import {FieldWidgetClassification} from "./field-classification";
-import {IFieldMessage} from "./field-message";
+import { FieldWidgetClassification } from './field-classification';
+import { IFieldMessage } from './field-message';
+import { IFieldValueOption } from './field-value-option';
 
 export interface IFieldInfo {
   name: string;
