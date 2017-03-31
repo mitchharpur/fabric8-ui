@@ -37,9 +37,9 @@ export interface IWorkflow {
   /** Retrieves the first step */
   firstStep(): IWorkflowStep;
   /** Workflow cancel handler */
-  cancel(options: any): any;
+  cancel(options?: any): any;
   /** Workflow finish handler */
-  finish(options: any): any;
+  finish(options?: any): any;
   /** Workflow reset handler */
-  reset(options: any): any;
+  reset(options?: any): any;
 }

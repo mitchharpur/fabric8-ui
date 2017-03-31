@@ -40,17 +40,17 @@ export class Workflow implements IWorkflow {
   }
 
   /** default cancel handler */
-  cancel(options: any): any {
+  cancel(options?: any): any {
     return null;
   }
 
   /** default finish handler */
-  finish(options: any): any {
+  finish(options?: any): any {
     return null;
   }
 
   /** default reset handler */
-  reset(options: any): any {
+  reset(options?: any): any {
     return null;
   }
 

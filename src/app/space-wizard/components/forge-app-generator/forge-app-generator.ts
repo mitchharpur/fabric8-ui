@@ -112,6 +112,22 @@ export class ForgeAppGenerator {
 
   }
 
+  reset() {
+    this.responseHistory = [];
+    this.currentResponse = null;
+    this.fieldSet = [];
+  }
+
+  finish() {
+    this.workflow.finish();
+    this.reset();
+  }
+
+  cancel() {
+    this.reset();
+    this.workflow.cancel();
+  }
+
   /** logger delegate delegates logging to a logger */
   private log: ILoggerDelegate = () => { };
 
