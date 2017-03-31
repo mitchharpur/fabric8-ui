@@ -16,7 +16,7 @@ import {
   IFieldValueOption
 } from '../../services/app-generator.service';
 
-class AppGeneratorForgeCommand {
+class ForgeAppGenerator {
   static instanceCount: number = 1;
 
   workflow: IWorkflow;
@@ -28,7 +28,7 @@ class AppGeneratorForgeCommand {
   private currentResponse: IAppGeneratorResponse;
 
   constructor(private _appGeneratorService: IAppGeneratorService, loggerFactory: LoggerFactory) {
-    this.log = loggerFactory.createLoggerDelegate(this.constructor.name, AppGeneratorForgeCommand.instanceCount++);
+    this.log = loggerFactory.createLoggerDelegate(this.constructor.name, ForgeAppGenerator.instanceCount++);
   }
 
   private get responseHistory(): Array<IAppGeneratorResponse> {
@@ -57,16 +57,16 @@ class AppGeneratorForgeCommand {
     };
     this.log('command being sent to the app generator service:');
     return this._appGeneratorService.getFieldSet(request)
-    .do((response: IAppGeneratorResponse) => {
+    .subscribe(response => {
+      this.log(`received a response for command = ${request.command.name}`);
       let nextCommand: IForgeCommand = response.context.nextCommand;
       let forgeCommandData: IForgeCommandData = nextCommand.parameters.data;
       this.state = forgeCommandData.state;
-    })
-    .subscribe(response => {
+
       if ( this.responseHistory.length > 0 ) {
         let prevResponse = this.currentResponse;
         this.responseHistory.push(prevResponse);
-        this.log(`Stored fieldset[${prevResponse.payload.data.length}] into fieldset history 
+        this.log(`Stored fieldset[${prevResponse.payload.data.length}] into fieldset history
         ... there are ${this.responseHistory.length} items in history ...`);
       }
       this.currentResponse = response;
@@ -78,7 +78,7 @@ class AppGeneratorForgeCommand {
   gotoNextStep() {
     let prevResponse = this.currentResponse;
     this.responseHistory.push(prevResponse);
-    this.log(`stored fieldset[${prevResponse.payload.data.length}] into history 
+    this.log(`stored fieldset[${prevResponse.payload.data.length}] into history
     ... there are ${this.responseHistory.length} items in history ...`);
     let command = this.currentResponse.context.nextCommand;
     command.parameters.inputs = this.fieldSet;
@@ -105,7 +105,7 @@ class AppGeneratorForgeCommand {
 
     let response = this.responseHistory.pop();
     this.fieldSet = response.payload.data;
-    this.log(`Restored fieldset[${response.payload.data.length}] from fieldset history 
+    this.log(`Restored fieldset[${response.payload.data.length}] from fieldset history
     ... there are ${this.responseHistory.length} items in history ...`);
   }
 
@@ -136,7 +136,7 @@ export class ForgeCommandComponent implements OnInit, OnDestroy, OnChanges {
   // keep track of the number of instances
   static instanceCount: number = 1;
 
-  public forge: AppGeneratorForgeCommand = null;
+  public forge: ForgeAppGenerator = null;
   @Input() title: string = 'Forge Command Wizard';
   @Input() stepName: string = '';
   @Input() commandName: string = '';
@@ -154,7 +154,7 @@ export class ForgeCommandComponent implements OnInit, OnDestroy, OnChanges {
       this.log = logger;
     }
     this.log(`New instance ...`);
-    this.forge = new AppGeneratorForgeCommand(this._appGeneratorService, loggerFactory);
+    this.forge = new ForgeAppGenerator(this._appGeneratorService, loggerFactory);
   }
 
   @Input()
@@ -311,7 +311,7 @@ export class ForgeCommandComponent implements OnInit, OnDestroy, OnChanges {
     this.log(`Subscribing to workflow transitions ...`);
     workflow.transitions.subscribe((transition) => {
       this.log({
-                 message: `Subscriber responding to an observed '${transition.direction}' workflow transition: 
+                 message: `Subscriber responding to an observed '${transition.direction}' workflow transition:
       from ${transition.from ? transition.from.name : 'null'} to ${transition.to ? transition.to.name : 'null'}.`
                });
       if ( this.isTransitioningToThisStep(transition) ) {
@@ -369,7 +369,7 @@ export class ForgeCommandComponent implements OnInit, OnDestroy, OnChanges {
     workflow.transitions.subscribe((transition) => {
       try {
         this.log({
-                   message: `Subscriber responding to an observed '${transition.direction}' workflow transition: 
+                   message: `Subscriber responding to an observed '${transition.direction}' workflow transition:
         from ${transition.from ? transition.from.name : 'null'} to ${transition.to ? transition.to.name : 'null'}.`
                  });
         // entering this step
@@ -398,7 +398,7 @@ export class ForgeCommandComponent implements OnInit, OnDestroy, OnChanges {
                   if ( this.responseHistory.length > 0 ) {
                     let prevResponse = this.currentResponse;
                     this.responseHistory.push(prevResponse);
-                    this.log(`Stored fieldset[${prevResponse.payload.data.length}] into fieldset history 
+                    this.log(`Stored fieldset[${prevResponse.payload.data.length}] into fieldset history
                     ... there are ${this.responseHistory.length} items in history ...`);
                   }
                   this.currentResponse = response;
@@ -411,7 +411,7 @@ export class ForgeCommandComponent implements OnInit, OnDestroy, OnChanges {
               if ( transition.from === transition.to ) {
                 let response = this.responseHistory.pop();
                 this.fieldSet = response.payload.data;
-                this.log(`Restored fieldset[${response.payload.data.length}] from fieldset history 
+                this.log(`Restored fieldset[${response.payload.data.length}] from fieldset history
                 ... there are ${this.responseHistory.length} items in history ...`);
               }
               break;
@@ -430,7 +430,7 @@ export class ForgeCommandComponent implements OnInit, OnDestroy, OnChanges {
                 transition.to = transition.from;
                 let prevResponse = this.currentResponse;
                 this.responseHistory.push(prevResponse);
-                this.log(`stored fieldset[${prevResponse.payload.data.length}] into history 
+                this.log(`stored fieldset[${prevResponse.payload.data.length}] into history
                 ... there are ${this.responseHistory.length} items in history ...`);
                 let command = this.currentResponse.context.nextCommand;
                 command.parameters.inputs = this.fieldSet;

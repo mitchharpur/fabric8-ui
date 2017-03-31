@@ -15,6 +15,8 @@ export {
   IAppGeneratorRequest,
   IAppGeneratorResponse,
   IAppGeneratorCommand,
+  IAppGeneratorForgeCommand,
+  IAppGeneratorForgeCommandParameters,
   FieldWidgetClassificationOptions,
   FieldWidgetClassification,
   IFieldValueOption

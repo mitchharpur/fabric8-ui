@@ -10,12 +10,15 @@ import {
   FieldWidgetClassificationOptions,
   IAppGeneratorRequest,
   IAppGeneratorResponse,
+  IAppGeneratorForgeCommand,
+  IAppGeneratorForgeCommandParameters,
   IFieldInfo,
   IFieldSet,
   IFieldValueOption
 } from '../contracts/app-generator-service';
 /** dependencies */
 import {
+  IForgeCommand,
   IForgeCommandRequest,
   IForgeCommandResponse,
   IForgeInput,
@@ -47,9 +50,9 @@ export class Fabric8AppGeneratorService extends AppGeneratorService {
     this.log({ message: errMessage, inner: err, error: true });
     return Observable.throw(new Error(errMessage));
   }
-
-  private updateForgeInputsWithAppInputs(command: any): any {
-    if ( command.parameters.inputs ) {
+  /** updates the parameters.data values with updated values from the parameters.inputs data */
+  private updateForgeInputsWithAppInputs(command: IAppGeneratorForgeCommand): any {
+    if (command.parameters && command.parameters.inputs ) {
       for ( let input of command.parameters.inputs ) {
         let field: IFieldInfo = input;
         let data: Array<IForgeInput> = command.parameters.data.inputs;
@@ -65,7 +68,7 @@ export class Fabric8AppGeneratorService extends AppGeneratorService {
 
   private executeForgeCommand(options: IAppGeneratorRequest): Observable<IAppGeneratorResponse> {
     let command = this.updateForgeInputsWithAppInputs(options.command);
-    this.log(`Invoking forge service for command = ${options.command.name} ...`);
+    this.log(`App generator invoking the forge service for command = ${options.command.name} ...`);
     console.dir(command);
     return Observable.create((observer: Observer<IAppGeneratorResponse>) => {
       options.command = options.command || {};
@@ -82,6 +85,7 @@ export class Fabric8AppGeneratorService extends AppGeneratorService {
       .map((fr) => this.mapForgeResponseToAppGeneratorResponse(fr))
       .catch((err) => this.handleError(err))
       .subscribe((appGeneratorResponse: IAppGeneratorResponse) => {
+        this.log(`App generator ${command.name} command executed:`);
         console.dir(appGeneratorResponse);
         observer.next(appGeneratorResponse);
         observer.complete();

@@ -34,7 +34,7 @@ export class MockAppGeneratorService extends AppGeneratorService {
         return getSecondFieldSet();
       }
       default: {
-        return AppGeneratorService.createEmptyResponse();
+        return this.createEmptyResponse();
       }
     }
   }

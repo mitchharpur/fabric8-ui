@@ -204,7 +204,7 @@ export class Fabric8ForgeService extends ForgeService {
       }
       default: {
         this.log({
-                   message: `Invalid forge command:${currentCommand.name} 
+                   message: `Invalid forge command:${currentCommand.name}
                    step:${currentParameters.pipeline.stage.name}`,
                    error: true
                  });
@@ -247,6 +247,7 @@ export class Fabric8ForgeService extends ForgeService {
       nextParameters.data = response.payload.data;
       nextCommand = { name: currentCommand.name, parameters: nextParameters };
     }
+    response.context=response.context||{};
     response.context.nextCommand = nextCommand;
   }
 

@@ -4,6 +4,8 @@ export {
   IAppGeneratorResponse,
   IAppGeneratorRequest,
   IAppGeneratorCommand,
+  IAppGeneratorForgeCommand,
+  IAppGeneratorForgeCommandParameters,
   IFieldSet,
   IFieldInfo,
   IFieldValueOption
