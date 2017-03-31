@@ -53,21 +53,25 @@ export class ForgeAppGenerator {
     this.log('command being sent to the app generator service:');
     return this._appGeneratorService.getFieldSet(request)
     .subscribe(response => {
-      this.log(`received a response for command = ${request.command.name}`);
-      let nextCommand: IForgeCommand = response.context.nextCommand;
-      let forgeCommandData: IForgeCommandData = nextCommand.parameters.data;
-      this.state = forgeCommandData.state;
-
-      if ( this.responseHistory.length > 0 ) {
-        let prevResponse = this.currentResponse;
-        this.responseHistory.push(prevResponse);
-        this.log(`Stored fieldset[${prevResponse.payload.data.length}] into fieldset history
-        ... there are ${this.responseHistory.length} items in history ...`);
-      }
-      this.currentResponse = response;
-      this.fieldSet = response.payload.data;
-
+      this.update(request,response);
     });
+  }
+
+  update(request:IAppGeneratorRequest,response:IAppGeneratorResponse)
+  {
+    this.log({message:`received a response for command = ${request.command.name}`,info:true});
+    console.dir(response);
+    let nextCommand: IForgeCommand = response.context.nextCommand;
+    let forgeCommandData: IForgeCommandData = nextCommand.parameters.data;
+    this.state = forgeCommandData.state;
+    if ( this.responseHistory.length > 0 ) {
+      let prevResponse = this.currentResponse;
+      this.responseHistory.push(prevResponse);
+      this.log(`Stored fieldset[${prevResponse.payload.data.length}] into fieldset history
+      ... there are ${this.responseHistory.length} items in history ...`);
+    }
+    this.currentResponse = response;
+    this.fieldSet = response.payload.data;
   }
 
   gotoNextStep() {
@@ -84,9 +88,7 @@ export class ForgeAppGenerator {
     };
     this._appGeneratorService.getFieldSet(request)
     .subscribe((response) => {
-      this.currentResponse = response;
-
-      this.fieldSet = response.payload.data;
+      this.update(request,response);
     });
     // TODO: need a way to be aware that the app generator pipeline is complete
     // if(this.workflow)
