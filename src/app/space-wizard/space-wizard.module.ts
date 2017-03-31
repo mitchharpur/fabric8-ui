@@ -6,7 +6,7 @@ import { AuthenticationService } from 'ngx-login-client';
 
 import { runtimeConsoleImports } from './../shared/runtime-console/runtime-console';
 import { LoggerFactory } from './common/logger';
-import { ForgeCommandComponent } from './components/forge-command/forge-command.component';
+import { ForgeAppGeneratorComponent } from './components/forge-app-generator/forge-app-generator.component';
 import { WorkflowFactory } from './models/workflow';
 
 import { IForgeServiceProvider } from './services/forge.service';
@@ -19,7 +19,7 @@ import { SpaceWizardComponent } from './space-wizard.component';
             ],
             declarations: [
               SpaceWizardComponent,
-              ForgeCommandComponent,
+              ForgeAppGeneratorComponent,
               UniqueSpaceNameValidatorDirective,
               ValidSpaceNameValidatorDirective
             ],
