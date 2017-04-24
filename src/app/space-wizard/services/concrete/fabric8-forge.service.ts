@@ -317,11 +317,12 @@ export class Fabric8ForgeService extends ForgeService {
         let validationPipeline = <IForgeCommandPipeline>validationCommand.parameters.pipeline;
 
         if ( state.wizard === true ) {
-          if ( state.canMoveToNextStep === true ) {
+          // note: should move to next step regardless because validation is a seperate concern
+          // if ( state.canMoveToNextStep === true ) {
             // next command will submit and move to the next step
             nextCommandPipeline.step.name = CommandPipelineStep.next;
             nextCommandPipeline.step.index =  1;
-          }
+          // }
           // validation command will validate the 'current' step
           validationPipeline.step.index = 0;
         }
